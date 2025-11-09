@@ -14,6 +14,7 @@ import {
 } from "firebase/auth";
 import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
 import {
+  AuthError,
   AuthInitializationError,
   AuthConfigurationError,
   AuthValidationError,
@@ -40,7 +41,7 @@ function validateEmail(email: string): boolean {
  */
 function validatePassword(
   password: string,
-  config: Required<Omit<AuthConfig, "onUserCreated" | "onUserUpdated" | "onSignOut">>
+  config: Required<Omit<AuthConfig, "onUserCreated" | "onUserUpdated" | "onSignOut" | "onAccountDeleted">>
 ): { valid: boolean; error?: string } {
   if (password.length < config.minPasswordLength) {
     return {
@@ -82,10 +83,13 @@ function validatePassword(
 
 /**
  * Map Firebase Auth errors to domain errors
+ * Type-safe error mapping
  */
-function mapFirebaseAuthError(error: any): Error {
-  const code = error?.code || "";
-  const message = error?.message || "Authentication failed";
+function mapFirebaseAuthError(error: unknown): Error {
+  // Type guard for Firebase Auth errors
+  const firebaseError = error as { code?: string; message?: string };
+  const code = firebaseError?.code || "";
+  const message = firebaseError?.message || "Authentication failed";
 
   // Firebase Auth error codes
   if (code === "auth/email-already-in-use") {
@@ -150,7 +154,7 @@ export class AuthService implements IAuthService {
   private getAuth(): Auth | null {
     if (!this.auth) {
       /* eslint-disable-next-line no-console */
-      if (__DEV__) {
+      if (typeof __DEV__ !== "undefined" && __DEV__) {
         console.warn("Auth service is not initialized. Call initialize() first.");
       }
       return null;
@@ -173,7 +177,10 @@ export class AuthService implements IAuthService {
     }
 
     // Validate password
-    const passwordValidation = validatePassword(params.password, this.config as any);
+    const passwordValidation = validatePassword(
+      params.password,
+      this.config as Required<Omit<AuthConfig, "onUserCreated" | "onUserUpdated" | "onSignOut" | "onAccountDeleted">>
+    );
     if (!passwordValidation.valid) {
       throw new AuthWeakPasswordError(passwordValidation.error);
     }
@@ -201,14 +208,14 @@ export class AuthService implements IAuthService {
       // Call user created callback if provided
       if (this.config.onUserCreated) {
         try {
-          await this.config.onUserCreated(userCredential.user);
+          await this.config.onUserCreated(userCredential.user, params.username);
         } catch (callbackError) {
           // Don't fail signup if callback fails
         }
       }
 
       return userCredential.user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw mapFirebaseAuthError(error);
     }
   }
@@ -241,7 +248,7 @@ export class AuthService implements IAuthService {
 
       this.isGuestMode = false;
       return userCredential.user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw mapFirebaseAuthError(error);
     }
   }
@@ -269,7 +276,7 @@ export class AuthService implements IAuthService {
           // Don't fail signout if callback fails
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw mapFirebaseAuthError(error);
     }
   }
@@ -359,7 +366,7 @@ export function initializeAuthService(
 export function getAuthService(): AuthService | null {
   if (!authServiceInstance || !authServiceInstance.isInitialized()) {
     /* eslint-disable-next-line no-console */
-    if (__DEV__) {
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
       console.warn(
         "Auth service is not initialized. Call initializeAuthService() first."
       );
