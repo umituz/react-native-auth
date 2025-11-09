@@ -12,7 +12,7 @@ import {
   type User,
   type Auth,
 } from "firebase/auth";
-import type { IAuthService, SignUpParams, SignInParams } from "../application/ports/IAuthService";
+import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
 import {
   AuthInitializationError,
   AuthValidationError,
@@ -22,9 +22,9 @@ import {
   AuthWrongPasswordError,
   AuthUserNotFoundError,
   AuthNetworkError,
-} from "../domain/errors/AuthError";
-import type { AuthConfig } from "../domain/value-objects/AuthConfig";
-import { DEFAULT_AUTH_CONFIG } from "../domain/value-objects/AuthConfig";
+} from "../../domain/errors/AuthError";
+import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
+import { DEFAULT_AUTH_CONFIG } from "../../domain/value-objects/AuthConfig";
 
 /**
  * Validate email format
