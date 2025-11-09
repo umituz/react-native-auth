@@ -15,6 +15,7 @@ import {
 import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
 import {
   AuthInitializationError,
+  AuthConfigurationError,
   AuthValidationError,
   AuthWeakPasswordError,
   AuthInvalidEmailError,
@@ -146,9 +147,13 @@ export class AuthService implements IAuthService {
     return this.auth !== null;
   }
 
-  private getAuth(): Auth {
+  private getAuth(): Auth | null {
     if (!this.auth) {
-      throw new AuthInitializationError();
+      /* eslint-disable-next-line no-console */
+      if (__DEV__) {
+        console.warn("Auth service is not initialized. Call initialize() first.");
+      }
+      return null;
     }
     return this.auth;
   }
@@ -158,6 +163,9 @@ export class AuthService implements IAuthService {
    */
   async signUp(params: SignUpParams): Promise<User> {
     const auth = this.getAuth();
+    if (!auth) {
+      throw new AuthInitializationError("Auth service is not initialized");
+    }
 
     // Validate email
     if (!params.email || !validateEmail(params.email)) {
@@ -210,6 +218,9 @@ export class AuthService implements IAuthService {
    */
   async signIn(params: SignInParams): Promise<User> {
     const auth = this.getAuth();
+    if (!auth) {
+      throw new AuthInitializationError("Auth service is not initialized");
+    }
 
     // Validate email
     if (!params.email || !validateEmail(params.email)) {
@@ -240,6 +251,11 @@ export class AuthService implements IAuthService {
    */
   async signOut(): Promise<void> {
     const auth = this.getAuth();
+    if (!auth) {
+      // If auth is not initialized, just clear guest mode
+      this.isGuestMode = false;
+      return;
+    }
 
     try {
       await firebaseSignOut(auth);
@@ -265,7 +281,7 @@ export class AuthService implements IAuthService {
     const auth = this.getAuth();
 
     // Sign out from Firebase if logged in
-    if (auth.currentUser) {
+    if (auth && auth.currentUser) {
       try {
         await firebaseSignOut(auth);
       } catch (error) {
@@ -298,6 +314,11 @@ export class AuthService implements IAuthService {
    */
   onAuthStateChange(callback: (user: User | null) => void): () => void {
     const auth = this.getAuth();
+    if (!auth) {
+      // Return no-op unsubscribe if auth is not initialized
+      callback(null);
+      return () => {};
+    }
 
     return onAuthStateChanged(auth, (user) => {
       // Don't update if in guest mode
@@ -333,13 +354,17 @@ export function initializeAuthService(
 
 /**
  * Get auth service instance
- * @throws {AuthInitializationError} If service is not initialized
+ * Returns null if service is not initialized (graceful degradation)
  */
-export function getAuthService(): AuthService {
+export function getAuthService(): AuthService | null {
   if (!authServiceInstance || !authServiceInstance.isInitialized()) {
-    throw new AuthInitializationError(
-      "Auth service is not initialized. Call initializeAuthService() first."
-    );
+    /* eslint-disable-next-line no-console */
+    if (__DEV__) {
+      console.warn(
+        "Auth service is not initialized. Call initializeAuthService() first."
+      );
+    }
+    return null;
   }
   return authServiceInstance;
 }

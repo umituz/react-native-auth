@@ -40,8 +40,16 @@ export function useAuth(): UseAuthResult {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
+    const service = getAuthService();
+    if (!service) {
+      // Auth service not initialized
+      setUser(null);
+      setIsGuest(false);
+      setLoading(false);
+      return () => {};
+    }
+
     try {
-      const service = getAuthService();
       const unsubscribe = service.onAuthStateChange((currentUser) => {
         setUser(currentUser);
         setIsGuest(service.getIsGuestMode());
@@ -58,7 +66,7 @@ export function useAuth(): UseAuthResult {
         unsubscribe();
       };
     } catch (error) {
-      // Auth service not initialized
+      // Auth service error
       setUser(null);
       setIsGuest(false);
       setLoading(false);
@@ -68,18 +76,27 @@ export function useAuth(): UseAuthResult {
 
   const signUp = useCallback(async (email: string, password: string, displayName?: string) => {
     const service = getAuthService();
+    if (!service) {
+      throw new Error("Auth service is not initialized");
+    }
     await service.signUp({ email, password, displayName });
     // State will be updated via onAuthStateChange
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const service = getAuthService();
+    if (!service) {
+      throw new Error("Auth service is not initialized");
+    }
     await service.signIn({ email, password });
     // State will be updated via onAuthStateChange
   }, []);
 
   const signOut = useCallback(async () => {
     const service = getAuthService();
+    if (!service) {
+      return;
+    }
     await service.signOut();
     setUser(null);
     setIsGuest(false);
@@ -87,6 +104,10 @@ export function useAuth(): UseAuthResult {
 
   const continueAsGuest = useCallback(async () => {
     const service = getAuthService();
+    if (!service) {
+      setIsGuest(true);
+      return;
+    }
     await service.setGuestMode();
     setUser(null);
     setIsGuest(true);
