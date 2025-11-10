@@ -14,6 +14,7 @@ import {
 } from "firebase/auth";
 import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
 import {
+  AuthError,
   AuthInitializationError,
   AuthConfigurationError,
   AuthValidationError,
@@ -84,6 +85,7 @@ function validatePassword(
  * Map Firebase Auth errors to domain errors
  */
 function mapFirebaseAuthError(error: any): Error {
+  // Extract error code and message
   const code = error?.code || "";
   const message = error?.message || "Authentication failed";
 

@@ -16,6 +16,8 @@ export interface UseAuthResult {
   isGuest: boolean;
   /** Whether user is authenticated */
   isAuthenticated: boolean;
+  /** Current error message */
+  error: string | null;
   /** Sign up function */
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
   /** Sign in function */
@@ -38,6 +40,7 @@ export function useAuth(): UseAuthResult {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const service = getAuthService();
@@ -77,19 +80,37 @@ export function useAuth(): UseAuthResult {
   const signUp = useCallback(async (email: string, password: string, displayName?: string) => {
     const service = getAuthService();
     if (!service) {
-      throw new Error("Auth service is not initialized");
+      const err = "Auth service is not initialized";
+      setError(err);
+      throw new Error(err);
     }
-    await service.signUp({ email, password, displayName });
-    // State will be updated via onAuthStateChange
+    try {
+      setError(null);
+      await service.signUp({ email, password, displayName });
+      // State will be updated via onAuthStateChange
+    } catch (err: any) {
+      const errorMessage = err.message || "Sign up failed";
+      setError(errorMessage);
+      throw err;
+    }
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const service = getAuthService();
     if (!service) {
-      throw new Error("Auth service is not initialized");
+      const err = "Auth service is not initialized";
+      setError(err);
+      throw new Error(err);
     }
-    await service.signIn({ email, password });
-    // State will be updated via onAuthStateChange
+    try {
+      setError(null);
+      await service.signIn({ email, password });
+      // State will be updated via onAuthStateChange
+    } catch (err: any) {
+      const errorMessage = err.message || "Sign in failed";
+      setError(errorMessage);
+      throw err;
+    }
   }, []);
 
   const signOut = useCallback(async () => {
@@ -118,6 +139,7 @@ export function useAuth(): UseAuthResult {
     loading,
     isGuest,
     isAuthenticated: !!user && !isGuest,
+    error,
     signUp,
     signIn,
     signOut,

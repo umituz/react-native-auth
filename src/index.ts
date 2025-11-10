@@ -60,3 +60,17 @@ export {
 export { useAuth } from './presentation/hooks/useAuth';
 export type { UseAuthResult } from './presentation/hooks/useAuth';
 
+// =============================================================================
+// PRESENTATION LAYER - Screens & Navigation
+// =============================================================================
+
+export { LoginScreen } from './presentation/screens/LoginScreen';
+export { RegisterScreen } from './presentation/screens/RegisterScreen';
+export { AuthNavigator } from './presentation/navigation/AuthNavigator';
+export type {
+  AuthStackParamList,
+  AuthNavigatorProps,
+} from './presentation/navigation/AuthNavigator';
+export { AuthLegalLinks } from './presentation/components/AuthLegalLinks';
+export type { AuthLegalLinksProps } from './presentation/components/AuthLegalLinks';
+
