@@ -9,7 +9,6 @@ export interface SignUpParams {
   email: string;
   password: string;
   displayName?: string;
-  username?: string; // Added: Username support for app-specific needs
 }
 
 export interface SignInParams {
