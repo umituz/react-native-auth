@@ -14,6 +14,7 @@ import {
 } from "firebase/auth";
 import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
 import {
+  AuthError,
   AuthInitializationError,
   AuthConfigurationError,
   AuthValidationError,
