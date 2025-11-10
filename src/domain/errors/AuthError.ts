@@ -83,11 +83,3 @@ export class AuthInvalidEmailError extends AuthError {
   }
 }
 
-export class AuthInvalidCredentialError extends AuthError {
-  constructor(message: string = "Invalid email or password") {
-    super(message, "AUTH_INVALID_CREDENTIAL");
-    this.name = "AuthInvalidCredentialError";
-    Object.setPrototypeOf(this, AuthInvalidCredentialError.prototype);
-  }
-}
-
