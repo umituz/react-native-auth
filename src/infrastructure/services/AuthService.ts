@@ -96,9 +96,6 @@ function mapFirebaseAuthError(error: any): Error {
   if (code === "auth/invalid-email") {
     return new AuthInvalidEmailError();
   }
-  if (code === "auth/operation-not-allowed") {
-    return new AuthConfigurationError("Email/password authentication is not enabled");
-  }
   if (code === "auth/weak-password") {
     return new AuthWeakPasswordError();
   }
@@ -116,6 +113,12 @@ function mapFirebaseAuthError(error: any): Error {
   }
   if (code === "auth/too-many-requests") {
     return new AuthError("Too many requests. Please try again later.", "AUTH_TOO_MANY_REQUESTS");
+  }
+  if (code === "auth/configuration-not-found" || code === "auth/app-not-authorized") {
+    return new AuthConfigurationError("Authentication is not properly configured. Please contact support.");
+  }
+  if (code === "auth/operation-not-allowed") {
+    return new AuthConfigurationError("Email/password authentication is not enabled. Please contact support.");
   }
 
   return new AuthError(message, code);

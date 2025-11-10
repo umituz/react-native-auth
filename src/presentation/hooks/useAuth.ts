@@ -6,6 +6,7 @@
 import { useEffect, useState, useCallback } from "react";
 import type { User } from "firebase/auth";
 import { getAuthService } from "../../infrastructure/services/AuthService";
+import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 
 export interface UseAuthResult {
   /** Current authenticated user */

@@ -17,6 +17,7 @@ import { useAuth } from "../hooks/useAuth";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
 import { AuthLegalLinks } from "./AuthLegalLinks";
+import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 
 interface RegisterFormProps {
   onNavigateToLogin: () => void;
@@ -121,7 +122,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         displayName.trim() || undefined,
       );
     } catch (err: any) {
-      const errorMessage = err.message || t("auth.errors.unknownError");
+      const localizationKey = getAuthErrorLocalizationKey(err);
+      const errorMessage = t(localizationKey);
       setLocalError(errorMessage);
     }
   };

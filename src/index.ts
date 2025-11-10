@@ -74,3 +74,9 @@ export type {
 export { AuthLegalLinks } from './presentation/components/AuthLegalLinks';
 export type { AuthLegalLinksProps } from './presentation/components/AuthLegalLinks';
 
+// =============================================================================
+// PRESENTATION LAYER - Utilities
+// =============================================================================
+
+export { getAuthErrorLocalizationKey } from './presentation/utils/getAuthErrorMessage';
+

@@ -11,6 +11,7 @@ import { useAuth } from "../hooks/useAuth";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthDivider } from "./AuthDivider";
 import { AuthLink } from "./AuthLink";
+import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 
 interface LoginFormProps {
   onNavigateToRegister: () => void;
@@ -73,7 +74,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     try {
       await signIn(email.trim(), password);
     } catch (err: any) {
-      const errorMessage = err.message || t("auth.errors.unknownError");
+      const localizationKey = getAuthErrorLocalizationKey(err);
+      const errorMessage = t(localizationKey);
       setLocalError(errorMessage);
     }
   };
