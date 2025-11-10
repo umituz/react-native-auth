@@ -24,6 +24,7 @@ import {
   AuthWrongPasswordError,
   AuthUserNotFoundError,
   AuthNetworkError,
+  AuthInvalidCredentialError,
 } from "../../domain/errors/AuthError";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 import { DEFAULT_AUTH_CONFIG } from "../../domain/value-objects/AuthConfig";
@@ -109,6 +110,9 @@ function mapFirebaseAuthError(error: any): Error {
   }
   if (code === "auth/wrong-password") {
     return new AuthWrongPasswordError();
+  }
+  if (code === "auth/invalid-credential") {
+    return new AuthInvalidCredentialError();
   }
   if (code === "auth/network-request-failed") {
     return new AuthNetworkError();

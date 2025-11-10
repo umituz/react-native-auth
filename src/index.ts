@@ -31,6 +31,7 @@ export {
   AuthEmailAlreadyInUseError,
   AuthWeakPasswordError,
   AuthInvalidEmailError,
+  AuthInvalidCredentialError,
 } from './domain/errors/AuthError';
 
 export type { AuthConfig } from './domain/value-objects/AuthConfig';
