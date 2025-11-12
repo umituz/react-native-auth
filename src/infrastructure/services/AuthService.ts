@@ -204,6 +204,7 @@ export class AuthService implements IAuthService {
       }
 
       // Call user created callback if provided
+      // User state is managed by Firebase Auth's onAuthStateChanged
       if (this.config.onUserCreated) {
         try {
           await this.config.onUserCreated(userCredential.user);
@@ -245,6 +246,17 @@ export class AuthService implements IAuthService {
       );
 
       this.isGuestMode = false;
+
+      // Call analytics callback if provided
+      // User state is managed by Firebase Auth's onAuthStateChanged
+      if (this.config.onSignIn) {
+        try {
+          await this.config.onSignIn("email");
+        } catch (callbackError) {
+          // Don't fail signin if analytics callback fails
+        }
+      }
+
       return userCredential.user;
     } catch (error: any) {
       throw mapFirebaseAuthError(error);
@@ -267,6 +279,7 @@ export class AuthService implements IAuthService {
       this.isGuestMode = false;
 
       // Call sign out callback if provided
+      // User state is managed by Firebase Auth's onAuthStateChanged
       if (this.config.onSignOut) {
         try {
           await this.config.onSignOut();
@@ -295,6 +308,16 @@ export class AuthService implements IAuthService {
     }
 
     this.isGuestMode = true;
+
+    // Call analytics callback if provided
+    // Guest mode state is managed by useAuth hook
+    if (this.config.onGuestModeEnabled) {
+      try {
+        await this.config.onGuestModeEnabled();
+      } catch (callbackError) {
+        // Don't fail guest mode if analytics callback fails
+      }
+    }
   }
 
   /**

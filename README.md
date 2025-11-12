@@ -15,6 +15,7 @@ npm install @umituz/react-native-auth
 - `firebase` >= 11.0.0
 - `react` >= 18.2.0
 - `react-native` >= 0.74.0
+- `@umituz/react-native-firebase-auth` >= 1.0.0 (for Firebase Auth initialization)
 
 ## Features
 
@@ -46,9 +47,10 @@ Initialize the service early in your app (e.g., in `App.tsx`):
 
 ```typescript
 import { initializeAuthService } from '@umituz/react-native-auth';
-import { getFirebaseAuth } from '@umituz/react-native-firebase';
+import { getFirebaseAuth } from '@umituz/react-native-firebase-auth';
 
-// Initialize Firebase first (using @umituz/react-native-firebase)
+// Initialize Firebase App first (using @umituz/react-native-firebase)
+// Then initialize Firebase Auth (using @umituz/react-native-firebase-auth)
 const auth = getFirebaseAuth();
 
 // Initialize auth service
@@ -189,15 +191,16 @@ await authService.setGuestMode();
 3. **Guest Mode**: Use guest mode for offline-first apps that don't require authentication
 4. **User Callbacks**: Use `onUserCreated` and `onSignOut` callbacks for app-specific logic
 
-## Integration with @umituz/react-native-firebase
+## Integration with Firebase Packages
 
-This package works seamlessly with `@umituz/react-native-firebase`:
+This package works seamlessly with Firebase initialization packages:
 
 ```typescript
-import { initializeFirebase, getFirebaseAuth } from '@umituz/react-native-firebase';
+import { initializeFirebase } from '@umituz/react-native-firebase';
+import { initializeFirebaseAuth, getFirebaseAuth } from '@umituz/react-native-firebase-auth';
 import { initializeAuthService } from '@umituz/react-native-auth';
 
-// Initialize Firebase
+// 1. Initialize Firebase App
 const config = {
   apiKey: 'your-api-key',
   authDomain: 'your-project.firebaseapp.com',
@@ -205,10 +208,18 @@ const config = {
 };
 initializeFirebase(config);
 
-// Initialize Auth Service
+// 2. Initialize Firebase Auth
+initializeFirebaseAuth();
+
+// 3. Initialize Auth Service (business logic)
 const auth = getFirebaseAuth();
-initializeAuthService(auth);
+initializeAuthService(auth, {
+  minPasswordLength: 6,
+  // ... other config
+});
 ```
+
+**Note:** This package is provider-agnostic. While it currently uses Firebase Auth, it can be easily adapted to work with Supabase or other authentication providers in the future.
 
 ## License
 

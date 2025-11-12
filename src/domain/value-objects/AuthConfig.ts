@@ -20,9 +20,17 @@ export interface AuthConfig {
   onUserUpdated?: (user: any) => Promise<void> | void;
   /** Callback for sign out cleanup */
   onSignOut?: () => Promise<void> | void;
+  /** Callback for analytics logging on sign in */
+  onSignIn?: (method: string) => Promise<void> | void;
+  /** Callback for analytics logging on guest mode */
+  onGuestModeEnabled?: () => Promise<void> | void;
+  /** Callback for analytics initialization when user authenticates */
+  onAnalyticsInit?: (userId: string) => Promise<void> | void;
+  /** Callback for analytics initialization when guest mode enabled */
+  onAnalyticsInitGuest?: () => Promise<void> | void;
 }
 
-export const DEFAULT_AUTH_CONFIG: Required<Omit<AuthConfig, 'onUserCreated' | 'onUserUpdated' | 'onSignOut'>> = {
+export const DEFAULT_AUTH_CONFIG: Required<Omit<AuthConfig, 'onUserCreated' | 'onUserUpdated' | 'onSignOut' | 'onSignIn' | 'onGuestModeEnabled' | 'onAnalyticsInit' | 'onAnalyticsInitGuest'>> = {
   minPasswordLength: 6,
   requireUppercase: false,
   requireLowercase: false,

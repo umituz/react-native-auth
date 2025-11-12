@@ -1,11 +1,15 @@
 /**
  * useAuth Hook
  * React hook for authentication state management
+ * 
+ * Uses Firebase Auth's built-in state management via useFirebaseAuth hook.
+ * Adds app-specific state (guest mode, error handling) on top of Firebase Auth.
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import type { User } from "firebase/auth";
 import { getAuthService } from "../../infrastructure/services/AuthService";
+import { useFirebaseAuth } from "@umituz/react-native-firebase-auth";
 
 export interface UseAuthResult {
   /** Current authenticated user */
@@ -26,10 +30,17 @@ export interface UseAuthResult {
   signOut: () => Promise<void>;
   /** Continue as guest function */
   continueAsGuest: () => Promise<void>;
+  /** Set error manually (for form validation, etc.) */
+  setError: (error: string | null) => void;
 }
 
 /**
  * Hook for authentication state management
+ * 
+ * Uses Firebase Auth's built-in state management and adds app-specific features:
+ * - Guest mode support
+ * - Error handling
+ * - Loading states
  * 
  * @example
  * ```typescript
@@ -37,47 +48,44 @@ export interface UseAuthResult {
  * ```
  */
 export function useAuth(): UseAuthResult {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Use Firebase Auth's built-in state management
+  const { user: firebaseUser, loading: firebaseLoading } = useFirebaseAuth();
+  
+  // App-specific state
   const [isGuest, setIsGuest] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const prevAuthState = useRef({ isAuthenticated: false, isGuest: false });
 
+  // Sync Firebase Auth user with guest mode
+  const user = isGuest ? null : firebaseUser;
+  const isAuthenticated = !!user && !isGuest;
+
+  // Handle analytics initialization (if callbacks are provided in config)
   useEffect(() => {
-    const service = getAuthService();
-    if (!service) {
-      // Auth service not initialized
-      setUser(null);
+    const authChanged =
+      prevAuthState.current.isAuthenticated !== isAuthenticated ||
+      prevAuthState.current.isGuest !== isGuest;
+
+    // Analytics initialization is handled by AuthService callbacks (onAnalyticsInit, onAnalyticsInitGuest)
+    // This effect is kept for backward compatibility but analytics should be configured via AuthConfig
+
+    // Update previous state
+    prevAuthState.current = { isAuthenticated, isGuest };
+  }, [isAuthenticated, isGuest]);
+
+  // Reset guest mode when user signs in
+  useEffect(() => {
+    if (firebaseUser && isGuest) {
       setIsGuest(false);
-      setLoading(false);
-      return () => {};
     }
+  }, [firebaseUser, isGuest]);
 
-    try {
-      const unsubscribe = service.onAuthStateChange((currentUser) => {
-        setUser(currentUser);
-        setIsGuest(service.getIsGuestMode());
-        setLoading(false);
-      });
-
-      // Set initial state
-      const currentUser = service.getCurrentUser();
-      setUser(currentUser);
-      setIsGuest(service.getIsGuestMode());
-      setLoading(false);
-
-      return () => {
-        unsubscribe();
-      };
-    } catch (error) {
-      // Auth service error
-      setUser(null);
-      setIsGuest(false);
-      setLoading(false);
-      return () => {};
-    }
-  }, []);
-
-  const signUp = useCallback(async (email: string, password: string, displayName?: string) => {
+  const signUp = useCallback(async (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => {
     const service = getAuthService();
     if (!service) {
       const err = "Auth service is not initialized";
@@ -85,13 +93,16 @@ export function useAuth(): UseAuthResult {
       throw new Error(err);
     }
     try {
+      setLoading(true);
       setError(null);
       await service.signUp({ email, password, displayName });
-      // State will be updated via onAuthStateChange
+      // User state is updated by Firebase Auth's onAuthStateChanged
     } catch (err: any) {
       const errorMessage = err.message || "Sign up failed";
       setError(errorMessage);
       throw err;
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -103,13 +114,16 @@ export function useAuth(): UseAuthResult {
       throw new Error(err);
     }
     try {
+      setLoading(true);
       setError(null);
       await service.signIn({ email, password });
-      // State will be updated via onAuthStateChange
+      // User state is updated by Firebase Auth's onAuthStateChanged
     } catch (err: any) {
-      const errorMessage = err.message || "Sign in failed";
+      const errorMessage = err.message || "Failed to sign in";
       setError(errorMessage);
       throw err;
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -118,9 +132,13 @@ export function useAuth(): UseAuthResult {
     if (!service) {
       return;
     }
-    await service.signOut();
-    setUser(null);
-    setIsGuest(false);
+    try {
+      setLoading(true);
+      await service.signOut();
+      // User state is updated by Firebase Auth's onAuthStateChanged
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const continueAsGuest = useCallback(async () => {
@@ -129,21 +147,25 @@ export function useAuth(): UseAuthResult {
       setIsGuest(true);
       return;
     }
-    await service.setGuestMode();
-    setUser(null);
-    setIsGuest(true);
+    try {
+      setLoading(true);
+      await service.setGuestMode();
+      setIsGuest(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   return {
     user,
-    loading,
+    loading: loading || firebaseLoading,
     isGuest,
-    isAuthenticated: !!user && !isGuest,
+    isAuthenticated,
     error,
     signUp,
     signIn,
     signOut,
     continueAsGuest,
+    setError,
   };
 }
-
