@@ -141,7 +141,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             t("auth.displayNamePlaceholder") || "Enter your full name"
           }
           autoCapitalize="words"
-          editable={!loading}
+          disabled={loading}
           state={fieldErrors.displayName ? "error" : "default"}
           helperText={fieldErrors.displayName || undefined}
         />
@@ -155,7 +155,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           placeholder={t("auth.emailPlaceholder")}
           keyboardType="email-address"
           autoCapitalize="none"
-          editable={!loading}
+          disabled={loading}
           state={fieldErrors.email ? "error" : "default"}
           helperText={fieldErrors.email || undefined}
         />
@@ -169,7 +169,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           placeholder={t("auth.passwordPlaceholder")}
           secureTextEntry
           autoCapitalize="none"
-          editable={!loading}
+          disabled={loading}
           state={fieldErrors.password ? "error" : "default"}
           helperText={fieldErrors.password || undefined}
         />
@@ -185,7 +185,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           }
           secureTextEntry
           autoCapitalize="none"
-          editable={!loading}
+          disabled={loading}
           state={fieldErrors.confirmPassword ? "error" : "default"}
           helperText={fieldErrors.confirmPassword || undefined}
         />

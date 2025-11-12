@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-auth",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Authentication service for React Native apps - Secure, type-safe, and production-ready. Provider-agnostic design supports Firebase Auth and can be adapted for Supabase or other providers.",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
