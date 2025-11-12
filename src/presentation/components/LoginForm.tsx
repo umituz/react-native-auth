@@ -100,7 +100,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           placeholder={t("auth.emailPlaceholder")}
           keyboardType="email-address"
           autoCapitalize="none"
-          editable={!loading}
+          disabled={loading}
           state={emailError ? "error" : "default"}
           helperText={emailError || undefined}
         />
@@ -114,7 +114,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           placeholder={t("auth.passwordPlaceholder")}
           secureTextEntry
           autoCapitalize="none"
-          editable={!loading}
+          disabled={loading}
           state={passwordError ? "error" : "default"}
           helperText={passwordError || undefined}
         />
@@ -128,7 +128,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           onPress={handleSignIn}
           disabled={loading || !email.trim() || !password.trim()}
           fullWidth
-          loading={loading}
           style={styles.signInButton}
         >
           {t("auth.signIn")}

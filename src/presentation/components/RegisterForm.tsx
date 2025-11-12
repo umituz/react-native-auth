@@ -204,7 +204,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             !confirmPassword.trim()
           }
           fullWidth
-          loading={loading}
           style={styles.signUpButton}
         >
           {t("auth.signUp")}
