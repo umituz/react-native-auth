@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-theme";
+import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 
 interface AuthFormCardProps {
   children: React.ReactNode;

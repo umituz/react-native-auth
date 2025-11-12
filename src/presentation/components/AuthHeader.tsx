@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-theme";
+import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 import { useLocalization } from "@umituz/react-native-localization";
 
 interface AuthHeaderProps {

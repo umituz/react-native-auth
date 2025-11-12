@@ -6,7 +6,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAppDesignTokens } from "@umituz/react-native-theme";
+import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 
 export const AuthGradientBackground: React.FC = () => {
   const tokens = useAppDesignTokens();

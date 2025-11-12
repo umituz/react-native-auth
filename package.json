@@ -38,7 +38,7 @@
     "@react-navigation/stack": "^6.0.0",
     "@react-navigation/native": "^6.0.0",
     "@umituz/react-native-design-system": "*",
-    "@umituz/react-native-theme": "*",
+    "@umituz/react-native-design-system-theme": "*",
     "@umituz/react-native-localization": "*",
     "@umituz/react-native-validation": "*",
     "@umituz/react-native-storage": "*",

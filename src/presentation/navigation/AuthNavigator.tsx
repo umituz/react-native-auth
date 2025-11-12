@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { useAppDesignTokens } from "@umituz/react-native-theme";
+import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 import { storageRepository } from "@umituz/react-native-storage";
 import { unwrap } from "@umituz/react-native-storage";
 import { LoginScreen } from "../screens/LoginScreen";
