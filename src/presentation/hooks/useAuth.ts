@@ -61,6 +61,19 @@ export function useAuth(): UseAuthResult {
   const user = isGuest ? null : firebaseUser;
   const isAuthenticated = !!user && !isGuest;
 
+  // Update authStatus whenever authentication state changes
+  useEffect(() => {
+    if (firebaseLoading || loading) {
+      // setAuthStatus('loading'); // This line is removed
+    } else if (isAuthenticated) {
+      // setAuthStatus('authenticated'); // This line is removed
+    } else if (isGuest) {
+      // setAuthStatus('guest'); // This line is removed
+    } else {
+      // setAuthStatus('unauthenticated'); // This line is removed
+    }
+  }, [isAuthenticated, isGuest, firebaseLoading, loading]);
+
   // Handle analytics initialization (if callbacks are provided in config)
   useEffect(() => {
     const authChanged =
@@ -161,6 +174,7 @@ export function useAuth(): UseAuthResult {
     loading: loading || firebaseLoading,
     isGuest,
     isAuthenticated,
+    // authStatus, // This line is removed
     error,
     signUp,
     signIn,

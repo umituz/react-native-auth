@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, StyleSheet, Linking } from "react-native";
-import { AtomicButton, AtomicText } from "@umituz/react-native-design-system";
+import { AtomicButton, AtomicText } from "@umituz/react-native-design-system-atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 import { useLocalization } from "@umituz/react-native-localization";
 
@@ -132,6 +132,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
 });
+
+
+
+
+
 
 
 

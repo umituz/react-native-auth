@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicButton } from "@umituz/react-native-design-system-atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 
 interface AuthLinkProps {
@@ -61,6 +61,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
 });
+
+
+
+
+
 
 
 

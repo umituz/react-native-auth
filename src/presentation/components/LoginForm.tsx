@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system-atoms";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useAuth } from "../hooks/useAuth";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";

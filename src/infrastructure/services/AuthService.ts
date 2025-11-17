@@ -27,6 +27,7 @@ import {
 } from "../../domain/errors/AuthError";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 import { DEFAULT_AUTH_CONFIG } from "../../domain/value-objects/AuthConfig";
+import { DeviceEventEmitter } from "react-native";
 
 /**
  * Validate email format
@@ -203,15 +204,8 @@ export class AuthService implements IAuthService {
         }
       }
 
-      // Call user created callback if provided
-      // User state is managed by Firebase Auth's onAuthStateChanged
-      if (this.config.onUserCreated) {
-        try {
-          await this.config.onUserCreated(userCredential.user);
-        } catch (callbackError) {
-          // Don't fail signup if callback fails
-        }
-      }
+      // Emit event for AppNavigator to handle navigation
+      DeviceEventEmitter.emit("user-authenticated", { userId: userCredential.user.uid });
 
       return userCredential.user;
     } catch (error: any) {
@@ -247,15 +241,8 @@ export class AuthService implements IAuthService {
 
       this.isGuestMode = false;
 
-      // Call analytics callback if provided
-      // User state is managed by Firebase Auth's onAuthStateChanged
-      if (this.config.onSignIn) {
-        try {
-          await this.config.onSignIn("email");
-        } catch (callbackError) {
-          // Don't fail signin if analytics callback fails
-        }
-      }
+      // Emit event for AppNavigator to handle navigation
+      DeviceEventEmitter.emit("user-authenticated", { userId: userCredential.user.uid });
 
       return userCredential.user;
     } catch (error: any) {
@@ -278,15 +265,6 @@ export class AuthService implements IAuthService {
       await firebaseSignOut(auth);
       this.isGuestMode = false;
 
-      // Call sign out callback if provided
-      // User state is managed by Firebase Auth's onAuthStateChanged
-      if (this.config.onSignOut) {
-        try {
-          await this.config.onSignOut();
-        } catch (callbackError) {
-          // Don't fail signout if callback fails
-        }
-      }
     } catch (error: any) {
       throw mapFirebaseAuthError(error);
     }
@@ -309,15 +287,6 @@ export class AuthService implements IAuthService {
 
     this.isGuestMode = true;
 
-    // Call analytics callback if provided
-    // Guest mode state is managed by useAuth hook
-    if (this.config.onGuestModeEnabled) {
-      try {
-        await this.config.onGuestModeEnabled();
-      } catch (callbackError) {
-        // Don't fail guest mode if analytics callback fails
-      }
-    }
   }
 
   /**
@@ -368,13 +337,26 @@ let authServiceInstance: AuthService | null = null;
 /**
  * Initialize auth service with Firebase Auth instance
  * Must be called before using any auth methods
+ * 
+ * Uses DEFAULT_AUTH_CONFIG if no config is provided:
+ * - minPasswordLength: 6
+ * - requireUppercase: false
+ * - requireLowercase: false
+ * - requireNumbers: false
+ * - requireSpecialChars: false
+ * 
+ * @param auth - Firebase Auth instance
+ * @param config - Optional auth configuration (defaults to permissive settings)
  */
 export function initializeAuthService(
   auth: Auth,
   config?: AuthConfig
 ): AuthService {
+  // Use default config if not provided (permissive settings for better UX)
+  const finalConfig = config || DEFAULT_AUTH_CONFIG;
+  
   if (!authServiceInstance) {
-    authServiceInstance = new AuthService(config);
+    authServiceInstance = new AuthService(finalConfig);
   }
   authServiceInstance.initialize(auth);
   return authServiceInstance;
