@@ -126,6 +126,14 @@ export { PasswordStrengthIndicator } from './presentation/components/PasswordStr
 export type { PasswordStrengthIndicatorProps } from './presentation/components/PasswordStrengthIndicator';
 export { PasswordMatchIndicator } from './presentation/components/PasswordMatchIndicator';
 export type { PasswordMatchIndicatorProps } from './presentation/components/PasswordMatchIndicator';
+export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
+export type { AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
+
+// =============================================================================
+// PRESENTATION LAYER - Stores
+// =============================================================================
+
+export { useAuthModalStore } from './presentation/stores/authModalStore';
 
 // =============================================================================
 // PRESENTATION LAYER - Utilities

@@ -32,7 +32,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const navigation = useNavigation();
 
   const handleNavigateToLogin = () => {
-    navigation.navigate("Login" as any);
+    navigation.navigate("Login" as never);
   };
 
   return (

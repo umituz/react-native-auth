@@ -20,7 +20,7 @@ export const LoginScreen: React.FC = () => {
   const navigation = useNavigation();
 
   const handleNavigateToRegister = () => {
-    navigation.navigate("Register" as any);
+    navigation.navigate("Register" as never);
   };
 
   return (

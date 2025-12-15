@@ -25,7 +25,9 @@ export interface UseAuthStateResult {
  * Hook for managing authentication state
  */
 export function useAuthState(): UseAuthStateResult {
+  if (__DEV__) console.log("[useAuthState] Hook called");
   const { user: firebaseUser, loading: firebaseLoading } = useFirebaseAuth();
+  if (__DEV__) console.log("[useAuthState] firebaseUser:", firebaseUser?.uid, "firebaseLoading:", firebaseLoading);
   const [isGuest, setIsGuest] = useState(() => {
     const service = getAuthService();
     return service ? service.getIsGuestMode() : false;
