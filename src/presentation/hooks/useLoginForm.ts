@@ -23,9 +23,6 @@ export interface UseLoginFormResult {
   displayError: string | null;
 }
 
-/**
- * Hook for login form logic
- */
 export function useLoginForm(): UseLoginFormResult {
   const { t } = useLocalization();
   const { signIn, loading, error, continueAsGuest } = useAuth();
@@ -36,23 +33,25 @@ export function useLoginForm(): UseLoginFormResult {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const handleEmailChange = useCallback((text: string) => {
-    setEmail(text);
-    if (emailError) setEmailError(null);
-    if (localError) setLocalError(null);
-  }, [emailError, localError]);
+  const handleEmailChange = useCallback(
+    (text: string) => {
+      setEmail(text);
+      if (emailError) setEmailError(null);
+      if (localError) setLocalError(null);
+    },
+    [emailError, localError],
+  );
 
-  const handlePasswordChange = useCallback((text: string) => {
-    setPassword(text);
-    if (passwordError) setPasswordError(null);
-    if (localError) setLocalError(null);
-  }, [passwordError, localError]);
+  const handlePasswordChange = useCallback(
+    (text: string) => {
+      setPassword(text);
+      if (passwordError) setPasswordError(null);
+      if (localError) setLocalError(null);
+    },
+    [passwordError, localError],
+  );
 
   const handleSignIn = useCallback(async () => {
-    /* eslint-disable-next-line no-console */
-    if (__DEV__) {
-      console.log("[useLoginForm] handleSignIn called");
-    }
     setEmailError(null);
     setPasswordError(null);
     setLocalError(null);
@@ -73,29 +72,11 @@ export function useLoginForm(): UseLoginFormResult {
       hasError = true;
     }
 
-    if (hasError) {
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.log("[useLoginForm] Validation errors, returning early");
-      }
-      return;
-    }
+    if (hasError) return;
 
     try {
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.log("[useLoginForm] Calling signIn with email:", email.trim());
-      }
       await signIn(email.trim(), password);
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.log("[useLoginForm] signIn completed successfully");
-      }
-    } catch (err: any) {
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.error("[useLoginForm] signIn error:", err);
-      }
+    } catch (err: unknown) {
       const localizationKey = getAuthErrorLocalizationKey(err);
       const errorMessage = t(localizationKey);
       setLocalError(errorMessage);
@@ -103,39 +84,12 @@ export function useLoginForm(): UseLoginFormResult {
   }, [email, password, t, signIn]);
 
   const handleContinueAsGuest = useCallback(async () => {
-    /* eslint-disable-next-line no-console */
-    if (__DEV__) {
-      console.log("========================================");
-      console.log("[useLoginForm] 🎯 Continue as Guest button PRESSED");
-      console.log("[useLoginForm] Current loading state:", loading);
-      console.log("[useLoginForm] Current error state:", error);
-      console.log("========================================");
-    }
-    
     try {
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.log("[useLoginForm] Calling continueAsGuest() function...");
-      }
-      
       await continueAsGuest();
-      
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.log("[useLoginForm] ✅ continueAsGuest() completed successfully");
-        console.log("[useLoginForm] Current loading state after:", loading);
-      }
-    } catch (err) {
-      /* eslint-disable-next-line no-console */
-      if (__DEV__) {
-        console.error("[useLoginForm] ❌ ERROR in continueAsGuest:", err);
-        console.error("[useLoginForm] Error details:", {
-          message: err instanceof Error ? err.message : String(err),
-          stack: err instanceof Error ? err.stack : undefined,
-        });
-      }
+    } catch {
+      // Silent fail - guest mode should always work
     }
-  }, [continueAsGuest, loading, error]);
+  }, [continueAsGuest]);
 
   const displayError = localError || error;
 
@@ -153,4 +107,3 @@ export function useLoginForm(): UseLoginFormResult {
     displayError,
   };
 }
-

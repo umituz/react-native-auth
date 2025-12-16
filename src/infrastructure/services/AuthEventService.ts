@@ -85,13 +85,11 @@ export class AuthEventService {
   private notifyListeners(event: string, payload: AuthEventPayload): void {
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
-      eventListeners.forEach(listener => {
+      eventListeners.forEach((listener) => {
         try {
           listener(payload);
-        } catch (error) {
-          if (__DEV__) {
-            console.error(`Error in auth event listener for ${event}:`, error);
-          }
+        } catch {
+          // Silent fail for listener errors
         }
       });
     }

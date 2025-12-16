@@ -47,10 +47,8 @@ export interface UseAuthResult {
  * ```
  */
 export function useAuth(): UseAuthResult {
-  if (__DEV__) console.log("[useAuth] Hook called");
   const state = useAuthState();
   const actions = useAuthActions(state);
-  if (__DEV__) console.log("[useAuth] isAuthenticated:", state.isAuthenticated, "isGuest:", state.isGuest);
 
   return {
     user: state.user,

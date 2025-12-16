@@ -134,6 +134,7 @@ export type { AuthBottomSheetProps } from './presentation/components/AuthBottomS
 // =============================================================================
 
 export { useAuthModalStore } from './presentation/stores/authModalStore';
+export type { AuthModalMode } from './presentation/stores/authModalStore';
 
 // =============================================================================
 // PRESENTATION LAYER - Utilities

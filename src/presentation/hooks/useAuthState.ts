@@ -25,9 +25,7 @@ export interface UseAuthStateResult {
  * Hook for managing authentication state
  */
 export function useAuthState(): UseAuthStateResult {
-  if (__DEV__) console.log("[useAuthState] Hook called");
   const { user: firebaseUser, loading: firebaseLoading } = useFirebaseAuth();
-  if (__DEV__) console.log("[useAuthState] firebaseUser:", firebaseUser?.uid, "firebaseLoading:", firebaseLoading);
   const [isGuest, setIsGuest] = useState(() => {
     const service = getAuthService();
     return service ? service.getIsGuestMode() : false;
@@ -44,7 +42,8 @@ export function useAuthState(): UseAuthStateResult {
     return mapToAuthUser(firebaseUser);
   }, [isGuest, firebaseUser?.uid]);
 
-  const isAuthenticated = !!user && !isGuest;
+  // Anonymous users are NOT authenticated - they need to register/login
+  const isAuthenticated = !!user && !isGuest && !user.isAnonymous;
 
   // Keep ref in sync with state
   useEffect(() => {

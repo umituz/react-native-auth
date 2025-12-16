@@ -8,7 +8,12 @@ import { AuthError } from "../../domain/errors/AuthError";
 /**
  * Map AuthError code to localization key
  */
-export function getAuthErrorLocalizationKey(error: Error): string {
+export function getAuthErrorLocalizationKey(error: unknown): string {
+  // Handle non-Error types
+  if (!(error instanceof Error)) {
+    return "auth.errors.unknownError";
+  }
+
   const code = error instanceof AuthError ? error.code : undefined;
 
   // Map error codes to localization keys

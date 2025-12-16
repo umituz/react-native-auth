@@ -19,7 +19,7 @@
 
 import { create } from "zustand";
 
-type AuthModalMode = "login" | "register";
+export type AuthModalMode = "login" | "register";
 
 interface AuthModalState {
   isVisible: boolean;
@@ -28,7 +28,10 @@ interface AuthModalState {
 }
 
 interface AuthModalActions {
-  showAuthModal: (callback?: () => void | Promise<void>) => void;
+  showAuthModal: (
+    callback?: () => void | Promise<void>,
+    mode?: AuthModalMode,
+  ) => void;
   hideAuthModal: () => void;
   setMode: (mode: AuthModalMode) => void;
   executePendingCallback: () => void;
@@ -42,10 +45,10 @@ export const useAuthModalStore = create<AuthModalStore>((set, get) => ({
   mode: "login",
   pendingCallback: null,
 
-  showAuthModal: (callback) => {
+  showAuthModal: (callback, mode = "login" as AuthModalMode) => {
     set({
       isVisible: true,
-      mode: "login",
+      mode,
       pendingCallback: callback || null,
     });
   },

@@ -9,16 +9,13 @@ import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system-at
 import { useLocalization } from "@umituz/react-native-localization";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
-import { AuthDivider } from "./AuthDivider";
 import { AuthLink } from "./AuthLink";
 
 interface LoginFormProps {
   onNavigateToRegister: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
-  onNavigateToRegister,
-}) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) => {
   const { t } = useLocalization();
   const {
     email,
@@ -29,7 +26,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     handleEmailChange,
     handlePasswordChange,
     handleSignIn,
-    handleContinueAsGuest,
     displayError,
   } = useLoginForm();
 
@@ -77,21 +73,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </AtomicButton>
       </View>
 
-      <AuthDivider />
-
-      <View style={styles.buttonContainer}>
-        <AtomicButton
-          variant="outline"
-          onPress={handleContinueAsGuest}
-          disabled={loading}
-          fullWidth
-          style={styles.guestButton}
-          testID="continue-as-guest-button"
-        >
-          {t("auth.continueAsGuest")}
-        </AtomicButton>
-      </View>
-
       <AuthLink
         text={t("auth.dontHaveAccount")}
         linkText={t("auth.createAccount")}
@@ -112,8 +93,4 @@ const styles = StyleSheet.create({
   signInButton: {
     minHeight: 52,
   },
-  guestButton: {
-    minHeight: 52,
-  },
 });
-
