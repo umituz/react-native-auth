@@ -108,6 +108,9 @@ export type { UseAccountManagementReturn } from './presentation/hooks/useAccount
 export { useProfileUpdate } from './presentation/hooks/useProfileUpdate';
 export type { UseProfileUpdateReturn } from './presentation/hooks/useProfileUpdate';
 
+export { useProfileEdit } from './presentation/hooks/useProfileEdit';
+export type { UseProfileEditReturn, ProfileEditFormState } from './presentation/hooks/useProfileEdit';
+
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
 
 // =============================================================================
@@ -118,6 +121,8 @@ export { LoginScreen } from './presentation/screens/LoginScreen';
 export { RegisterScreen } from './presentation/screens/RegisterScreen';
 export { AccountScreen } from './presentation/screens/AccountScreen';
 export type { AccountScreenConfig, AccountScreenProps } from './presentation/screens/AccountScreen';
+export { EditProfileScreen } from './presentation/screens/EditProfileScreen';
+export type { EditProfileConfig, EditProfileScreenProps } from './presentation/screens/EditProfileScreen';
 
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type {
