@@ -6,6 +6,7 @@
 
 import { useMemo } from "react";
 import { useAuth } from "./useAuth";
+import { generateGuestName, type GuestNameConfig } from "../../domain/utils/guestNameGenerator";
 
 export interface UserProfileData {
     displayName: string;
@@ -16,9 +17,9 @@ export interface UserProfileData {
 }
 
 export interface UseUserProfileParams {
-    anonymousDisplayName?: string;
     guestDisplayName?: string;
     accountRoute?: string;
+    guestNameConfig?: GuestNameConfig;
 }
 
 export const useUserProfile = (
@@ -26,9 +27,9 @@ export const useUserProfile = (
 ): UserProfileData | undefined => {
     const { user } = useAuth();
 
-    const anonymousName = params?.anonymousDisplayName || "Anonymous User";
-    const guestName = params?.guestDisplayName || "Guest User";
+    const guestName = params?.guestDisplayName || "Guest";
     const accountRoute = params?.accountRoute || "Account";
+    const nameConfig = params?.guestNameConfig;
 
     return useMemo(() => {
         if (!user) {
@@ -39,7 +40,7 @@ export const useUserProfile = (
 
         if (isAnonymous) {
             return {
-                displayName: anonymousName,
+                displayName: generateGuestName(user.uid, nameConfig),
                 userId: user.uid,
                 isAnonymous: true,
             };
@@ -52,5 +53,5 @@ export const useUserProfile = (
             isAnonymous: false,
             avatarUrl: user.photoURL || undefined,
         };
-    }, [user, anonymousName, guestName, accountRoute]);
+    }, [user, guestName, accountRoute, nameConfig]);
 };

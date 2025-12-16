@@ -113,6 +113,10 @@ export type { UseProfileEditReturn, ProfileEditFormState } from './presentation/
 
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
 
+// Domain Utils - Guest Names
+export { generateGuestName, getGuestDisplayName } from './domain/utils/guestNameGenerator';
+export type { GuestNameConfig } from './domain/utils/guestNameGenerator';
+
 // =============================================================================
 // PRESENTATION LAYER - Screens & Navigation
 // =============================================================================
