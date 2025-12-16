@@ -13,7 +13,6 @@ import {
 } from "@gorhom/bottom-sheet";
 import { useAppDesignTokens } from "@umituz/react-native-design-system-theme";
 import { useLocalization } from "@umituz/react-native-localization";
-import { X } from "lucide-react-native";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
 import { LoginForm } from "./LoginForm";
@@ -105,7 +104,9 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           onPress={handleClose}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <X size={24} color={tokens.colors.textSecondary} />
+          <Text style={[styles.closeIcon, { color: tokens.colors.textSecondary }]}>
+            ✕
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.header}>
@@ -155,6 +156,10 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 8,
     zIndex: 10,
+  },
+  closeIcon: {
+    fontSize: 24,
+    fontWeight: "400",
   },
   header: {
     alignItems: "center",
