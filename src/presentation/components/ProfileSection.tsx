@@ -14,6 +14,7 @@ export interface ProfileSectionConfig {
     isAnonymous: boolean;
     avatarUrl?: string;
     accountSettingsRoute?: string;
+    benefits?: string[]; // App-specific benefits for anonymous users to encourage sign-in
 }
 
 export interface ProfileSectionProps {
@@ -111,6 +112,22 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                         { borderTopColor: tokens.colors.border },
                     ]}
                 >
+                    {/* Benefits List */}
+                    {profile.benefits && profile.benefits.length > 0 && (
+                        <View style={styles.benefitsContainer}>
+                            {profile.benefits.map((benefit, index) => (
+                                <View key={index} style={styles.benefitItem}>
+                                    <Text style={[styles.benefitBullet, { color: tokens.colors.primary }]}>
+                                        ✓
+                                    </Text>
+                                    <Text style={[styles.benefitText, { color: tokens.colors.textSecondary }]}>
+                                        {benefit}
+                                    </Text>
+                                </View>
+                            ))}
+                        </View>
+                    )}
+
                     <TouchableOpacity
                         style={[
                             styles.ctaButton,
@@ -175,6 +192,25 @@ const styles = StyleSheet.create({
         marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
+    },
+    benefitsContainer: {
+        marginBottom: 16,
+        gap: 8,
+    },
+    benefitItem: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        gap: 8,
+    },
+    benefitBullet: {
+        fontSize: 16,
+        fontWeight: "600",
+        marginTop: 2,
+    },
+    benefitText: {
+        flex: 1,
+        fontSize: 14,
+        lineHeight: 20,
     },
     ctaButton: {
         paddingVertical: 12,
