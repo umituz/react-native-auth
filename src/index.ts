@@ -102,12 +102,23 @@ export type { UseAuthResult } from './presentation/hooks/useAuth';
 export { useUserProfile } from './presentation/hooks/useUserProfile';
 export type { UserProfileData, UseUserProfileParams } from './presentation/hooks/useUserProfile';
 
+export { useAccountManagement } from './presentation/hooks/useAccountManagement';
+export type { UseAccountManagementReturn } from './presentation/hooks/useAccountManagement';
+
+export { useProfileUpdate } from './presentation/hooks/useProfileUpdate';
+export type { UseProfileUpdateReturn } from './presentation/hooks/useProfileUpdate';
+
+export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
+
 // =============================================================================
 // PRESENTATION LAYER - Screens & Navigation
 // =============================================================================
 
 export { LoginScreen } from './presentation/screens/LoginScreen';
 export { RegisterScreen } from './presentation/screens/RegisterScreen';
+export { AccountScreen } from './presentation/screens/AccountScreen';
+export type { AccountScreenConfig, AccountScreenProps } from './presentation/screens/AccountScreen';
+
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type {
   AuthStackParamList,
@@ -133,6 +144,8 @@ export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
 export type { AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
 export { ProfileSection } from './presentation/components/ProfileSection';
 export type { ProfileSectionConfig, ProfileSectionProps } from './presentation/components/ProfileSection';
+export { AccountActions } from './presentation/components/AccountActions';
+export type { AccountActionsConfig, AccountActionsProps } from './presentation/components/AccountActions';
 
 // =============================================================================
 // PRESENTATION LAYER - Stores
