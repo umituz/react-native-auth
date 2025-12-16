@@ -99,6 +99,9 @@ export type {
 export { useAuth } from './presentation/hooks/useAuth';
 export type { UseAuthResult } from './presentation/hooks/useAuth';
 
+export { useUserProfile } from './presentation/hooks/useUserProfile';
+export type { UserProfileData, UseUserProfileParams } from './presentation/hooks/useUserProfile';
+
 // =============================================================================
 // PRESENTATION LAYER - Screens & Navigation
 // =============================================================================
@@ -128,6 +131,8 @@ export { PasswordMatchIndicator } from './presentation/components/PasswordMatchI
 export type { PasswordMatchIndicatorProps } from './presentation/components/PasswordMatchIndicator';
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
 export type { AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
+export { ProfileSection } from './presentation/components/ProfileSection';
+export type { ProfileSectionConfig, ProfileSectionProps } from './presentation/components/ProfileSection';
 
 // =============================================================================
 // PRESENTATION LAYER - Stores
