@@ -12,7 +12,8 @@ import { AccountActions, type AccountActionsConfig } from "../components/Account
 
 export interface AccountScreenConfig {
     profile: ProfileSectionConfig;
-    accountActions: AccountActionsConfig;
+    accountActions?: AccountActionsConfig;
+    isAnonymous: boolean;
 }
 
 export interface AccountScreenProps {
@@ -27,9 +28,17 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
             style={[styles.container, { backgroundColor: tokens.colors.backgroundPrimary }]}
             contentContainerStyle={styles.content}
         >
-            <ProfileSection profile={config.profile} />
-            <View style={styles.divider} />
-            <AccountActions config={config.accountActions} />
+            <ProfileSection
+                profile={config.profile}
+                onSignIn={config.profile.isAnonymous ? config.accountActions?.onLogout : undefined}
+            />
+
+            {!config.isAnonymous && config.accountActions && (
+                <>
+                    <View style={styles.divider} />
+                    <AccountActions config={config.accountActions} />
+                </>
+            )}
         </ScrollView>
     );
 };
