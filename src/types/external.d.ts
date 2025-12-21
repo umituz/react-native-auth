@@ -24,7 +24,7 @@ declare module '@umituz/react-native-localization' {
   };
 }
 
-declare module '@umituz/react-native-firebase-auth' {
+declare module '@umituz/react-native-firebase' {
   export function useFirebaseAuth(): any;
 }
 

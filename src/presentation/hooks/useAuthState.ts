@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { DeviceEventEmitter } from "react-native";
 import { getAuthService } from "../../infrastructure/services/AuthService";
-import { useFirebaseAuth } from "@umituz/react-native-firebase-auth";
+import { useFirebaseAuth } from "@umituz/react-native-firebase";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 

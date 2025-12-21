@@ -6,7 +6,7 @@
 
 import { useCallback, useState } from "react";
 import { useAuth } from "./useAuth";
-import { deleteCurrentUser } from "@umituz/react-native-firebase-auth";
+import { deleteCurrentUser } from "@umituz/react-native-firebase";
 
 export interface UseAccountManagementOptions {
   /**
