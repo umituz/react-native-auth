@@ -13,6 +13,10 @@ import { AuthCoreService } from "./AuthCoreService";
 import { GuestModeService, type IStorageProvider } from "./GuestModeService";
 import { authEventService } from "./AuthEventService";
 import { initializeAuthPackage, getAuthPackage } from "./AuthPackage";
+import {
+  trackPackageError,
+  addPackageBreadcrumb,
+} from "@umituz/react-native-sentry";
 
 export class AuthService implements IAuthService {
   private coreService: AuthCoreService;
@@ -56,35 +60,90 @@ export class AuthService implements IAuthService {
   }
 
   async signUp(params: SignUpParams): Promise<AuthUser> {
-    const user = await this.coreService.signUp(params);
+    addPackageBreadcrumb("auth", "Sign up started", {
+      email: params.email,
+    });
 
-    // Clear guest mode when user signs up
-    if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-      await this.guestModeService.clear(this.storageProvider);
+    try {
+      const user = await this.coreService.signUp(params);
+
+      // Clear guest mode when user signs up
+      if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
+        await this.guestModeService.clear(this.storageProvider);
+      }
+
+      addPackageBreadcrumb("auth", "Sign up successful", {
+        userId: user.uid,
+      });
+
+      authEventService.emitUserAuthenticated(user.uid);
+      return user;
+    } catch (error) {
+      trackPackageError(
+        error instanceof Error ? error : new Error("Sign up failed"),
+        {
+          packageName: "auth",
+          operation: "sign-up",
+          email: params.email,
+        }
+      );
+      throw error;
     }
-
-    authEventService.emitUserAuthenticated(user.uid);
-    return user;
   }
 
   async signIn(params: SignInParams): Promise<AuthUser> {
-    const user = await this.coreService.signIn(params);
+    addPackageBreadcrumb("auth", "Sign in started", {
+      email: params.email,
+    });
 
-    // Clear guest mode when user signs in
-    if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-      await this.guestModeService.clear(this.storageProvider);
+    try {
+      const user = await this.coreService.signIn(params);
+
+      // Clear guest mode when user signs in
+      if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
+        await this.guestModeService.clear(this.storageProvider);
+      }
+
+      addPackageBreadcrumb("auth", "Sign in successful", {
+        userId: user.uid,
+      });
+
+      authEventService.emitUserAuthenticated(user.uid);
+      return user;
+    } catch (error) {
+      trackPackageError(
+        error instanceof Error ? error : new Error("Sign in failed"),
+        {
+          packageName: "auth",
+          operation: "sign-in",
+          email: params.email,
+        }
+      );
+      throw error;
     }
-
-    authEventService.emitUserAuthenticated(user.uid);
-    return user;
   }
 
   async signOut(): Promise<void> {
-    await this.coreService.signOut();
+    addPackageBreadcrumb("auth", "Sign out started");
 
-    // Clear guest mode if signing out explicitly
-    if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-      await this.guestModeService.clear(this.storageProvider);
+    try {
+      await this.coreService.signOut();
+
+      // Clear guest mode if signing out explicitly
+      if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
+        await this.guestModeService.clear(this.storageProvider);
+      }
+
+      addPackageBreadcrumb("auth", "Sign out successful");
+    } catch (error) {
+      trackPackageError(
+        error instanceof Error ? error : new Error("Sign out failed"),
+        {
+          packageName: "auth",
+          operation: "sign-out",
+        }
+      );
+      throw error;
     }
   }
 

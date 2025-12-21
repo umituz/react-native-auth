@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-auth",
-  "version": "2.6.13",
+  "version": "2.6.14",
   "description": "Authentication service for React Native apps - Secure, type-safe, and production-ready. Provider-agnostic design with dependency injection, configurable validation, and comprehensive error handling.",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -38,6 +38,7 @@
     "@umituz/react-native-firebase": "latest",
     "@umituz/react-native-localization": "latest",
     "@umituz/react-native-avatar": "latest",
+    "@umituz/react-native-sentry": "latest",
     "@umituz/react-native-storage": "latest",
     "@umituz/react-native-validation": "latest",
     "expo-linear-gradient": ">=13.0.0",
