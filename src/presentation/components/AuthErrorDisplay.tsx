@@ -1,10 +1,11 @@
 /**
  * Auth Error Display Component
- * Displays authentication errors
+ * Displays authentication errors using design system tokens
  */
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
 
 interface AuthErrorDisplayProps {
   error: string | null;
@@ -13,13 +14,28 @@ interface AuthErrorDisplayProps {
 export const AuthErrorDisplay: React.FC<AuthErrorDisplayProps> = ({
   error,
 }) => {
+  const tokens = useAppDesignTokens();
+
   if (!error) {
     return null;
   }
 
   return (
-    <View style={styles.errorContainer}>
-      <Text style={styles.errorText}>{error}</Text>
+    <View
+      style={[
+        styles.errorContainer,
+        {
+          backgroundColor: tokens.colors.errorLight,
+          borderColor: tokens.colors.error,
+        },
+      ]}
+    >
+      <AtomicText
+        type="body"
+        style={[styles.errorText, { color: tokens.colors.error }]}
+      >
+        {error}
+      </AtomicText>
     </View>
   );
 };
@@ -29,12 +45,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 14,
     borderRadius: 12,
-    backgroundColor: "rgba(255, 59, 48, 0.1)",
     borderWidth: 1,
-    borderColor: "rgba(255, 59, 48, 0.2)",
   },
   errorText: {
-    color: "#FF3B30",
     fontSize: 14,
     textAlign: "center",
     fontWeight: "500",

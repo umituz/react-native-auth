@@ -38,9 +38,24 @@ export function useAuthState(): UseAuthStateResult {
 
   // Memoize user to prevent new object reference on every render
   const user = useMemo(() => {
+    // If no Firebase user, return null
+    if (!firebaseUser) return null;
+
+    // If Firebase user exists and is NOT anonymous, always return the user
+    // This ensures real authenticated users (email, Google, Apple) always have user object
+    // even if isGuest was previously true (which gets reset by useEffect below)
+    if (!firebaseUser.isAnonymous) {
+      return mapToAuthUser(firebaseUser);
+    }
+
+    // If Firebase user is anonymous AND we're in guest mode, return null
+    // Guest mode = user clicked "Continue as Guest" with no account
     if (isGuest) return null;
+
+    // If Firebase user is anonymous but NOT in guest mode, return the user
+    // This handles anonymous auth accounts that can be upgraded later
     return mapToAuthUser(firebaseUser);
-  }, [isGuest, firebaseUser?.uid]);
+  }, [isGuest, firebaseUser?.uid, firebaseUser?.isAnonymous]);
 
   // Anonymous users are NOT authenticated - they need to register/login
   const isAuthenticated = !!user && !isGuest && !user.isAnonymous;
