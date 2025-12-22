@@ -81,11 +81,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                     )}
                 </View>
 
-                {/* Action Icon */}
-                {(onPress || onSignIn) && (
+                {/* Action Icon - only for authenticated users */}
+                {onPress && !profile.isAnonymous && (
                     <Text style={[styles.chevron, { color: tokens.colors.textTertiary }]}>
                         ›
-                    </Text>)}
+                    </Text>
+                )}
             </View>
 
             {/* Sign In CTA for Anonymous Users */}
