@@ -30,8 +30,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     profile,
     onPress,
     onSignIn,
-    signInText = "Sign In",
-    anonymousText = "Anonymous User",
+    signInText,
+    anonymousText,
 }) => {
     const tokens = useAppDesignTokens();
 
