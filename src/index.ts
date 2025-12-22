@@ -170,6 +170,8 @@ export { ProfileSection } from './presentation/components/ProfileSection';
 export type { ProfileSectionConfig, ProfileSectionProps } from './presentation/components/ProfileSection';
 export { AccountActions } from './presentation/components/AccountActions';
 export type { AccountActionsConfig, AccountActionsProps } from './presentation/components/AccountActions';
+export { UserProfileHeader } from './presentation/components/UserProfileHeader';
+export type { UserProfileHeaderProps } from './presentation/components/UserProfileHeader';
 
 // =============================================================================
 // PRESENTATION LAYER - Stores
