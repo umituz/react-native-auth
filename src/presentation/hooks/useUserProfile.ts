@@ -43,6 +43,7 @@ export const useUserProfile = (
                 displayName: generateGuestName(user.uid, nameConfig),
                 userId: user.uid,
                 isAnonymous: true,
+                accountSettingsRoute: accountRoute,
             };
         }
 
