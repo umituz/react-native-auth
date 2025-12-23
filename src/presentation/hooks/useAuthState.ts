@@ -115,22 +115,6 @@ export function useAuthState(): UseAuthStateResult {
     };
   }, []);
 
-  // Debug logging in development
-  if (typeof __DEV__ !== "undefined" && __DEV__) {
-    console.log("[useAuthState] Current state:", {
-      hasUser: !!user,
-      userUid: user?.uid,
-      userEmail: user?.email,
-      userIsAnonymous: user?.isAnonymous,
-      isAuthenticated,
-      isGuest,
-      loading,
-      firebaseLoading,
-      hasFirebaseUser: !!firebaseUser,
-      firebaseUserUid: firebaseUser?.uid,
-    });
-  }
-
   return {
     user,
     isAuthenticated,

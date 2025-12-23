@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { View, StyleSheet } from "react-native";
+import { AtomicText, useResponsiveDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 
 interface AuthHeaderProps {
@@ -14,31 +14,30 @@ interface AuthHeaderProps {
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
-  const tokens = useAppDesignTokens();
+  const tokens = useResponsiveDesignTokens();
   const { t } = useLocalization();
 
   return (
-    <View style={styles.header}>
-      <Text
-        style={[
-          styles.title,
-          { color: tokens.colors.onPrimary || "#FFFFFF" },
-        ]}
+    <View style={[styles.header, { marginBottom: tokens.spacing.xl, paddingHorizontal: tokens.spacing.md }]}>
+      <AtomicText
+        type="heading1"
+        style={{ color: tokens.colors.onPrimary, textAlign: "center" }}
+        responsive
       >
         {title}
-      </Text>
+      </AtomicText>
       {(subtitle || t("auth.subtitle")) && (
-        <Text
-          style={[
-            styles.subtitle,
-            {
-              color:
-                tokens.colors.textInverse || "rgba(255, 255, 255, 0.9)",
-            },
-          ]}
+        <AtomicText
+          type="bodyMedium"
+          style={{
+            color: tokens.colors.textInverse,
+            textAlign: "center",
+            marginTop: tokens.spacing.xs,
+          }}
+          responsive
         >
           {subtitle || t("auth.subtitle")}
-        </Text>
+        </AtomicText>
       )}
     </View>
   );
@@ -46,23 +45,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
 
 const styles = StyleSheet.create({
   header: {
-    marginBottom: 28,
     alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: "700",
-    marginBottom: 8,
-    textAlign: "center",
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    lineHeight: 22,
-    fontWeight: "400",
-    marginTop: 4,
   },
 });
 

@@ -47,7 +47,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                     try {
                         await onLogout();
                     } catch (error) {
-                        console.error("Logout failed:", error);
+                        // Silent error handling
                     }
                 },
             },
@@ -64,7 +64,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                     try {
                         await onDeleteAccount();
                     } catch (error) {
-                        console.error("Delete account failed:", error);
+                        // Silent error handling
                     }
                 },
             },

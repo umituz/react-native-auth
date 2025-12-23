@@ -5,20 +5,24 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { useResponsiveDesignTokens } from "@umituz/react-native-design-system";
 
 interface AuthFormCardProps {
   children: React.ReactNode;
 }
 
 export const AuthFormCard: React.FC<AuthFormCardProps> = ({ children }) => {
-  const tokens = useAppDesignTokens();
+  const tokens = useResponsiveDesignTokens();
 
   return (
     <View
       style={[
         styles.formCard,
-        { backgroundColor: tokens.colors.surface || "#FFFFFF" },
+        {
+          backgroundColor: tokens.colors.surface,
+          borderRadius: tokens.borderRadius.xl,
+          padding: tokens.spacing.lg,
+        },
       ]}
     >
       <View style={styles.form}>{children}</View>
@@ -28,8 +32,7 @@ export const AuthFormCard: React.FC<AuthFormCardProps> = ({ children }) => {
 
 const styles = StyleSheet.create({
   formCard: {
-    borderRadius: 24,
-    padding: 24,
+    width: "100%",
   },
   form: {
     width: "100%",

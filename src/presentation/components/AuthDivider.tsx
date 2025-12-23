@@ -4,34 +4,38 @@
  */
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { View, StyleSheet } from "react-native";
+import { AtomicText, useResponsiveDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 
 export const AuthDivider: React.FC = () => {
-  const tokens = useAppDesignTokens();
+  const tokens = useResponsiveDesignTokens();
   const { t } = useLocalization();
 
   return (
-    <View style={styles.divider}>
+    <View style={[styles.divider, { marginVertical: tokens.spacing.md }]}>
       <View
         style={[
           styles.dividerLine,
-          { backgroundColor: tokens.colors.borderLight || "#E5E5E5" },
+          { backgroundColor: tokens.colors.borderLight },
         ]}
       />
-      <Text
-        style={[
-          styles.dividerText,
-          { color: tokens.colors.textSecondary || "#999999" },
-        ]}
+      <AtomicText
+        type="caption"
+        style={{
+          color: tokens.colors.textSecondary,
+          marginHorizontal: tokens.spacing.sm,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+        }}
+        responsive
       >
         {t("general.or")}
-      </Text>
+      </AtomicText>
       <View
         style={[
           styles.dividerLine,
-          { backgroundColor: tokens.colors.borderLight || "#E5E5E5" },
+          { backgroundColor: tokens.colors.borderLight },
         ]}
       />
     </View>
@@ -42,18 +46,10 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 20,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 13,
-    fontWeight: "500",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
   },
 });
 
