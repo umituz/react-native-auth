@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-auth",
-  "version": "2.6.22",
+  "version": "2.6.23",
   "description": "Authentication service for React Native apps - Secure, type-safe, and production-ready. Provider-agnostic design with dependency injection, configurable validation, and comprehensive error handling.",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
