@@ -4,14 +4,14 @@
  */
 
 import React, { useEffect, useCallback, useRef, useState, useMemo } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, AtomicText, AtomicIcon } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
@@ -138,19 +138,19 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           style={styles.closeButton}
           onPress={handleClose}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityLabel={t("common.close") || "Close"}
+          accessibilityRole="button"
         >
-          <Text style={[styles.closeIcon, { color: tokens.colors.textSecondary }]}>
-            ✕
-          </Text>
+          <AtomicIcon name="close" size="md" color="secondary" />
         </TouchableOpacity>
 
         <View style={styles.header}>
-          <Text style={[styles.title, { color: tokens.colors.textPrimary }]}>
+          <AtomicText type="headlineLarge" color="primary" style={styles.title}>
             {mode === "login" ? t("auth.signIn") : t("auth.createAccount")}
-          </Text>
-          <Text style={[styles.subtitle, { color: tokens.colors.textSecondary }]}>
+          </AtomicText>
+          <AtomicText type="bodyLarge" color="secondary" style={styles.subtitle}>
             {mode === "login" ? t("auth.signInSubtitle") : t("auth.createAccountSubtitle")}
-          </Text>
+          </AtomicText>
         </View>
 
         <View style={styles.formContainer}>

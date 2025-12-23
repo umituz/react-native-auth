@@ -21,10 +21,6 @@ export const styles = StyleSheet.create({
         padding: 8,
         zIndex: 10,
     },
-    closeIcon: {
-        fontSize: 24,
-        fontWeight: "400",
-    },
     header: {
         alignItems: "center",
         marginBottom: 24,
@@ -32,13 +28,10 @@ export const styles = StyleSheet.create({
         paddingTop: 16,
     },
     title: {
-        fontSize: 28,
-        fontWeight: "700",
         marginBottom: 8,
         textAlign: "center",
     },
     subtitle: {
-        fontSize: 15,
         textAlign: "center",
         lineHeight: 22,
     },
