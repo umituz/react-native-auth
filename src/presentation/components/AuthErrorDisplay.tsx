@@ -31,7 +31,7 @@ export const AuthErrorDisplay: React.FC<AuthErrorDisplayProps> = ({
       ]}
     >
       <AtomicText
-        type="body"
+        type="bodyMedium"
         style={[styles.errorText, { color: tokens.colors.error }]}
       >
         {error}

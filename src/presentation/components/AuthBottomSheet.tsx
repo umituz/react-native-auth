@@ -9,8 +9,8 @@ import {
   BottomSheetModal,
   BottomSheetBackdrop,
   BottomSheetScrollView,
-  type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 import { useAppDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useAuthModalStore } from "../stores/authModalStore";
@@ -45,7 +45,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
   const { t } = useLocalization();
-  const modalRef = useRef<BottomSheetModal>(null);
+  const modalRef = useRef<any>(null);
 
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
