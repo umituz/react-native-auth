@@ -15,7 +15,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system";
-import { Avatar } from "@umituz/react-native-avatar";
+import { Avatar } from "@umituz/react-native-design-system";
 
 export interface EditProfileConfig {
     displayName: string;

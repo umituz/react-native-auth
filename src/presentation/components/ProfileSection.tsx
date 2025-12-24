@@ -7,7 +7,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system";
-import { Avatar } from "@umituz/react-native-avatar";
+import { Avatar } from "@umituz/react-native-design-system";
 
 export interface ProfileSectionConfig {
     displayName: string;
