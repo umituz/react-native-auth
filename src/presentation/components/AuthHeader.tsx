@@ -20,7 +20,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
   return (
     <View style={[styles.header, { marginBottom: tokens.spacing.xl, paddingHorizontal: tokens.spacing.md }]}>
       <AtomicText
-        type="heading1"
+        type="headlineLarge"
         style={{ color: tokens.colors.onPrimary, textAlign: "center" }}
         responsive
       >

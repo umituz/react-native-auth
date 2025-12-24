@@ -35,7 +35,7 @@ export const AuthLink: React.FC<AuthLinkProps> = ({
         variant="text"
         onPress={onPress}
         disabled={disabled}
-        style={{ paddingHorizontal: tokens.spacing.xxs }}
+        style={{ paddingHorizontal: tokens.spacing.xs }}
       >
         {linkText}
       </AtomicButton>
