@@ -7,7 +7,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { DeviceEventEmitter } from "react-native";
 import { getAuthService } from "../../infrastructure/services/AuthService";
-// @ts-expect-error - Module def issue in node_modules vs types
 import { useFirebaseAuth } from "@umituz/react-native-firebase";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthUser } from "../../domain/entities/AuthUser";

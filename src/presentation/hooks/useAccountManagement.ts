@@ -7,7 +7,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import { useCallback, useState } from "react";
 import { useAuth } from "./useAuth";
-// @ts-expect-error - Module def issue in node_modules vs types
 import { deleteCurrentUser } from "@umituz/react-native-firebase";
 
 export interface UseAccountManagementOptions {
