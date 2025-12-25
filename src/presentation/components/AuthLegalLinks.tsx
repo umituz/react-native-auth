@@ -83,7 +83,7 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
             style={styles.linkButton}
           >
             <AtomicText type="bodySmall" color="primary">
-              {t("auth.termsOfService") || "Terms of Service"}
+              {t("auth.termsOfService")}
             </AtomicText>
           </AtomicButton>
         )}
@@ -99,7 +99,7 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
             style={styles.linkButton}
           >
             <AtomicText type="bodySmall" color="primary">
-              {t("auth.privacyPolicy") || "Privacy Policy"}
+              {t("auth.privacyPolicy")}
             </AtomicText>
           </AtomicButton>
         )}

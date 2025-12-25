@@ -1,11 +1,7 @@
-/**
- * Password Strength Indicator Component
- * Shows password requirements with visual feedback
- */
-
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { View, StyleSheet } from "react-native";
+import { useAppDesignTokens, AtomicText } from "@umituz/react-native-design-system";
+import { useLocalization } from "@umituz/react-native-localization";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
 
 export interface PasswordStrengthIndicatorProps {
@@ -31,7 +27,7 @@ const RequirementDot: React.FC<RequirementDotProps> = ({
   return (
     <View style={styles.requirement}>
       <View style={[styles.dot, { backgroundColor: color }]} />
-      <Text style={[styles.label, { color }]}>{label}</Text>
+      <AtomicText type="labelSmall" style={{ color }}>{label}</AtomicText>
     </View>
   );
 };
@@ -40,15 +36,16 @@ export const PasswordStrengthIndicator: React.FC<
   PasswordStrengthIndicatorProps
 > = ({ requirements, showLabels = true }) => {
   const tokens = useAppDesignTokens();
+  const { t } = useLocalization();
   const successColor = tokens.colors.success;
   const pendingColor = tokens.colors.textTertiary;
 
   const items = [
-    { key: "minLength", label: "8+", isValid: requirements.hasMinLength },
-    { key: "uppercase", label: "A-Z", isValid: requirements.hasUppercase },
-    { key: "lowercase", label: "a-z", isValid: requirements.hasLowercase },
-    { key: "number", label: "0-9", isValid: requirements.hasNumber },
-    { key: "special", label: "!@#", isValid: requirements.hasSpecialChar },
+    { key: "minLength", label: t("auth.passwordReq.minLength"), isValid: requirements.hasMinLength },
+    { key: "uppercase", label: t("auth.passwordReq.uppercase"), isValid: requirements.hasUppercase },
+    { key: "lowercase", label: t("auth.passwordReq.lowercase"), isValid: requirements.hasLowercase },
+    { key: "number", label: t("auth.passwordReq.number"), isValid: requirements.hasNumber },
+    { key: "special", label: t("auth.passwordReq.special"), isValid: requirements.hasSpecialChar },
   ];
 
   if (!showLabels) {
@@ -111,8 +108,5 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  label: {
-    fontSize: 11,
-    fontWeight: "500",
-  },
 });
+

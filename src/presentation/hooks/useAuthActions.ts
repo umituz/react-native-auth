@@ -1,11 +1,11 @@
-/**
- * useAuthActions Hook
- * Single Responsibility: Handle authentication actions
- */
-
 import { useCallback } from "react";
-import { getAuthService } from "../../infrastructure/services/AuthService";
 import type { UseAuthStateResult } from "./useAuthState";
+import {
+  useSignInMutation,
+  useSignUpMutation,
+  useSignOutMutation,
+  useGuestModeMutation,
+} from "./mutations/useAuthMutations";
 
 export interface UseAuthActionsResult {
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
@@ -17,18 +17,17 @@ export interface UseAuthActionsResult {
 export function useAuthActions(state: UseAuthStateResult): UseAuthActionsResult {
   const { isGuest, setIsGuest, setLoading, setError } = state;
 
+  const signInMutation = useSignInMutation();
+  const signUpMutation = useSignUpMutation();
+  const signOutMutation = useSignOutMutation();
+  const guestModeMutation = useGuestModeMutation();
+
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {
-      const service = getAuthService();
-      if (!service) {
-        const err = "Auth service is not initialized";
-        setError(err);
-        throw new Error(err);
-      }
       try {
         setLoading(true);
         setError(null);
-        await service.signUp({ email, password, displayName });
+        await signUpMutation.mutateAsync({ email, password, displayName });
         if (isGuest) {
           setIsGuest(false);
         }
@@ -40,21 +39,15 @@ export function useAuthActions(state: UseAuthStateResult): UseAuthActionsResult 
         setLoading(false);
       }
     },
-    [isGuest, setIsGuest, setLoading, setError],
+    [isGuest, setIsGuest, setLoading, setError, signUpMutation],
   );
 
   const signIn = useCallback(
     async (email: string, password: string) => {
-      const service = getAuthService();
-      if (!service) {
-        const err = "Auth service is not initialized";
-        setError(err);
-        throw new Error(err);
-      }
       try {
         setLoading(true);
         setError(null);
-        await service.signIn({ email, password });
+        await signInMutation.mutateAsync({ email, password });
         if (isGuest) {
           setIsGuest(false);
         }
@@ -66,38 +59,29 @@ export function useAuthActions(state: UseAuthStateResult): UseAuthActionsResult 
         setLoading(false);
       }
     },
-    [isGuest, setIsGuest, setLoading, setError],
+    [isGuest, setIsGuest, setLoading, setError, signInMutation],
   );
 
   const signOut = useCallback(async () => {
-    const service = getAuthService();
-    if (!service) return;
-
     try {
       setLoading(true);
-      await service.signOut();
+      await signOutMutation.mutateAsync();
     } finally {
       setLoading(false);
     }
-  }, [setLoading]);
+  }, [setLoading, signOutMutation]);
 
   const continueAsGuest = useCallback(async () => {
-    const service = getAuthService();
-    if (!service) {
-      setIsGuest(true);
-      return;
-    }
-
     try {
       setLoading(true);
-      await service.setGuestMode();
+      await guestModeMutation.mutateAsync();
       setIsGuest(true);
     } catch {
       setIsGuest(true);
     } finally {
       setLoading(false);
     }
-  }, [setIsGuest, setLoading]);
+  }, [setIsGuest, setLoading, guestModeMutation]);
 
   return {
     signUp,

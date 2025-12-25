@@ -1,16 +1,14 @@
 import React from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, AtomicText, AtomicIcon } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
-import { AppleIconSvg, GoogleIconSvg } from "./icons";
 
 export interface SocialLoginButtonsProps {
   /** Enabled providers to display */
@@ -49,9 +47,9 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
     <View style={styles.container}>
       <View style={styles.dividerContainer}>
         <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
-        <Text style={[styles.dividerText, { color: tokens.colors.textSecondary }]}>
+        <AtomicText type="bodySmall" color="secondary" style={styles.dividerText}>
           {t("auth.orContinueWith")}
-        </Text>
+        </AtomicText>
         <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
       </View>
 
@@ -71,10 +69,10 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
               <ActivityIndicator size="small" color={tokens.colors.textPrimary} />
             ) : (
               <>
-                <GoogleIconSvg size={20} />
-                <Text style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
-                  Google
-                </Text>
+                <AtomicIcon name="google" size="sm" />
+                <AtomicText style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
+                  {t("auth.google")}
+                </AtomicText>
               </>
             )}
           </TouchableOpacity>
@@ -95,10 +93,10 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
               <ActivityIndicator size="small" color={tokens.colors.textPrimary} />
             ) : (
               <>
-                <AppleIconSvg size={20} color={tokens.colors.textPrimary} />
-                <Text style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
-                  Apple
-                </Text>
+                <AtomicIcon name="apple" size="sm" color="primary" />
+                <AtomicText style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
+                  {t("auth.apple")}
+                </AtomicText>
               </>
             )}
           </TouchableOpacity>
@@ -107,7 +105,6 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -124,7 +121,6 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     marginHorizontal: 16,
-    fontSize: 14,
   },
   buttonsContainer: {
     flexDirection: "row",

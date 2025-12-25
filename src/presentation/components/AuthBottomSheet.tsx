@@ -138,7 +138,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           style={styles.closeButton}
           onPress={handleClose}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          accessibilityLabel={t("common.close") || "Close"}
+          accessibilityLabel={t("common.close")}
           accessibilityRole="button"
         >
           <AtomicIcon name="close" size="md" color="secondary" />

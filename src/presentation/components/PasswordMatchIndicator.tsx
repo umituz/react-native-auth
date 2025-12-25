@@ -1,11 +1,6 @@
-/**
- * Password Match Indicator Component
- * Shows whether passwords match
- */
-
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { View, StyleSheet } from "react-native";
+import { useAppDesignTokens, AtomicText } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 
 export interface PasswordMatchIndicatorProps {
@@ -20,13 +15,13 @@ export const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
 
   const color = isMatch ? tokens.colors.success : tokens.colors.error;
   const text = isMatch
-    ? t("auth.passwordsMatch", { defaultValue: "Passwords match" })
-    : t("auth.passwordsDontMatch", { defaultValue: "Passwords don't match" });
+    ? t("auth.passwordsMatch")
+    : t("auth.passwordsDontMatch");
 
   return (
     <View style={styles.container}>
       <View style={[styles.dot, { backgroundColor: color }]} />
-      <Text style={[styles.text, { color }]}>{text}</Text>
+      <AtomicText type="labelSmall" style={{ color }}>{text}</AtomicText>
     </View>
   );
 };
@@ -43,8 +38,5 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-  text: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
 });
+

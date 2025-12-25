@@ -51,11 +51,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     <>
       <View style={styles.inputContainer}>
         <AtomicInput
-          label={t("auth.displayName") || "Full Name"}
+          label={t("auth.displayName")}
           value={displayName}
           onChangeText={handleDisplayNameChange}
           placeholder={
-            t("auth.displayNamePlaceholder") || "Enter your full name"
+            t("auth.displayNamePlaceholder")
           }
           autoCapitalize="words"
           disabled={loading}
@@ -97,11 +97,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <View style={styles.inputContainer}>
         <AtomicInput
-          label={t("auth.confirmPassword") || "Confirm Password"}
+          label={t("auth.confirmPassword")}
           value={confirmPassword}
           onChangeText={handleConfirmPasswordChange}
           placeholder={
-            t("auth.confirmPasswordPlaceholder") || "Confirm your password"
+            t("auth.confirmPasswordPlaceholder")
           }
           secureTextEntry
           autoCapitalize="none"
@@ -145,7 +145,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         privacyUrl={privacyUrl}
         onTermsPress={onTermsPress}
         onPrivacyPress={onPrivacyPress}
-        prefixText={t("auth.bySigningUp") || "By signing up, you agree to our"}
+        prefixText={t("auth.bySigningUp")}
       />
     </>
   );

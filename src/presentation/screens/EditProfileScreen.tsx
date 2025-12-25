@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import { useAppDesignTokens, AtomicText } from "@umituz/react-native-design-system";
 import { EditProfileAvatar } from "../components/EditProfileAvatar";
 import { EditProfileForm } from "../components/EditProfileForm";
 import { EditProfileActions } from "../components/EditProfileActions";
@@ -56,9 +56,9 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ config }) 
             style={[styles.container, { backgroundColor: tokens.colors.backgroundPrimary }]}
             contentContainerStyle={styles.content}
         >
-            <Text style={[styles.title, { color: tokens.colors.text }]}>
+            <AtomicText type="headlineSmall" style={styles.title}>
                 {config.labels.title}
-            </Text>
+            </AtomicText>
 
             <EditProfileAvatar
                 photoURL={config.photoURL}
@@ -96,8 +96,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     title: {
-        fontSize: 24,
-        fontWeight: "600",
         marginBottom: 24,
     },
 });

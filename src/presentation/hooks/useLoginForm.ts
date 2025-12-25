@@ -7,7 +7,7 @@ import { useState, useCallback } from "react";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
-import { validateEmail } from "../../infrastructure/utils/AuthValidation";
+import { validateEmail, validatePasswordForLogin } from "../../infrastructure/utils/AuthValidation";
 
 export interface UseLoginFormResult {
   email: string;
@@ -59,16 +59,14 @@ export function useLoginForm(): UseLoginFormResult {
     let hasError = false;
 
     const emailResult = validateEmail(email.trim());
-    if (!emailResult.isValid) {
-      setEmailError(t("auth.errors.invalidEmail"));
+    if (!emailResult.isValid && emailResult.error) {
+      setEmailError(t(emailResult.error));
       hasError = true;
     }
 
-    if (!password.trim()) {
-      setPasswordError(t("auth.errors.weakPassword"));
-      hasError = true;
-    } else if (password.length < 6) {
-      setPasswordError(t("auth.errors.weakPassword"));
+    const passwordResult = validatePasswordForLogin(password);
+    if (!passwordResult.isValid && passwordResult.error) {
+      setPasswordError(t(passwordResult.error));
       hasError = true;
     }
 

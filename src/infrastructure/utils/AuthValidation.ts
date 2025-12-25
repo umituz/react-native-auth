@@ -8,7 +8,7 @@ import { getAuthPackage } from "../services/AuthPackage";
 
 export interface ValidationResult {
   isValid: boolean;
-  error?: string;
+  error?: string; // This should be a localization key
 }
 
 export interface PasswordStrengthResult extends ValidationResult {
@@ -58,12 +58,12 @@ function getValidationConfig(): ValidationConfig {
  */
 export function validateEmail(email: string): ValidationResult {
   if (!email || email.trim() === "") {
-    return { isValid: false, error: "Email is required" };
+    return { isValid: false, error: "auth.validation.emailRequired" };
   }
 
   const config = getValidationConfig();
   if (!config.emailRegex.test(email.trim())) {
-    return { isValid: false, error: "Please enter a valid email address" };
+    return { isValid: false, error: "auth.validation.invalidEmail" };
   }
 
   return { isValid: true };
@@ -75,7 +75,7 @@ export function validateEmail(email: string): ValidationResult {
  */
 export function validatePasswordForLogin(password: string): ValidationResult {
   if (!password || password.length === 0) {
-    return { isValid: false, error: "Password is required" };
+    return { isValid: false, error: "auth.validation.passwordRequired" };
   }
 
   return { isValid: true };
@@ -102,7 +102,7 @@ export function validatePasswordForRegister(
   if (!password || password.length === 0) {
     return {
       isValid: false,
-      error: "Password is required",
+      error: "auth.validation.passwordRequired",
       requirements,
     };
   }
@@ -110,7 +110,7 @@ export function validatePasswordForRegister(
   if (!requirements.hasMinLength) {
     return {
       isValid: false,
-      error: `Password must be at least ${config.minLength} characters`,
+      error: "auth.validation.passwordTooShort",
       requirements,
     };
   }
@@ -118,7 +118,7 @@ export function validatePasswordForRegister(
   if (config.requireUppercase && !validationConfig.uppercaseRegex.test(password)) {
     return {
       isValid: false,
-      error: "Password must contain at least one uppercase letter",
+      error: "auth.validation.passwordRequireUppercase",
       requirements,
     };
   }
@@ -126,7 +126,7 @@ export function validatePasswordForRegister(
   if (config.requireLowercase && !validationConfig.lowercaseRegex.test(password)) {
     return {
       isValid: false,
-      error: "Password must contain at least one lowercase letter",
+      error: "auth.validation.passwordRequireLowercase",
       requirements,
     };
   }
@@ -134,7 +134,7 @@ export function validatePasswordForRegister(
   if (config.requireNumber && !validationConfig.numberRegex.test(password)) {
     return {
       isValid: false,
-      error: "Password must contain at least one number",
+      error: "auth.validation.passwordRequireNumber",
       requirements,
     };
   }
@@ -142,7 +142,7 @@ export function validatePasswordForRegister(
   if (config.requireSpecialChar && !validationConfig.specialCharRegex.test(password)) {
     return {
       isValid: false,
-      error: "Password must contain at least one special character",
+      error: "auth.validation.passwordRequireSpecialChar",
       requirements,
     };
   }
@@ -158,11 +158,11 @@ export function validatePasswordConfirmation(
   confirmPassword: string
 ): ValidationResult {
   if (!confirmPassword) {
-    return { isValid: false, error: "Please confirm your password" };
+    return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
   }
 
   if (password !== confirmPassword) {
-    return { isValid: false, error: "Passwords do not match" };
+    return { isValid: false, error: "auth.validation.passwordsDoNotMatch" };
   }
 
   return { isValid: true };
@@ -176,7 +176,7 @@ export function validateDisplayName(
   minLength?: number
 ): ValidationResult {
   if (!displayName || displayName.trim() === "") {
-    return { isValid: false, error: "Name is required" };
+    return { isValid: false, error: "auth.validation.nameRequired" };
   }
 
   const config = getValidationConfig();
@@ -185,10 +185,11 @@ export function validateDisplayName(
   if (displayName.trim().length < actualMinLength) {
     return {
       isValid: false,
-      error: `Name must be at least ${actualMinLength} characters`,
+      error: "auth.validation.nameTooShort",
     };
   }
 
   return { isValid: true };
 }
+
 

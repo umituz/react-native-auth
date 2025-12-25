@@ -9,7 +9,7 @@ import { useAuth } from "./useAuth";
 import { generateGuestName, type GuestNameConfig } from "../../domain/utils/guestNameGenerator";
 
 export interface UserProfileData {
-    displayName: string;
+    displayName?: string;
     userId?: string;
     isAnonymous: boolean;
     avatarUrl?: string;
@@ -27,8 +27,8 @@ export const useUserProfile = (
 ): UserProfileData | undefined => {
     const { user } = useAuth();
 
-    const guestName = params?.guestDisplayName || "Guest";
-    const accountRoute = params?.accountRoute || "Account";
+    const guestName = params?.guestDisplayName;
+    const accountRoute = params?.accountRoute;
     const nameConfig = params?.guestNameConfig;
 
     return useMemo(() => {

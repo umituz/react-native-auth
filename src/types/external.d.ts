@@ -8,6 +8,19 @@
 
 import React from 'react';
 
+declare module 'expo-device';
+declare module 'expo-application';
+declare module '@umituz/react-native-uuid';
+declare module 'rn-emoji-keyboard';
+declare module '@react-navigation/bottom-tabs';
+declare module '@umituz/react-native-haptics';
+declare module 'expo-clipboard';
+declare module 'expo-sharing';
+declare module 'expo-file-system/build/legacy';
+declare module '@umituz/react-native-design-system-theme';
+declare module '@sentry/react-native';
+declare module '@sentry/types';
+
 declare module 'react-native-safe-area-context' {
   export function useSafeAreaInsets(): {
     top: number;
@@ -38,9 +51,4 @@ declare module '@react-navigation/native' {
     goBack: () => void;
     reset: (state: any) => void;
   };
-}
-
-declare module '@umituz/react-native-sentry' {
-  export const trackPackageError: (error: any, context?: any) => void;
-  export const addPackageBreadcrumb: (category: string, message: string, data?: any) => void;
 }
