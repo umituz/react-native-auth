@@ -16,22 +16,21 @@ export interface UseProfileUpdateReturn {
 
 export const useProfileUpdate = (): UseProfileUpdateReturn => {
     const { user } = useAuth();
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [isUpdating] = useState(false);
+    const [error] = useState<string | null>(null);
 
     const updateProfile = useCallback(
-        async (params: UpdateProfileParams) => {
+        (_params: UpdateProfileParams) => {
             if (!user) {
-                throw new Error("No user logged in");
+                return Promise.reject(new Error("No user logged in"));
             }
 
             if (user.isAnonymous) {
-                throw new Error("Anonymous users cannot update profile");
+                return Promise.reject(new Error("Anonymous users cannot update profile"));
             }
 
             // Note: App should implement this via Firebase SDK
-            // Example: auth().currentUser?.updateProfile({ displayName, photoURL })
-            throw new Error("Profile update should be implemented by app");
+            return Promise.reject(new Error("Profile update should be implemented by app"));
         },
         [user],
     );
@@ -42,3 +41,4 @@ export const useProfileUpdate = (): UseProfileUpdateReturn => {
         error,
     };
 };
+

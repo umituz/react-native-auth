@@ -5,7 +5,6 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { useLocalization } from "@umituz/react-native-localization";
-import { batchValidate } from "@umituz/react-native-validation";
 import {
   validateEmail,
   validatePasswordForRegister,
@@ -85,8 +84,8 @@ export function useRegisterForm(): UseRegisterFormResult {
       }
       return next;
     });
-    if (localError) setLocalError(null);
-  }, [localError]);
+    setLocalError(null);
+  }, []);
 
   const handleEmailChange = useCallback((text: string) => {
     setEmail(text);
@@ -97,8 +96,8 @@ export function useRegisterForm(): UseRegisterFormResult {
       }
       return next;
     });
-    if (localError) setLocalError(null);
-  }, [localError]);
+    setLocalError(null);
+  }, []);
 
   const handlePasswordChange = useCallback((text: string) => {
     setPassword(text);
@@ -112,8 +111,8 @@ export function useRegisterForm(): UseRegisterFormResult {
       }
       return next;
     });
-    if (localError) setLocalError(null);
-  }, [localError]);
+    setLocalError(null);
+  }, []);
 
   const handleConfirmPasswordChange = useCallback((text: string) => {
     setConfirmPassword(text);
@@ -124,14 +123,13 @@ export function useRegisterForm(): UseRegisterFormResult {
       }
       return next;
     });
-    if (localError) setLocalError(null);
-  }, [localError]);
+    setLocalError(null);
+  }, []);
 
   const handleSignUp = useCallback(async () => {
     setLocalError(null);
     setFieldErrors({});
 
-    // Manual validation since batchValidate is not available
     const emailResult = validateEmail(email.trim());
     if (!emailResult.isValid) {
       setFieldErrors((prev) => ({ ...prev, email: emailResult.error }));
@@ -156,7 +154,7 @@ export function useRegisterForm(): UseRegisterFormResult {
         password,
         displayName.trim() || undefined,
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       const localizationKey = getAuthErrorLocalizationKey(err);
       const errorMessage = t(localizationKey);
       setLocalError(errorMessage);
@@ -183,4 +181,5 @@ export function useRegisterForm(): UseRegisterFormResult {
     displayError,
   };
 }
+
 

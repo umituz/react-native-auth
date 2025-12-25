@@ -64,7 +64,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
       <View style={styles.buttonContainer}>
         <AtomicButton
           variant="primary"
-          onPress={handleSignIn}
+          onPress={() => { void handleSignIn(); }}
           disabled={loading || !email.trim() || !password.trim()}
           fullWidth
           style={styles.signInButton}

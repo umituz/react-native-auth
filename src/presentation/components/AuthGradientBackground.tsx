@@ -13,7 +13,7 @@ export const AuthGradientBackground: React.FC = () => {
 
   return (
     <LinearGradient
-      colors={[tokens.colors.primary, tokens.colors.secondary]}
+      colors={[tokens.colors.primary, tokens.colors.surfaceSecondary]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={StyleSheet.absoluteFill}

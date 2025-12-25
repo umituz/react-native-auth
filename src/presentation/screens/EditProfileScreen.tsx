@@ -1,21 +1,26 @@
 /**
  * Edit Profile Screen
- * Pure UI for profile editing
- * Business logic provided via props
+ * Pure UI for profile editing - Composition only
  */
 
 import React from "react";
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    ScrollView,
-    StyleSheet,
-    ActivityIndicator,
-} from "react-native";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system";
-import { Avatar } from "@umituz/react-native-design-system";
+import { EditProfileAvatar } from "../components/EditProfileAvatar";
+import { EditProfileForm } from "../components/EditProfileForm";
+import { EditProfileActions } from "../components/EditProfileActions";
+
+export interface EditProfileLabels {
+    title: string;
+    displayNameLabel: string;
+    displayNamePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    photoLabel: string;
+    changePhotoButton: string;
+    saveButton: string;
+    cancelButton: string;
+}
 
 export interface EditProfileConfig {
     displayName: string;
@@ -28,26 +33,14 @@ export interface EditProfileConfig {
     onChangePhoto?: () => void;
     onSave: () => void;
     onCancel?: () => void;
-    labels: {
-        title: string;
-        displayNameLabel: string;
-        displayNamePlaceholder: string;
-        emailLabel: string;
-        emailPlaceholder: string;
-        photoLabel: string;
-        changePhotoButton: string;
-        saveButton: string;
-        cancelButton: string;
-    };
+    labels: EditProfileLabels;
 }
 
 export interface EditProfileScreenProps {
     config: EditProfileConfig;
 }
 
-export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
-    config,
-}) => {
+export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
 
     if (config.isLoading) {
@@ -67,111 +60,25 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
                 {config.labels.title}
             </Text>
 
-            {/* Avatar */}
-            <View style={styles.avatarContainer}>
-                <Avatar
-                    uri={config.photoURL || undefined}
-                    name={config.displayName}
-                    size="xl"
-                    shape="circle"
-                />
-            </View>
+            <EditProfileAvatar
+                photoURL={config.photoURL}
+                displayName={config.displayName}
+            />
 
-            {/* Display Name */}
-            <View style={styles.field}>
-                <Text style={[styles.label, { color: tokens.colors.textSecondary }]}>
-                    {config.labels.displayNameLabel}
-                </Text>
-                <TextInput
-                    style={[
-                        styles.input,
-                        {
-                            backgroundColor: tokens.colors.surface,
-                            color: tokens.colors.text,
-                            borderColor: tokens.colors.border,
-                        },
-                    ]}
-                    value={config.displayName}
-                    onChangeText={config.onChangeDisplayName}
-                    placeholder={config.labels.displayNamePlaceholder}
-                    placeholderTextColor={tokens.colors.textTertiary}
-                />
-            </View>
+            <EditProfileForm
+                displayName={config.displayName}
+                email={config.email}
+                onChangeDisplayName={config.onChangeDisplayName}
+                onChangeEmail={config.onChangeEmail}
+                labels={config.labels}
+            />
 
-            {/* Email */}
-            <View style={styles.field}>
-                <Text style={[styles.label, { color: tokens.colors.textSecondary }]}>
-                    {config.labels.emailLabel}
-                </Text>
-                <TextInput
-                    style={[
-                        styles.input,
-                        {
-                            backgroundColor: tokens.colors.surface,
-                            color: tokens.colors.text,
-                            borderColor: tokens.colors.border,
-                        },
-                    ]}
-                    value={config.email}
-                    onChangeText={config.onChangeEmail}
-                    placeholder={config.labels.emailPlaceholder}
-                    placeholderTextColor={tokens.colors.textTertiary}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-            </View>
-
-            {/* Photo */}
-            {config.onChangePhoto && (
-                <View style={styles.field}>
-                    <Text style={[styles.label, { color: tokens.colors.textSecondary }]}>
-                        {config.labels.photoLabel}
-                    </Text>
-                    <TouchableOpacity
-                        style={[
-                            styles.photoButton,
-                            { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border },
-                        ]}
-                        onPress={config.onChangePhoto}
-                    >
-                        <Text style={[styles.photoButtonText, { color: tokens.colors.primary }]}>
-                            {config.labels.changePhotoButton}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            {/* Actions */}
-            <View style={styles.actions}>
-                <TouchableOpacity
-                    style={[styles.saveButton, { backgroundColor: tokens.colors.primary }]}
-                    onPress={config.onSave}
-                    disabled={config.isSaving}
-                >
-                    {config.isSaving ? (
-                        <ActivityIndicator size="small" color={tokens.colors.onPrimary} />
-                    ) : (
-                        <Text style={[styles.saveButtonText, { color: tokens.colors.onPrimary }]}>
-                            {config.labels.saveButton}
-                        </Text>
-                    )}
-                </TouchableOpacity>
-
-                {config.onCancel && (
-                    <TouchableOpacity
-                        style={[
-                            styles.cancelButton,
-                            { backgroundColor: tokens.colors.surface, borderColor: tokens.colors.border },
-                        ]}
-                        onPress={config.onCancel}
-                        disabled={config.isSaving}
-                    >
-                        <Text style={[styles.cancelButtonText, { color: tokens.colors.text }]}>
-                            {config.labels.cancelButton}
-                        </Text>
-                    </TouchableOpacity>
-                )}
-            </View>
+            <EditProfileActions
+                isSaving={config.isSaving}
+                onSave={config.onSave}
+                onCancel={config.onCancel}
+                labels={config.labels}
+            />
         </ScrollView>
     );
 };
@@ -193,55 +100,5 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         marginBottom: 24,
     },
-    avatarContainer: {
-        alignItems: "center",
-        marginBottom: 24,
-    },
-    field: {
-        marginBottom: 20,
-    },
-    label: {
-        fontSize: 14,
-        fontWeight: "500",
-        marginBottom: 8,
-    },
-    input: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
-    },
-    photoButton: {
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        alignItems: "center",
-    },
-    photoButtonText: {
-        fontSize: 14,
-        fontWeight: "500",
-    },
-    actions: {
-        marginTop: 32,
-        gap: 12,
-    },
-    saveButton: {
-        padding: 16,
-        borderRadius: 8,
-        alignItems: "center",
-    },
-    saveButtonText: {
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    cancelButton: {
-        padding: 16,
-        borderRadius: 8,
-        alignItems: "center",
-        borderWidth: 1,
-    },
-    cancelButtonText: {
-        fontSize: 16,
-        fontWeight: "500",
-    },
 });
+

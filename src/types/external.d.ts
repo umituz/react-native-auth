@@ -1,46 +1,12 @@
 /**
- * Type declarations for external dependencies
- * These are optional dependencies that should be provided by the consuming application
+ * Type declarations for external dependencies that might not have types
+ * or where package resolution is failing in the current environment.
  */
 
-declare module '@umituz/react-native-design-system' {
-  export function useAppDesignTokens(): any;
-  export const defaultTheme: any;
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
-declare module '@umituz/react-native-design-system' {
-  export const AtomicInput: any;
-  export const AtomicButton: any;
-  export const AtomicText: any;
-  export const AtomicView: any;
-}
-
-declare module '@umituz/react-native-localization' {
-  export function useTranslation(): {
-    t: (key: string, params?: Record<string, any>) => string;
-  };
-  export function useLocalization(): {
-    t: (key: string, params?: Record<string, any>) => string;
-  };
-}
-
-declare module '@umituz/react-native-firebase' {
-  export function useFirebaseAuth(): any;
-}
-
-declare module '@umituz/react-native-validation' {
-  export function useValidation(): any;
-  export function batchValidate(): any;
-}
-
-declare module '@umituz/react-native-storage' {
-  export const storageRepository: {
-    getString: (key: string, defaultValue?: string) => Promise<{ value: string } | null>;
-    setString: (key: string, value: string) => Promise<void>;
-    removeItem: (key: string) => Promise<void>;
-  };
-  export function unwrap(result: any, defaultValue: any): any;
-}
+import React from 'react';
 
 declare module 'react-native-safe-area-context' {
   export function useSafeAreaInsets(): {
@@ -52,17 +18,29 @@ declare module 'react-native-safe-area-context' {
 }
 
 declare module 'expo-linear-gradient' {
-  import { ComponentType } from 'react';
-  export const LinearGradient: ComponentType<any>;
+  export const LinearGradient: React.ComponentType<any>;
 }
 
 declare module '@react-navigation/stack' {
-  import { ComponentType } from 'react';
-  export const createStackNavigator: any;
-  export type StackNavigationProp<any> = any;
+  export function createStackNavigator<T = any>(): {
+    Navigator: React.ComponentType<any>;
+    Screen: React.ComponentType<any>;
+  };
+  export type StackNavigationProp<T = any> = any;
+  export type StackScreenProps<T = any, K = any> = any;
 }
 
 declare module '@react-navigation/native' {
-  export function useNavigation(): any;
+  export function useNavigation<T = any>(): T;
   export function useFocusEffect(effect: () => void | (() => void)): void;
+  export type NavigationProp<T = any> = {
+    navigate: (name: string, params?: any) => void;
+    goBack: () => void;
+    reset: (state: any) => void;
+  };
+}
+
+declare module '@umituz/react-native-sentry' {
+  export const trackPackageError: (error: any, context?: any) => void;
+  export const addPackageBreadcrumb: (category: string, message: string, data?: any) => void;
 }

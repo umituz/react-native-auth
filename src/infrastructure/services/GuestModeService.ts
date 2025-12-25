@@ -6,12 +6,7 @@
 import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import { emitGuestModeEnabled } from "../utils/AuthEventEmitter";
-
-export interface IStorageProvider {
-  get(key: string): Promise<string | null>;
-  set(key: string, value: string): Promise<void>;
-  remove(key: string): Promise<void>;
-}
+import type { IStorageProvider } from "./AuthPackage";
 
 export class GuestModeService {
   private isGuestMode: boolean = false;

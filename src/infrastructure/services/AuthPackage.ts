@@ -3,7 +3,8 @@
  * Centralized configuration for the auth package
  */
 
-import type { AuthConfig, PasswordConfig } from "../../domain/value-objects/AuthConfig";
+import type { DesignTokens } from "@umituz/react-native-design-system";
+import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
 
 export interface AuthPackageConfig {
   storageKeys: {
@@ -15,7 +16,8 @@ export interface AuthPackageConfig {
     passwordConfig: PasswordConfig;
   };
   ui: {
-    theme?: any;
+    theme?: DesignTokens;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     localization?: any;
   };
   features: {
@@ -58,13 +60,17 @@ export interface IStorageProvider {
 }
 
 export interface IUIProvider {
-  getTheme(): any;
+  getTheme(): DesignTokens | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getLocalization(): any;
 }
 
 export interface IValidationProvider {
   validateEmail(email: string): { isValid: boolean; error?: string };
-  validatePassword(password: string, config: PasswordConfig): { isValid: boolean; error?: string };
+  validatePassword(
+    password: string,
+    config: PasswordConfig
+  ): { isValid: boolean; error?: string };
 }
 
 export class AuthPackage {
@@ -124,7 +130,7 @@ export class AuthPackage {
     return this.validationProvider;
   }
 
-  isFeatureEnabled(feature: keyof AuthPackageConfig['features']): boolean {
+  isFeatureEnabled(feature: keyof AuthPackageConfig["features"]): boolean {
     return this.config.features[feature];
   }
 }
@@ -132,7 +138,9 @@ export class AuthPackage {
 // Global package instance
 let packageInstance: AuthPackage | null = null;
 
-export function initializeAuthPackage(config: Partial<AuthPackageConfig> = {}): AuthPackage {
+export function initializeAuthPackage(
+  config: Partial<AuthPackageConfig> = {}
+): AuthPackage {
   if (!packageInstance) {
     packageInstance = new AuthPackage(config);
   }

@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, StackScreenProps } from "@react-navigation/stack";
 import { useAppDesignTokens } from "@umituz/react-native-design-system";
 import { storageRepository } from "@umituz/react-native-storage";
 import { unwrap } from "@umituz/react-native-storage";
@@ -16,7 +16,7 @@ export type AuthStackParamList = {
   Register: undefined;
 };
 
-const AuthStack = createStackNavigator();
+const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const SHOW_REGISTER_KEY = "auth_show_register";
 
@@ -51,15 +51,18 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
   >(undefined);
 
   useEffect(() => {
-    storageRepository.getString(SHOW_REGISTER_KEY, "false").then((result) => {
+    const checkInitialRoute = async () => {
+      const result = await storageRepository.getString(SHOW_REGISTER_KEY, "false");
       const value = unwrap(result, "false");
       if (value === "true") {
         setInitialRouteName("Register");
-        storageRepository.removeItem(SHOW_REGISTER_KEY);
+        void storageRepository.removeItem(SHOW_REGISTER_KEY);
       } else {
         setInitialRouteName("Login");
       }
-    });
+    };
+
+    void checkInitialRoute();
   }, []);
 
   if (initialRouteName === undefined) {
@@ -76,7 +79,7 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     >
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Register">
-        {(props: any) => (
+        {(props: StackScreenProps<AuthStackParamList, "Register">) => (
           <RegisterScreen
             {...props}
             termsUrl={termsUrl}
@@ -89,4 +92,5 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     </AuthStack.Navigator>
   );
 };
+
 

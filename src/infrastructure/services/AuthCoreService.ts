@@ -5,6 +5,7 @@
 
 import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
 import type { IAuthProvider } from "../../application/ports/IAuthProvider";
+import { FirebaseAuthProvider } from "../providers/FirebaseAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 import {
@@ -28,23 +29,27 @@ export class AuthCoreService implements Partial<IAuthService> {
     this.config = config;
   }
 
-  async initialize(providerOrAuth: IAuthProvider | any): Promise<void> {
+  async initialize(
+    providerOrAuth: IAuthProvider | Record<string, unknown>
+  ): Promise<void> {
     if (!providerOrAuth) {
-      throw new AuthInitializationError("Auth provider or Firebase Auth instance is required");
+      throw new AuthInitializationError(
+        "Auth provider or Firebase Auth instance is required"
+      );
     }
 
     // Check if it's a Firebase Auth instance (has currentUser property)
     if ("currentUser" in providerOrAuth) {
-      // Import FirebaseAuthProvider directly
-      const { FirebaseAuthProvider } = require("../providers/FirebaseAuthProvider");
-      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth as any);
       await firebaseProvider.initialize();
-      this.provider = firebaseProvider;
+      this.provider = firebaseProvider as unknown as IAuthProvider;
     } else {
       this.provider = providerOrAuth as IAuthProvider;
       await this.provider.initialize();
     }
   }
+
 
   isInitialized(): boolean {
     return this.provider !== null && this.provider.isInitialized();
@@ -126,7 +131,7 @@ export class AuthCoreService implements Partial<IAuthService> {
   onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
     if (!this.provider) {
       callback(null);
-      return () => {};
+      return () => { };
     }
 
     return this.provider.onAuthStateChange(callback);

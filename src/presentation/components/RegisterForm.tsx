@@ -119,7 +119,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <View style={styles.buttonContainer}>
         <AtomicButton
           variant="primary"
-          onPress={handleSignUp}
+          onPress={() => { void handleSignUp(); }}
           disabled={
             loading ||
             !email.trim() ||

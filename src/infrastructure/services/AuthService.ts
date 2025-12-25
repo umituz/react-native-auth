@@ -10,13 +10,10 @@ import type { AuthUser } from "../../domain/entities/AuthUser";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 import { DEFAULT_AUTH_CONFIG } from "../../domain/value-objects/AuthConfig";
 import { AuthCoreService } from "./AuthCoreService";
-import { GuestModeService, type IStorageProvider } from "./GuestModeService";
+import { GuestModeService } from "./GuestModeService";
 import { authEventService } from "./AuthEventService";
-import { initializeAuthPackage, getAuthPackage } from "./AuthPackage";
-import {
-  trackPackageError,
-  addPackageBreadcrumb,
-} from "@umituz/react-native-sentry";
+import { authTracker } from "../utils/auth-tracker.util";
+import type { IStorageProvider } from "./AuthPackage";
 
 export class AuthService implements IAuthService {
   private coreService: AuthCoreService;
@@ -28,30 +25,20 @@ export class AuthService implements IAuthService {
     const authConfig = {
       ...DEFAULT_AUTH_CONFIG,
       ...config,
-      password: {
-        ...DEFAULT_AUTH_CONFIG.password,
-        ...config.password,
-      },
+      password: { ...DEFAULT_AUTH_CONFIG.password, ...config.password },
     };
-
     this.coreService = new AuthCoreService(authConfig);
     this.guestModeService = new GuestModeService();
     this.storageProvider = storageProvider;
   }
 
   async initialize(providerOrAuth: IAuthProvider | Auth): Promise<void> {
-    if (this.initialized) {
-      return;
-    }
-
-    // Initialize core service
-    await this.coreService.initialize(providerOrAuth);
-
-    // Initialize guest mode if storage provider is available
+    if (this.initialized) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+    await this.coreService.initialize(providerOrAuth as any);
     if (this.storageProvider) {
       await this.guestModeService.load(this.storageProvider);
     }
-
     this.initialized = true;
   }
 
@@ -60,90 +47,48 @@ export class AuthService implements IAuthService {
   }
 
   async signUp(params: SignUpParams): Promise<AuthUser> {
-    addPackageBreadcrumb("auth", "Sign up started", {
-      email: params.email,
-    });
-
+    authTracker.logOperationStarted("Sign up", { email: params.email });
     try {
       const user = await this.coreService.signUp(params);
-
-      // Clear guest mode when user signs up
-      if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-        await this.guestModeService.clear(this.storageProvider);
-      }
-
-      addPackageBreadcrumb("auth", "Sign up successful", {
-        userId: user.uid,
-      });
-
+      await this.clearGuestModeIfNeeded();
+      authTracker.logOperationSuccess("Sign up", { userId: user.uid });
       authEventService.emitUserAuthenticated(user.uid);
       return user;
     } catch (error) {
-      trackPackageError(
-        error instanceof Error ? error : new Error("Sign up failed"),
-        {
-          packageName: "auth",
-          operation: "sign-up",
-          email: params.email,
-        }
-      );
+      authTracker.logOperationError("sign-up", error, { email: params.email });
       throw error;
     }
   }
 
   async signIn(params: SignInParams): Promise<AuthUser> {
-    addPackageBreadcrumb("auth", "Sign in started", {
-      email: params.email,
-    });
-
+    authTracker.logOperationStarted("Sign in", { email: params.email });
     try {
       const user = await this.coreService.signIn(params);
-
-      // Clear guest mode when user signs in
-      if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-        await this.guestModeService.clear(this.storageProvider);
-      }
-
-      addPackageBreadcrumb("auth", "Sign in successful", {
-        userId: user.uid,
-      });
-
+      await this.clearGuestModeIfNeeded();
+      authTracker.logOperationSuccess("Sign in", { userId: user.uid });
       authEventService.emitUserAuthenticated(user.uid);
       return user;
     } catch (error) {
-      trackPackageError(
-        error instanceof Error ? error : new Error("Sign in failed"),
-        {
-          packageName: "auth",
-          operation: "sign-in",
-          email: params.email,
-        }
-      );
+      authTracker.logOperationError("sign-in", error, { email: params.email });
       throw error;
     }
   }
 
   async signOut(): Promise<void> {
-    addPackageBreadcrumb("auth", "Sign out started");
-
+    authTracker.logOperationStarted("Sign out");
     try {
       await this.coreService.signOut();
-
-      // Clear guest mode if signing out explicitly
-      if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-        await this.guestModeService.clear(this.storageProvider);
-      }
-
-      addPackageBreadcrumb("auth", "Sign out successful");
+      await this.clearGuestModeIfNeeded();
+      authTracker.logOperationSuccess("Sign out");
     } catch (error) {
-      trackPackageError(
-        error instanceof Error ? error : new Error("Sign out failed"),
-        {
-          packageName: "auth",
-          operation: "sign-out",
-        }
-      );
+      authTracker.logOperationError("sign-out", error);
       throw error;
+    }
+  }
+
+  private async clearGuestModeIfNeeded(): Promise<void> {
+    if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
+      await this.guestModeService.clear(this.storageProvider);
     }
   }
 
@@ -151,17 +96,11 @@ export class AuthService implements IAuthService {
     if (!this.storageProvider) {
       throw new Error("Storage provider is required for guest mode");
     }
-
-    // No provider needed for guest mode enablement
-    
     await this.guestModeService.enable(this.storageProvider);
   }
 
   getCurrentUser(): AuthUser | null {
-    if (this.guestModeService.getIsGuestMode()) {
-      return null;
-    }
-    return this.coreService.getCurrentUser();
+    return this.guestModeService.getIsGuestMode() ? null : this.coreService.getCurrentUser();
   }
 
   getIsGuestMode(): boolean {
@@ -173,52 +112,29 @@ export class AuthService implements IAuthService {
     return this.coreService.onAuthStateChange(wrappedCallback);
   }
 
-  getConfig(): AuthConfig {
-    return this.coreService.getConfig();
-  }
-
-  getCoreService(): AuthCoreService {
-    return this.coreService;
-  }
-
-  getGuestModeService(): GuestModeService {
-    return this.guestModeService;
-  }
+  getConfig(): AuthConfig { return this.coreService.getConfig(); }
+  getCoreService(): AuthCoreService { return this.coreService; }
+  getGuestModeService(): GuestModeService { return this.guestModeService; }
 }
 
-// Singleton instance
 let authServiceInstance: AuthService | null = null;
 
-/**
- * Initialize auth service with provider or Firebase Auth instance
- */
 export async function initializeAuthService(
   providerOrAuth: IAuthProvider | Auth,
   config?: Partial<AuthConfig>,
   storageProvider?: IStorageProvider
 ): Promise<AuthService> {
   if (!authServiceInstance) {
-    // Initialize package if not already done
-    const packageConfig = getAuthPackage()?.getConfig();
     authServiceInstance = new AuthService(config, storageProvider);
   }
   await authServiceInstance.initialize(providerOrAuth);
   return authServiceInstance;
 }
 
-/**
- * Get auth service instance
- */
 export function getAuthService(): AuthService | null {
-  if (!authServiceInstance || !authServiceInstance.isInitialized()) {
-    return null;
-  }
-  return authServiceInstance;
+  return (authServiceInstance && authServiceInstance.isInitialized()) ? authServiceInstance : null;
 }
 
-/**
- * Reset auth service (useful for testing)
- */
 export function resetAuthService(): void {
   authServiceInstance = null;
 }

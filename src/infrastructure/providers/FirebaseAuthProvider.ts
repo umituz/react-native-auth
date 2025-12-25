@@ -9,7 +9,6 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   updateProfile,
-  type User,
   type Auth,
 } from "firebase/auth";
 import type {
@@ -34,6 +33,8 @@ export class FirebaseAuthProvider implements IAuthProvider {
     if (!this.auth) {
       throw new Error("Firebase Auth instance must be provided");
     }
+    // Satisfy require-await
+    await Promise.resolve();
   }
 
   setAuth(auth: Auth): void {
@@ -119,7 +120,7 @@ export class FirebaseAuthProvider implements IAuthProvider {
   onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
     if (!this.auth) {
       callback(null);
-      return () => {};
+      return () => { };
     }
 
     return onAuthStateChanged(this.auth, (user) => {

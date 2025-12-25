@@ -4,16 +4,13 @@
  */
 
 import React from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { AuthStackParamList } from "../navigation/AuthNavigator";
-import type { StackNavigationProp } from "@react-navigation/stack";
 import { AuthContainer } from "../components/AuthContainer";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthFormCard } from "../components/AuthFormCard";
 import { RegisterForm } from "../components/RegisterForm";
-
-type RegisterScreenNavigationProp = any;
 
 export interface RegisterScreenProps {
   termsUrl?: string;
@@ -29,10 +26,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onPrivacyPress,
 }) => {
   const { t } = useLocalization();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
 
   const handleNavigateToLogin = () => {
-    navigation.navigate("Login" as never);
+    navigation.navigate("Login");
   };
 
   return (
@@ -50,3 +47,4 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
     </AuthContainer>
   );
 };
+

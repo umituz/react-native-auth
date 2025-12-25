@@ -43,12 +43,14 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
             {
                 text: logoutText,
                 style: "destructive",
-                onPress: async () => {
-                    try {
-                        await onLogout();
-                    } catch (error) {
-                        // Silent error handling
-                    }
+                onPress: () => {
+                    void (async () => {
+                        try {
+                            await onLogout();
+                        } catch (error) {
+                            // Silent error handling
+                        }
+                    })();
                 },
             },
         ]);
@@ -60,12 +62,14 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
             {
                 text: deleteAccountText,
                 style: "destructive",
-                onPress: async () => {
-                    try {
-                        await onDeleteAccount();
-                    } catch (error) {
-                        // Silent error handling
-                    }
+                onPress: () => {
+                    void (async () => {
+                        try {
+                            await onDeleteAccount();
+                        } catch (error) {
+                            // Silent error handling
+                        }
+                    })();
                 },
             },
         ]);

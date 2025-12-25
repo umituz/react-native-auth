@@ -45,7 +45,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
   const { t } = useLocalization();
-  const modalRef = useRef<any>(null);
+  const modalRef = useRef<BottomSheetModal>(null);
 
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
@@ -169,8 +169,8 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           {socialProviders.length > 0 && (
             <SocialLoginButtons
               enabledProviders={socialProviders}
-              onGooglePress={handleGoogleSignIn}
-              onApplePress={handleAppleSignIn}
+              onGooglePress={() => { void handleGoogleSignIn(); }}
+              onApplePress={() => { void handleAppleSignIn(); }}
               googleLoading={googleLoading}
               appleLoading={appleLoading}
             />

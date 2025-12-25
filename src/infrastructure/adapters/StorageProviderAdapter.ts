@@ -3,21 +3,37 @@
  * Adapts external storage implementations to our IStorageProvider interface
  */
 
-import type { IStorageProvider } from "../services/GuestModeService";
+import type { IStorageProvider } from "../services/AuthPackage";
+
+/**
+ * Interface that describes the shape of common storage implementations
+ * to avoid using 'any' and resolve lint errors.
+ */
+interface StorageLike {
+  getString?: (
+    key: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    defaultValue?: any
+  ) => Promise<{ value: string | null } | null>;
+  getItem?: (key: string) => Promise<string | null>;
+  setString?: (key: string, value: string) => Promise<void>;
+  setItem?: (key: string, value: string) => Promise<void>;
+  removeItem?: (key: string) => Promise<void>;
+}
 
 export class StorageProviderAdapter implements IStorageProvider {
-  private storage: any;
+  private storage: StorageLike;
 
-  constructor(storage: any) {
-    this.storage = storage;
+  constructor(storage: unknown) {
+    this.storage = storage as StorageLike;
   }
 
   async get(key: string): Promise<string | null> {
     try {
-      if (this.storage.getString) {
+      if (typeof this.storage.getString === "function") {
         const result = await this.storage.getString(key, null);
         return result?.value ?? null;
-      } else if (this.storage.getItem) {
+      } else if (typeof this.storage.getItem === "function") {
         return await this.storage.getItem(key);
       } else {
         throw new Error("Unsupported storage implementation");
@@ -28,9 +44,9 @@ export class StorageProviderAdapter implements IStorageProvider {
   }
 
   async set(key: string, value: string): Promise<void> {
-    if (this.storage.setString) {
+    if (typeof this.storage.setString === "function") {
       await this.storage.setString(key, value);
-    } else if (this.storage.setItem) {
+    } else if (typeof this.storage.setItem === "function") {
       await this.storage.setItem(key, value);
     } else {
       throw new Error("Unsupported storage implementation");
@@ -38,7 +54,7 @@ export class StorageProviderAdapter implements IStorageProvider {
   }
 
   async remove(key: string): Promise<void> {
-    if (this.storage.removeItem) {
+    if (typeof this.storage.removeItem === "function") {
       await this.storage.removeItem(key);
     } else {
       throw new Error("Unsupported storage implementation");
@@ -46,6 +62,6 @@ export class StorageProviderAdapter implements IStorageProvider {
   }
 }
 
-export function createStorageProvider(storage: any): IStorageProvider {
+export function createStorageProvider(storage: unknown): IStorageProvider {
   return new StorageProviderAdapter(storage);
 }

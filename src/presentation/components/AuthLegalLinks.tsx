@@ -6,7 +6,7 @@
 import React from "react";
 import { View, StyleSheet, Linking } from "react-native";
 import { AtomicButton, AtomicText } from "@umituz/react-native-design-system";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+
 import { useLocalization } from "@umituz/react-native-localization";
 
 export interface AuthLegalLinksProps {
@@ -39,22 +39,21 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
   onPrivacyPress,
   prefixText,
 }) => {
-  const tokens = useAppDesignTokens();
   const { t } = useLocalization();
 
-  const handleTermsPress = async () => {
+  const handleTermsPress = () => {
     if (onTermsPress) {
       onTermsPress();
     } else if (termsUrl) {
-      await Linking.openURL(termsUrl);
+      void Linking.openURL(termsUrl);
     }
   };
 
-  const handlePrivacyPress = async () => {
+  const handlePrivacyPress = () => {
     if (onPrivacyPress) {
       onPrivacyPress();
     } else if (privacyUrl) {
-      await Linking.openURL(privacyUrl);
+      void Linking.openURL(privacyUrl);
     }
   };
 

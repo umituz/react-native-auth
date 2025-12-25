@@ -21,7 +21,6 @@ export const AuthDivider: React.FC = () => {
         ]}
       />
       <AtomicText
-        type="caption"
         style={{
           color: tokens.colors.textSecondary,
           marginHorizontal: tokens.spacing.sm,

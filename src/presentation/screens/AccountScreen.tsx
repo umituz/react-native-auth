@@ -7,6 +7,7 @@
 import React from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system";
+
 import { ProfileSection, type ProfileSectionConfig } from "../components/ProfileSection";
 import { AccountActions, type AccountActionsConfig } from "../components/AccountActions";
 
@@ -23,6 +24,12 @@ export interface AccountScreenProps {
 export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
 
+    const handleLogout = () => {
+        if (config.accountActions?.onLogout) {
+            void config.accountActions.onLogout();
+        }
+    };
+
     return (
         <ScrollView
             style={[styles.container, { backgroundColor: tokens.colors.backgroundPrimary }]}
@@ -30,7 +37,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
         >
             <ProfileSection
                 profile={config.profile}
-                onSignIn={config.profile.isAnonymous ? config.accountActions?.onLogout : undefined}
+                onSignIn={config.profile.isAnonymous ? handleLogout : undefined}
             />
 
             {!config.isAnonymous && config.accountActions && (
@@ -54,3 +61,4 @@ const styles = StyleSheet.create({
         height: 24,
     },
 });
+

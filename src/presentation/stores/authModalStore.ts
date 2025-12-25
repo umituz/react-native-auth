@@ -64,10 +64,11 @@ export const useAuthModalStore = create<AuthModalStore>((set, get) => ({
   executePendingCallback: () => {
     const { pendingCallback } = get();
     if (pendingCallback) {
-      pendingCallback();
+      void pendingCallback();
       set({ pendingCallback: null });
     }
   },
+
 
   clearPendingCallback: () => {
     set({ pendingCallback: null });
