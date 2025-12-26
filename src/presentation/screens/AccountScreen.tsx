@@ -40,6 +40,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
             <ProfileSection
                 profile={config.profile}
                 onSignIn={config.profile.isAnonymous ? handleLogout : undefined}
+                signInText="Sign In"
             />
 
             {!config.isAnonymous && config.accountActions && (

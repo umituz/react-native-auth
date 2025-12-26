@@ -15,6 +15,8 @@ export interface AccountActionsConfig {
     logoutConfirmMessage: string;
     deleteConfirmTitle: string;
     deleteConfirmMessage: string;
+    deleteErrorTitle?: string;
+    deleteErrorMessage?: string;
     onLogout: () => Promise<void>;
     onDeleteAccount: () => Promise<void>;
 }
@@ -32,6 +34,8 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
         logoutConfirmMessage,
         deleteConfirmTitle,
         deleteConfirmMessage,
+        deleteErrorTitle = "Error",
+        deleteErrorMessage = "Failed to delete account. Please try again.",
         onLogout,
         onDeleteAccount,
     } = config;
@@ -66,7 +70,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                         try {
                             await onDeleteAccount();
                         } catch (error) {
-                            // Silent error handling
+                            Alert.alert(deleteErrorTitle, deleteErrorMessage);
                         }
                     })();
                 },
