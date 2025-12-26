@@ -20,7 +20,7 @@
 // DOMAIN LAYER - Entities
 // =============================================================================
 
-export type { AuthUser } from './domain/entities/AuthUser';
+export type { AuthUser, AuthProviderType } from './domain/entities/AuthUser';
 
 // =============================================================================
 // DOMAIN LAYER - Errors
@@ -177,6 +177,13 @@ export type { AccountActionsConfig, AccountActionsProps } from './presentation/c
 
 export { useAuthModalStore } from './presentation/stores/authModalStore';
 export type { AuthModalMode } from './presentation/stores/authModalStore';
+
+export {
+  useAuthStore,
+  initializeAuthListener,
+  resetAuthListener,
+  selectIsAuthenticated,
+} from './presentation/stores/authStore';
 
 // =============================================================================
 // PRESENTATION LAYER - Utilities

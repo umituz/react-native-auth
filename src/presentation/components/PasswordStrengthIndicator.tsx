@@ -83,9 +83,8 @@ export const PasswordStrengthIndicator: React.FC<
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
+    flexDirection: "column",
+    gap: 8,
     marginTop: 8,
   },
   dotsOnly: {

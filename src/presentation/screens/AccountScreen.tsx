@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { useAppDesignTokens } from "@umituz/react-native-design-system";
+import { View, StyleSheet } from "react-native";
+import { useAppDesignTokens, ScreenLayout } from "@umituz/react-native-design-system";
 
 import { ProfileSection, type ProfileSectionConfig } from "../components/ProfileSection";
 import { AccountActions, type AccountActionsConfig } from "../components/AccountActions";
@@ -31,8 +31,10 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
     };
 
     return (
-        <ScrollView
-            style={[styles.container, { backgroundColor: tokens.colors.backgroundPrimary }]}
+        <ScreenLayout
+            scrollable={true}
+            edges={['bottom']}
+            backgroundColor={tokens.colors.backgroundPrimary}
             contentContainerStyle={styles.content}
         >
             <ProfileSection
@@ -46,14 +48,11 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
                     <AccountActions config={config.accountActions} />
                 </>
             )}
-        </ScrollView>
+        </ScreenLayout>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
     content: {
         padding: 16,
     },

@@ -80,7 +80,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 </View>
 
                 {onPress && !profile.isAnonymous && (
-                    <AtomicIcon name="chevron-right" size="sm" color="secondary" />
+                    <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
                 )}
             </View>
 
