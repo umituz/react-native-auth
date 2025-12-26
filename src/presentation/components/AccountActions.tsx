@@ -82,11 +82,11 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                 onPress={handleLogout}
                 activeOpacity={0.7}
             >
-                <AtomicIcon name="logout" size="md" color="error" />
+                <AtomicIcon name="log-out-outline" size="md" color="error" />
                 <AtomicText style={[styles.actionText, { color: tokens.colors.error }]}>
                     {logoutText}
                 </AtomicText>
-                <AtomicIcon name="chevron-right" size="sm" color="secondary" />
+                <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
             </TouchableOpacity>
 
             {/* Delete Account */}
@@ -95,11 +95,11 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                 onPress={handleDeleteAccount}
                 activeOpacity={0.7}
             >
-                <AtomicIcon name="trash-2" size="md" color="error" />
+                <AtomicIcon name="trash-outline" size="md" color="error" />
                 <AtomicText style={[styles.actionText, { color: tokens.colors.error }]}>
                     {deleteAccountText}
                 </AtomicText>
-                <AtomicIcon name="chevron-right" size="sm" color="secondary" />
+                <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
             </TouchableOpacity>
         </View>
     );
