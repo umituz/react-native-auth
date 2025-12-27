@@ -106,11 +106,22 @@ export type {
 } from './infrastructure/utils/AuthValidation';
 
 // =============================================================================
+// PRESENTATION LAYER - Provider
+// =============================================================================
+
+export { AuthProvider } from './presentation/providers/AuthProvider';
+
+// =============================================================================
 // PRESENTATION LAYER - Hooks
 // =============================================================================
 
 export { useAuth } from './presentation/hooks/useAuth';
 export type { UseAuthResult } from './presentation/hooks/useAuth';
+
+export { useAuthRequired } from './presentation/hooks/useAuthRequired';
+export type { UseAuthRequiredResult } from './presentation/hooks/useAuthRequired';
+
+export { useRequireAuth, useUserId } from './presentation/hooks/useRequireAuth';
 
 export { useUserProfile } from './presentation/hooks/useUserProfile';
 export type { UserProfileData, UseUserProfileParams } from './presentation/hooks/useUserProfile';
