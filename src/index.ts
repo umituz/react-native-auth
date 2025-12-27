@@ -183,7 +183,18 @@ export {
   initializeAuthListener,
   resetAuthListener,
   selectIsAuthenticated,
+  selectUserId,
+  selectIsAnonymous,
+  selectUserType,
+  selectIsAuthReady,
+  getUserId,
+  getUserType,
+  getIsAuthenticated,
+  getIsGuest,
+  getIsAnonymous,
 } from './presentation/stores/authStore';
+
+export type { UserType } from './presentation/stores/authStore';
 
 // =============================================================================
 // PRESENTATION LAYER - Utilities

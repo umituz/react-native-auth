@@ -4,15 +4,18 @@
  *
  * Uses centralized Zustand store for auth state.
  * Single source of truth - no duplicate subscriptions.
- *
- * @example
- * ```typescript
- * const { user, isAuthenticated, signIn, signUp, signOut } = useAuth();
- * ```
  */
 
 import { useCallback } from "react";
-import { useAuthStore, selectIsAuthenticated } from "../stores/authStore";
+import {
+  useAuthStore,
+  selectIsAuthenticated,
+  selectUserId,
+  selectUserType,
+  selectIsAnonymous,
+  selectIsAuthReady,
+  type UserType,
+} from "../stores/authStore";
 import {
   useSignInMutation,
   useSignUpMutation,
@@ -24,11 +27,19 @@ import type { AuthUser } from "../../domain/entities/AuthUser";
 export interface UseAuthResult {
   /** Current authenticated user */
   user: AuthUser | null;
+  /** Current user ID (uid) */
+  userId: string | null;
+  /** Current user type */
+  userType: UserType;
   /** Whether auth state is loading */
   loading: boolean;
+  /** Whether auth is ready (initialized and not loading) */
+  isAuthReady: boolean;
   /** Whether user is in guest mode */
   isGuest: boolean;
-  /** Whether user is authenticated */
+  /** Whether user is anonymous */
+  isAnonymous: boolean;
+  /** Whether user is authenticated (not guest, not anonymous) */
   isAuthenticated: boolean;
   /** Current error message */
   error: string | null;
@@ -49,11 +60,6 @@ export interface UseAuthResult {
  *
  * Uses centralized Zustand store - all components share the same state.
  * Must call initializeAuthListener() once in app root.
- *
- * @example
- * ```typescript
- * const { user, isAuthenticated, signIn, signUp, signOut } = useAuth();
- * ```
  */
 export function useAuth(): UseAuthResult {
   // State from store
@@ -62,6 +68,10 @@ export function useAuth(): UseAuthResult {
   const isGuest = useAuthStore((state) => state.isGuest);
   const error = useAuthStore((state) => state.error);
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const userId = useAuthStore(selectUserId);
+  const userType = useAuthStore(selectUserType);
+  const isAnonymous = useAuthStore(selectIsAnonymous);
+  const isAuthReady = useAuthStore(selectIsAuthReady);
 
   // Actions from store
   const setLoading = useAuthStore((state) => state.setLoading);
@@ -137,8 +147,12 @@ export function useAuth(): UseAuthResult {
 
   return {
     user,
+    userId,
+    userType,
     loading,
+    isAuthReady,
     isGuest,
+    isAnonymous,
     isAuthenticated,
     error,
     signUp,

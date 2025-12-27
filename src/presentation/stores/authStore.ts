@@ -4,18 +4,6 @@
  *
  * Single source of truth for auth state across the app.
  * Firebase auth changes are synced via initializeAuthListener().
- *
- * @example
- * ```typescript
- * // Initialize once in app root
- * useEffect(() => {
- *   const unsubscribe = initializeAuthListener();
- *   return unsubscribe;
- * }, []);
- *
- * // Use anywhere
- * const { user, isAuthenticated, signIn, signOut } = useAuthStore();
- * ```
  */
 
 import { createStore } from "@umituz/react-native-storage";
@@ -24,6 +12,13 @@ import { getFirebaseAuth } from "@umituz/react-native-firebase";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import { getAuthService } from "../../infrastructure/services/AuthService";
+
+declare const __DEV__: boolean;
+
+/**
+ * User type classification
+ */
+export type UserType = "authenticated" | "anonymous" | "none";
 
 // =============================================================================
 // STATE TYPES
@@ -82,7 +77,6 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
   persist: true,
   version: 1,
   partialize: (state) => ({
-    // Only persist these fields (not functions, not firebaseUser)
     isGuest: state.isGuest,
     initialized: state.initialized,
   }),
@@ -93,12 +87,9 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
       let user: AuthUser | null = null;
 
       if (firebaseUser) {
-        // Non-anonymous users always get mapped
         if (!firebaseUser.isAnonymous) {
           user = mapToAuthUser(firebaseUser);
-        }
-        // Anonymous users only if not in guest mode
-        else if (!isGuest) {
+        } else if (!isGuest) {
           user = mapToAuthUser(firebaseUser);
         }
       }
@@ -115,7 +106,6 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     setIsGuest: (isGuest) => {
       const { firebaseUser } = get();
 
-      // Recalculate user when guest mode changes
       let user: AuthUser | null = null;
       if (firebaseUser) {
         if (!firebaseUser.isAnonymous) {
@@ -141,11 +131,85 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
 // =============================================================================
 
 /**
+ * Get current user ID
+ */
+export const selectUserId = (state: AuthState): string | null => {
+  return state.firebaseUser?.uid ?? state.user?.uid ?? null;
+};
+
+/**
  * Check if user is authenticated (not guest, not anonymous)
  */
 export const selectIsAuthenticated = (state: AuthState): boolean => {
   return !!state.user && !state.isGuest && !state.user.isAnonymous;
 };
+
+/**
+ * Check if user is anonymous
+ */
+export const selectIsAnonymous = (state: AuthState): boolean => {
+  return state.firebaseUser?.isAnonymous ?? state.user?.isAnonymous ?? false;
+};
+
+/**
+ * Get current user type
+ */
+export const selectUserType = (state: AuthState): UserType => {
+  if (!state.firebaseUser && !state.user) {
+    return "none";
+  }
+
+  const isAnonymous =
+    state.firebaseUser?.isAnonymous ?? state.user?.isAnonymous ?? false;
+
+  return isAnonymous ? "anonymous" : "authenticated";
+};
+
+/**
+ * Check if auth is ready (initialized and not loading)
+ */
+export const selectIsAuthReady = (state: AuthState): boolean => {
+  return state.initialized && !state.loading;
+};
+
+// =============================================================================
+// NON-HOOK GETTERS
+// =============================================================================
+
+/**
+ * Get user ID without hook
+ */
+export function getUserId(): string | null {
+  return selectUserId(useAuthStore.getState());
+}
+
+/**
+ * Get user type without hook
+ */
+export function getUserType(): UserType {
+  return selectUserType(useAuthStore.getState());
+}
+
+/**
+ * Check if authenticated without hook
+ */
+export function getIsAuthenticated(): boolean {
+  return selectIsAuthenticated(useAuthStore.getState());
+}
+
+/**
+ * Check if guest without hook
+ */
+export function getIsGuest(): boolean {
+  return useAuthStore.getState().isGuest;
+}
+
+/**
+ * Check if anonymous without hook
+ */
+export function getIsAnonymous(): boolean {
+  return selectIsAnonymous(useAuthStore.getState());
+}
 
 // =============================================================================
 // LISTENER
@@ -156,17 +220,8 @@ let listenerInitialized = false;
 /**
  * Initialize Firebase auth listener
  * Call once in app root, returns unsubscribe function
- *
- * @example
- * ```typescript
- * useEffect(() => {
- *   const unsubscribe = initializeAuthListener();
- *   return unsubscribe;
- * }, []);
- * ```
  */
 export function initializeAuthListener(): () => void {
-  // Prevent multiple initializations
   if (listenerInitialized) {
     return () => {};
   }
@@ -180,7 +235,6 @@ export function initializeAuthListener(): () => void {
     return () => {};
   }
 
-  // Sync initial guest mode from service
   const service = getAuthService();
   if (service) {
     const isGuest = service.getIsGuestMode();
@@ -191,16 +245,15 @@ export function initializeAuthListener(): () => void {
 
   listenerInitialized = true;
 
-  // Subscribe to auth state changes
   const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (__DEV__) {
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
+      // eslint-disable-next-line no-console
       console.log("[authStore] Auth state changed:", user?.uid ?? "null");
     }
 
     store.setFirebaseUser(user);
     store.setInitialized(true);
 
-    // Reset guest mode when real user signs in
     if (user && !user.isAnonymous && store.isGuest) {
       store.setIsGuest(false);
     }

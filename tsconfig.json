@@ -16,9 +16,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "declaration": true,
-    "noEmit": true,
+    "jsx": "react-native",
+    "declaration": true
   },
   "include": [
     "src/**/*"
