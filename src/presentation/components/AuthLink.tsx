@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { AtomicText, AtomicButton, useResponsiveDesignTokens } from "@umituz/react-native-design-system";
+import { AtomicText, AtomicButton, useAppDesignTokens } from "@umituz/react-native-design-system";
 
 interface AuthLinkProps {
   text: string;
@@ -20,14 +20,13 @@ export const AuthLink: React.FC<AuthLinkProps> = ({
   onPress,
   disabled = false,
 }) => {
-  const tokens = useResponsiveDesignTokens();
+  const tokens = useAppDesignTokens();
 
   return (
     <View style={[styles.container, { marginTop: tokens.spacing.xs, paddingTop: tokens.spacing.xs }]}>
       <AtomicText
         type="bodyMedium"
         style={{ color: tokens.colors.textSecondary }}
-        responsive
       >
         {text}{" "}
       </AtomicText>

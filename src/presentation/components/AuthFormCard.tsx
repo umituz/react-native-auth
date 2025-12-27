@@ -5,14 +5,14 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { useResponsiveDesignTokens } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system";
 
 interface AuthFormCardProps {
   children: React.ReactNode;
 }
 
 export const AuthFormCard: React.FC<AuthFormCardProps> = ({ children }) => {
-  const tokens = useResponsiveDesignTokens();
+  const tokens = useAppDesignTokens();
 
   return (
     <View

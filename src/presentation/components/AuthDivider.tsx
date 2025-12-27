@@ -5,11 +5,11 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { AtomicText, useResponsiveDesignTokens } from "@umituz/react-native-design-system";
+import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 
 export const AuthDivider: React.FC = () => {
-  const tokens = useResponsiveDesignTokens();
+  const tokens = useAppDesignTokens();
   const { t } = useLocalization();
 
   return (
@@ -27,7 +27,6 @@ export const AuthDivider: React.FC = () => {
           textTransform: "uppercase",
           letterSpacing: 0.5,
         }}
-        responsive
       >
         {t("general.or")}
       </AtomicText>

@@ -40,11 +40,11 @@ export function useAuthRequired(): UseAuthRequiredResult {
   const isAllowed = useAuthStore(selectIsAuthenticated);
   const isLoading = useAuthStore((state) => state.loading);
   const userId = useAuthStore((state) => state.firebaseUser?.uid ?? null);
-  const openAuthModal = useAuthModalStore((state) => state.open);
+  const showAuthModal = useAuthModalStore((state) => state.showAuthModal);
 
   const requireAuth = useCallback(() => {
-    openAuthModal("login");
-  }, [openAuthModal]);
+    showAuthModal(undefined, "login");
+  }, [showAuthModal]);
 
   const checkAndRequireAuth = useCallback((): boolean => {
     if (isLoading) {
@@ -52,12 +52,12 @@ export function useAuthRequired(): UseAuthRequiredResult {
     }
 
     if (!isAllowed) {
-      openAuthModal("login");
+      showAuthModal(undefined, "login");
       return false;
     }
 
     return true;
-  }, [isAllowed, isLoading, openAuthModal]);
+  }, [isAllowed, isLoading, showAuthModal]);
 
   return {
     isAllowed,

@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { AtomicText, useResponsiveDesignTokens } from "@umituz/react-native-design-system";
+import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 
 interface AuthHeaderProps {
@@ -14,7 +14,7 @@ interface AuthHeaderProps {
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
-  const tokens = useResponsiveDesignTokens();
+  const tokens = useAppDesignTokens();
   const { t } = useLocalization();
 
   return (
@@ -22,7 +22,6 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
       <AtomicText
         type="headlineLarge"
         style={{ color: tokens.colors.onPrimary, textAlign: "center" }}
-        responsive
       >
         {title}
       </AtomicText>
@@ -34,7 +33,6 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
             textAlign: "center",
             marginTop: tokens.spacing.xs,
           }}
-          responsive
         >
           {subtitle || t("auth.subtitle")}
         </AtomicText>

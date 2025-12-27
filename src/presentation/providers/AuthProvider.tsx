@@ -10,7 +10,7 @@
  * ```
  */
 
-import React, { useEffect, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { initializeAuthListener } from "../stores/authStore";
 
 interface AuthProviderProps {
@@ -22,7 +22,7 @@ interface AuthProviderProps {
  * Initializes Firebase auth listener on mount
  * Must wrap the app root
  */
-export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
+export function AuthProvider({ children }: AuthProviderProps): ReactNode {
   useEffect(() => {
     const unsubscribe = initializeAuthListener();
     return unsubscribe;
