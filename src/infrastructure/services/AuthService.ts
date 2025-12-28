@@ -146,7 +146,6 @@ export class AuthService implements IAuthService {
 
   getConfig(): AuthConfig { return this.config; }
   getGuestModeService(): GuestModeService { return this.guestModeService; }
-  getRepository(): AuthRepository { return this.repositoryInstance; }
 }
 
 let authServiceInstance: AuthService | null = null;

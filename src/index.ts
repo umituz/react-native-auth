@@ -207,6 +207,7 @@ export {
   useAuthStore,
   initializeAuthListener,
   resetAuthListener,
+  isAuthListenerInitialized,
   selectIsAuthenticated,
   selectUserId,
   selectIsAnonymous,
@@ -219,7 +220,8 @@ export {
   getIsAnonymous,
 } from './presentation/stores/authStore';
 
-export type { UserType } from './presentation/stores/authStore';
+export type { UserType, AuthState, AuthActions } from './presentation/stores/authStore';
+export type { AuthListenerOptions } from './types/auth-store.types';
 
 // =============================================================================
 // PRESENTATION LAYER - Utilities

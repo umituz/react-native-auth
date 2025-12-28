@@ -13,8 +13,7 @@ export const useSignUpMutation = () => {
         mutationFn: async (params: SignUpParams): Promise<AuthUser> => {
             const service = getAuthService();
             if (!service) throw new Error("Auth Service not initialized");
-            // Access repository directly
-            return service.getRepository().signUp(params);
+            return service.signUp(params);
         },
     });
 };
@@ -24,7 +23,7 @@ export const useSignInMutation = () => {
         mutationFn: async (params: SignInParams): Promise<AuthUser> => {
             const service = getAuthService();
             if (!service) throw new Error("Auth Service not initialized");
-            return service.getRepository().signIn(params);
+            return service.signIn(params);
         },
     });
 };
@@ -34,7 +33,7 @@ export const useSignOutMutation = () => {
         mutationFn: async (): Promise<void> => {
             const service = getAuthService();
             if (!service) throw new Error("Auth Service not initialized");
-            return service.getRepository().signOut();
+            return service.signOut();
         },
     });
 };
