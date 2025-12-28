@@ -135,6 +135,15 @@ export type { UseProfileUpdateReturn } from './presentation/hooks/useProfileUpda
 export { useProfileEdit } from './presentation/hooks/useProfileEdit';
 export type { UseProfileEditReturn, ProfileEditFormState } from './presentation/hooks/useProfileEdit';
 
+export { useSocialLogin } from './presentation/hooks/useSocialLogin';
+export type { UseSocialLoginConfig, UseSocialLoginResult } from './presentation/hooks/useSocialLogin';
+
+export { useGoogleAuth } from './presentation/hooks/useGoogleAuth';
+export type { UseGoogleAuthResult, GoogleAuthConfig as GoogleAuthHookConfig } from './presentation/hooks/useGoogleAuth';
+
+export { useAppleAuth } from './presentation/hooks/useAppleAuth';
+export type { UseAppleAuthResult } from './presentation/hooks/useAppleAuth';
+
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
 
 // Domain Utils - Guest Names
@@ -175,6 +184,11 @@ export { PasswordMatchIndicator } from './presentation/components/PasswordMatchI
 export type { PasswordMatchIndicatorProps } from './presentation/components/PasswordMatchIndicator';
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
 export type { AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
+export { AuthBottomSheetWrapper } from './presentation/components/AuthBottomSheetWrapper';
+export type {
+  AuthBottomSheetWrapperProps,
+  SocialAuthConfiguration,
+} from './presentation/components/AuthBottomSheetWrapper';
 export { SocialLoginButtons } from './presentation/components/SocialLoginButtons';
 export type { SocialLoginButtonsProps } from './presentation/components/SocialLoginButtons';
 export { ProfileSection } from './presentation/components/ProfileSection';
