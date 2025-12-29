@@ -47,7 +47,7 @@ export function generateGuestName(
 
     if (!userId) {
         const randomIndex = Math.floor(Math.random() * names.length);
-        return names[randomIndex];
+        return names[randomIndex] ?? "Guest";
     }
 
     // Use userId hash for consistent name per user
@@ -56,7 +56,7 @@ export function generateGuestName(
     }, 0);
 
     const nameIndex = Math.abs(hash) % names.length;
-    const name = names[nameIndex];
+    const name = names[nameIndex] ?? "Guest";
 
     if (usePrefixes && prefixes.length > 0) {
         const prefixIndex = Math.abs(hash >> 8) % prefixes.length;

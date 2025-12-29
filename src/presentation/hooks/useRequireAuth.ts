@@ -10,7 +10,7 @@
  * ```
  */
 
-import { useAuthStore, selectIsAuthenticated } from "../stores/authStore";
+import { useAuthStore, selectIsAuthenticated, selectFirebaseUserId } from "../stores/authStore";
 
 /**
  * Get userId or throw if not authenticated
@@ -18,7 +18,7 @@ import { useAuthStore, selectIsAuthenticated } from "../stores/authStore";
  */
 export function useRequireAuth(): string {
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
-  const userId = useAuthStore((state) => state.firebaseUser?.uid ?? null);
+  const userId = useAuthStore(selectFirebaseUserId);
 
   if (!isAuthenticated || !userId) {
     throw new Error("User not authenticated. This component requires auth.");
@@ -31,5 +31,5 @@ export function useRequireAuth(): string {
  * Get userId safely (returns null if not authenticated)
  */
 export function useUserId(): string | null {
-  return useAuthStore((state) => state.firebaseUser?.uid ?? null);
+  return useAuthStore(selectFirebaseUserId);
 }

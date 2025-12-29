@@ -17,8 +17,9 @@
  */
 
 import { useCallback } from "react";
-import { useAuthStore, selectIsAuthenticated } from "../stores/authStore";
+import { useAuthStore, selectIsAuthenticated, selectLoading, selectFirebaseUserId } from "../stores/authStore";
 import { useAuthModalStore } from "../stores/authModalStore";
+import { selectShowAuthModal } from "../stores/auth.selectors";
 
 export interface UseAuthRequiredResult {
   /** Whether user is authenticated (not guest, not anonymous) */
@@ -38,9 +39,9 @@ export interface UseAuthRequiredResult {
  */
 export function useAuthRequired(): UseAuthRequiredResult {
   const isAllowed = useAuthStore(selectIsAuthenticated);
-  const isLoading = useAuthStore((state) => state.loading);
-  const userId = useAuthStore((state) => state.firebaseUser?.uid ?? null);
-  const showAuthModal = useAuthModalStore((state) => state.showAuthModal);
+  const isLoading = useAuthStore(selectLoading);
+  const userId = useAuthStore(selectFirebaseUserId);
+  const showAuthModal = useAuthModalStore(selectShowAuthModal);
 
   const requireAuth = useCallback(() => {
     showAuthModal(undefined, "login");

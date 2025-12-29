@@ -9,6 +9,13 @@
 import { useCallback } from "react";
 import {
   useAuthStore,
+  selectUser,
+  selectLoading,
+  selectIsGuest,
+  selectError,
+  selectSetLoading,
+  selectSetError,
+  selectSetIsGuest,
   selectIsAuthenticated,
   selectUserId,
   selectUserType,
@@ -62,21 +69,21 @@ export interface UseAuthResult {
  * Must call initializeAuthListener() once in app root.
  */
 export function useAuth(): UseAuthResult {
-  // State from store
-  const user = useAuthStore((state) => state.user);
-  const loading = useAuthStore((state) => state.loading);
-  const isGuest = useAuthStore((state) => state.isGuest);
-  const error = useAuthStore((state) => state.error);
+  // State from store - using typed selectors
+  const user = useAuthStore(selectUser);
+  const loading = useAuthStore(selectLoading);
+  const isGuest = useAuthStore(selectIsGuest);
+  const error = useAuthStore(selectError);
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const userId = useAuthStore(selectUserId);
   const userType = useAuthStore(selectUserType);
   const isAnonymous = useAuthStore(selectIsAnonymous);
   const isAuthReady = useAuthStore(selectIsAuthReady);
 
-  // Actions from store
-  const setLoading = useAuthStore((state) => state.setLoading);
-  const setError = useAuthStore((state) => state.setError);
-  const setIsGuest = useAuthStore((state) => state.setIsGuest);
+  // Actions from store - using typed selectors
+  const setLoading = useAuthStore(selectSetLoading);
+  const setError = useAuthStore(selectSetError);
+  const setIsGuest = useAuthStore(selectSetIsGuest);
 
   // Mutations
   const signInMutation = useSignInMutation();

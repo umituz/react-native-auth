@@ -17,7 +17,7 @@
  * ```
  */
 
-import { create } from "zustand";
+import { createStore } from "@umituz/react-native-storage";
 
 export type AuthModalMode = "login" | "register";
 
@@ -38,39 +38,46 @@ interface AuthModalActions {
   clearPendingCallback: () => void;
 }
 
-type AuthModalStore = AuthModalState & AuthModalActions;
-
-export const useAuthModalStore = create<AuthModalStore>((set, get) => ({
+const initialAuthModalState: AuthModalState = {
   isVisible: false,
   mode: "login",
   pendingCallback: null,
+};
 
-  showAuthModal: (callback, mode = "login" as AuthModalMode) => {
-    set({
-      isVisible: true,
-      mode,
-      pendingCallback: callback || null,
-    });
-  },
+export const useAuthModalStore = createStore<AuthModalState, AuthModalActions>({
+  name: "auth-modal-store",
+  initialState: initialAuthModalState,
+  persist: false,
+  actions: (set, get) => ({
+    showAuthModal: (
+      callback?: () => void | Promise<void>,
+      mode: AuthModalMode = "login",
+    ) => {
+      set({
+        isVisible: true,
+        mode,
+        pendingCallback: callback || null,
+      });
+    },
 
-  hideAuthModal: () => {
-    set({ isVisible: false });
-  },
+    hideAuthModal: () => {
+      set({ isVisible: false });
+    },
 
-  setMode: (mode) => {
-    set({ mode });
-  },
+    setMode: (mode: AuthModalMode) => {
+      set({ mode });
+    },
 
-  executePendingCallback: () => {
-    const { pendingCallback } = get();
-    if (pendingCallback) {
-      void pendingCallback();
+    executePendingCallback: () => {
+      const state = get();
+      if (state.pendingCallback) {
+        void state.pendingCallback();
+        set({ pendingCallback: null });
+      }
+    },
+
+    clearPendingCallback: () => {
       set({ pendingCallback: null });
-    }
-  },
-
-
-  clearPendingCallback: () => {
-    set({ pendingCallback: null });
-  },
-}));
+    },
+  }),
+});

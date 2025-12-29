@@ -12,6 +12,14 @@ import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthState, AuthActions, UserType } from "../../types/auth-store.types";
 import { initialAuthState } from "../../types/auth-store.types";
 import {
+  selectUser,
+  selectLoading,
+  selectIsGuest,
+  selectError,
+  selectFirebaseUserId,
+  selectSetLoading,
+  selectSetError,
+  selectSetIsGuest,
   selectUserId,
   selectIsAuthenticated,
   selectIsAnonymous,
@@ -24,6 +32,14 @@ export type { AuthState, AuthActions, UserType };
 
 // Re-export selectors
 export {
+  selectUser,
+  selectLoading,
+  selectIsGuest,
+  selectError,
+  selectFirebaseUserId,
+  selectSetLoading,
+  selectSetError,
+  selectSetIsGuest,
   selectUserId,
   selectIsAuthenticated,
   selectIsAnonymous,
