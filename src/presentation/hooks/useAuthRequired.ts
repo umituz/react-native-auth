@@ -22,7 +22,7 @@ import { useAuthModalStore } from "../stores/authModalStore";
 import { selectShowAuthModal } from "../stores/auth.selectors";
 
 export interface UseAuthRequiredResult {
-  /** Whether user is authenticated (not guest, not anonymous) */
+  /** Whether user is authenticated (not anonymous) */
   isAllowed: boolean;
   /** Whether auth is still loading */
   isLoading: boolean;

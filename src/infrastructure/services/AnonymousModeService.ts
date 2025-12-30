@@ -1,26 +1,26 @@
 /**
- * Guest Mode Service
- * Handles guest mode functionality
+ * Anonymous Mode Service
+ * Handles anonymous mode functionality
  */
 
 import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
-import { emitGuestModeEnabled } from "../utils/AuthEventEmitter";
+import { emitAnonymousModeEnabled } from "../utils/AuthEventEmitter";
 import type { IStorageProvider } from "./AuthPackage";
 
-export class GuestModeService {
-  private isGuestMode: boolean = false;
+export class AnonymousModeService {
+  private isAnonymousMode: boolean = false;
   private storageKey: string;
 
-  constructor(storageKey: string = "@auth_guest_mode") {
+  constructor(storageKey: string = "@auth_anonymous_mode") {
     this.storageKey = storageKey;
   }
 
   async load(storageProvider: IStorageProvider): Promise<boolean> {
     try {
       const value = await storageProvider.get(this.storageKey);
-      this.isGuestMode = value === "true";
-      return this.isGuestMode;
+      this.isAnonymousMode = value === "true";
+      return this.isAnonymousMode;
     } catch {
       return false;
     }
@@ -28,7 +28,7 @@ export class GuestModeService {
 
   async save(storageProvider: IStorageProvider): Promise<void> {
     try {
-      await storageProvider.set(this.storageKey, this.isGuestMode.toString());
+      await storageProvider.set(this.storageKey, this.isAnonymousMode.toString());
     } catch {
       // Silently fail storage operations
     }
@@ -40,7 +40,7 @@ export class GuestModeService {
     } catch {
       // Silently fail storage operations
     }
-    this.isGuestMode = false;
+    this.isAnonymousMode = false;
   }
 
   async enable(storageProvider: IStorageProvider, provider?: IAuthProvider): Promise<void> {
@@ -49,29 +49,29 @@ export class GuestModeService {
       try {
         await provider.signOut();
       } catch {
-        // Ignore sign out errors when switching to guest mode
+        // Ignore sign out errors when switching to anonymous mode
       }
     }
 
-    this.isGuestMode = true;
+    this.isAnonymousMode = true;
     await this.save(storageProvider);
-    emitGuestModeEnabled();
+    emitAnonymousModeEnabled();
   }
 
-  getIsGuestMode(): boolean {
-    return this.isGuestMode;
+  getIsAnonymousMode(): boolean {
+    return this.isAnonymousMode;
   }
 
-  setGuestMode(enabled: boolean): void {
-    this.isGuestMode = enabled;
+  setAnonymousMode(enabled: boolean): void {
+    this.isAnonymousMode = enabled;
   }
 
   wrapAuthStateCallback(
     callback: (user: AuthUser | null) => void
   ): (user: AuthUser | null) => void {
     return (user: AuthUser | null) => {
-      // Don't update if in guest mode
-      if (!this.isGuestMode) {
+      // Don't update if in anonymous mode
+      if (!this.isAnonymousMode) {
         callback(user);
       } else {
         callback(null);

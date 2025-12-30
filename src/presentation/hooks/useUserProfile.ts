@@ -6,7 +6,7 @@
 
 import { useMemo } from "react";
 import { useAuth } from "./useAuth";
-import { generateGuestName, type GuestNameConfig } from "../../domain/utils/guestNameGenerator";
+import { generateAnonymousName, type AnonymousNameConfig } from "../../domain/utils/anonymousNameGenerator";
 
 export interface UserProfileData {
     displayName?: string;
@@ -17,9 +17,9 @@ export interface UserProfileData {
 }
 
 export interface UseUserProfileParams {
-    guestDisplayName?: string;
+    anonymousDisplayName?: string;
     accountRoute?: string;
-    guestNameConfig?: GuestNameConfig;
+    anonymousNameConfig?: AnonymousNameConfig;
 }
 
 export const useUserProfile = (
@@ -27,9 +27,9 @@ export const useUserProfile = (
 ): UserProfileData | undefined => {
     const { user } = useAuth();
 
-    const guestName = params?.guestDisplayName;
+    const anonymousName = params?.anonymousDisplayName;
     const accountRoute = params?.accountRoute;
-    const nameConfig = params?.guestNameConfig;
+    const nameConfig = params?.anonymousNameConfig;
 
     return useMemo(() => {
         if (!user) {
@@ -40,7 +40,7 @@ export const useUserProfile = (
 
         if (isAnonymous) {
             return {
-                displayName: generateGuestName(user.uid, nameConfig),
+                displayName: generateAnonymousName(user.uid, nameConfig),
                 userId: user.uid,
                 isAnonymous: true,
                 accountSettingsRoute: accountRoute,
@@ -49,10 +49,10 @@ export const useUserProfile = (
 
         return {
             accountSettingsRoute: accountRoute,
-            displayName: user.displayName || user.email || guestName,
+            displayName: user.displayName || user.email || anonymousName,
             userId: user.uid,
             isAnonymous: false,
             avatarUrl: user.photoURL || undefined,
         };
-    }, [user, guestName, accountRoute, nameConfig]);
+    }, [user, anonymousName, accountRoute, nameConfig]);
 };

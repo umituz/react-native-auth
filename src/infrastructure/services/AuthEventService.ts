@@ -38,13 +38,13 @@ export class AuthEventService {
     this.notifyListeners("user-authenticated", payload);
   }
 
-  emitGuestModeEnabled(): void {
+  emitAnonymousModeEnabled(): void {
     const payload: AuthEventPayload = {
       timestamp: Date.now(),
     };
 
-    DeviceEventEmitter.emit("guest-mode-enabled", payload);
-    this.notifyListeners("guest-mode-enabled", payload);
+    DeviceEventEmitter.emit("anonymous-mode-enabled", payload);
+    this.notifyListeners("anonymous-mode-enabled", payload);
   }
 
   emitAuthError(error: string): void {
@@ -99,13 +99,13 @@ export class AuthEventService {
 // Export singleton instance for backward compatibility
 export const authEventService = AuthEventService.getInstance();
 
-// Legacy functions for backward compatibility
+// Helper functions
 export function emitUserAuthenticated(userId: string): void {
   authEventService.emitUserAuthenticated(userId);
 }
 
-export function emitGuestModeEnabled(): void {
-  authEventService.emitGuestModeEnabled();
+export function emitAnonymousModeEnabled(): void {
+  authEventService.emitAnonymousModeEnabled();
 }
 
 export function emitAuthError(error: string): void {

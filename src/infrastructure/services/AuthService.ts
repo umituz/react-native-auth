@@ -11,14 +11,14 @@ import type { AuthUser } from "../../domain/entities/AuthUser";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 import { DEFAULT_AUTH_CONFIG } from "../../domain/value-objects/AuthConfig";
 import { AuthRepository } from "../repositories/AuthRepository";
-import { GuestModeService } from "./GuestModeService";
+import { AnonymousModeService } from "./AnonymousModeService";
 import { authEventService } from "./AuthEventService";
 import { authTracker } from "../utils/auth-tracker.util";
 import type { IStorageProvider } from "./AuthPackage";
 
 export class AuthService implements IAuthService {
   private repository!: AuthRepository;
-  private guestModeService: GuestModeService;
+  private anonymousModeService: AnonymousModeService;
   private storageProvider?: IStorageProvider;
   private initialized: boolean = false;
   private config: AuthConfig;
@@ -29,19 +29,9 @@ export class AuthService implements IAuthService {
       ...config,
       password: { ...DEFAULT_AUTH_CONFIG.password, ...config.password },
     };
-    // Initialize with a dummy provider effectively, or null?
-    // AuthRepository needs a provider. We can't init it without one.
-    // We'll initialize it properly in initialize()
-    // For now we can cast null or strict init check.
-    // Better: Allow repository to be nullable or initialize with a dummy/proxy.
-    // To satisfy strict TS, let's delay repository creation or create a NotInitializedProvider.
-    // But since initialize() sets it up, we can use a ! or optional.
 
-    this.guestModeService = new GuestModeService();
+    this.anonymousModeService = new AnonymousModeService();
     this.storageProvider = storageProvider;
-
-    // We can't instantiate AuthRepository yet if we don't have provider.
-    // So we'll have to keep it optional or allow late init.
   }
 
   private get repositoryInstance(): AuthRepository {
@@ -54,7 +44,6 @@ export class AuthService implements IAuthService {
 
     let provider: IAuthProvider;
 
-    // Check if it's a Firebase Auth instance (has currentUser property)
     if ("currentUser" in providerOrAuth) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
       const firebaseProvider = new FirebaseAuthProvider(providerOrAuth as any);
@@ -68,7 +57,7 @@ export class AuthService implements IAuthService {
     this.repository = new AuthRepository(provider, this.config);
 
     if (this.storageProvider) {
-      await this.guestModeService.load(this.storageProvider);
+      await this.anonymousModeService.load(this.storageProvider);
     }
     this.initialized = true;
   }
@@ -81,7 +70,7 @@ export class AuthService implements IAuthService {
     authTracker.logOperationStarted("Sign up", { email: params.email });
     try {
       const user = await this.repositoryInstance.signUp(params);
-      await this.clearGuestModeIfNeeded();
+      await this.clearAnonymousModeIfNeeded();
       authTracker.logOperationSuccess("Sign up", { userId: user.uid });
       authEventService.emitUserAuthenticated(user.uid);
       return user;
@@ -95,7 +84,7 @@ export class AuthService implements IAuthService {
     authTracker.logOperationStarted("Sign in", { email: params.email });
     try {
       const user = await this.repositoryInstance.signIn(params);
-      await this.clearGuestModeIfNeeded();
+      await this.clearAnonymousModeIfNeeded();
       authTracker.logOperationSuccess("Sign in", { userId: user.uid });
       authEventService.emitUserAuthenticated(user.uid);
       return user;
@@ -109,7 +98,7 @@ export class AuthService implements IAuthService {
     authTracker.logOperationStarted("Sign out");
     try {
       await this.repositoryInstance.signOut();
-      await this.clearGuestModeIfNeeded();
+      await this.clearAnonymousModeIfNeeded();
       authTracker.logOperationSuccess("Sign out");
     } catch (error) {
       authTracker.logOperationError("sign-out", error);
@@ -117,35 +106,35 @@ export class AuthService implements IAuthService {
     }
   }
 
-  private async clearGuestModeIfNeeded(): Promise<void> {
-    if (this.guestModeService.getIsGuestMode() && this.storageProvider) {
-      await this.guestModeService.clear(this.storageProvider);
+  private async clearAnonymousModeIfNeeded(): Promise<void> {
+    if (this.anonymousModeService.getIsAnonymousMode() && this.storageProvider) {
+      await this.anonymousModeService.clear(this.storageProvider);
     }
   }
 
-  async setGuestMode(): Promise<void> {
+  async setAnonymousMode(): Promise<void> {
     if (!this.storageProvider) {
-      throw new Error("Storage provider is required for guest mode");
+      throw new Error("Storage provider is required for anonymous mode");
     }
-    await this.guestModeService.enable(this.storageProvider);
+    await this.anonymousModeService.enable(this.storageProvider);
   }
 
   getCurrentUser(): AuthUser | null {
     if (!this.initialized) return null;
-    return this.guestModeService.getIsGuestMode() ? null : this.repositoryInstance.getCurrentUser();
+    return this.anonymousModeService.getIsAnonymousMode() ? null : this.repositoryInstance.getCurrentUser();
   }
 
-  getIsGuestMode(): boolean {
-    return this.guestModeService.getIsGuestMode();
+  getIsAnonymousMode(): boolean {
+    return this.anonymousModeService.getIsAnonymousMode();
   }
 
   onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
-    const wrappedCallback = this.guestModeService.wrapAuthStateCallback(callback);
+    const wrappedCallback = this.anonymousModeService.wrapAuthStateCallback(callback);
     return this.repositoryInstance.onAuthStateChange(wrappedCallback);
   }
 
   getConfig(): AuthConfig { return this.config; }
-  getGuestModeService(): GuestModeService { return this.guestModeService; }
+  getAnonymousModeService(): AnonymousModeService { return this.anonymousModeService; }
 }
 
 let authServiceInstance: AuthService | null = null;

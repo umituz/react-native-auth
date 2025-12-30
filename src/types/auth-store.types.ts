@@ -21,8 +21,8 @@ export interface AuthState {
   firebaseUser: User | null;
   /** Loading state during auth operations */
   loading: boolean;
-  /** Guest mode (user skipped authentication) */
-  isGuest: boolean;
+  /** Anonymous mode (user using anonymous auth) */
+  isAnonymous: boolean;
   /** Error message from last auth operation */
   error: string | null;
   /** Whether auth listener has initialized */
@@ -37,8 +37,8 @@ export interface AuthActions {
   setFirebaseUser: (user: User | null) => void;
   /** Set loading state */
   setLoading: (loading: boolean) => void;
-  /** Set guest mode */
-  setIsGuest: (isGuest: boolean) => void;
+  /** Set anonymous mode */
+  setIsAnonymous: (isAnonymous: boolean) => void;
   /** Set error message */
   setError: (error: string | null) => void;
   /** Mark as initialized */
@@ -54,7 +54,7 @@ export const initialAuthState: AuthState = {
   user: null,
   firebaseUser: null,
   loading: true,
-  isGuest: false,
+  isAnonymous: false,
   error: null,
   initialized: false,
 };

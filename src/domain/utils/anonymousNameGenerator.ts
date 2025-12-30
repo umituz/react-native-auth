@@ -27,19 +27,19 @@ const DEFAULT_NAMES = [
     'Phoenix',
 ];
 
-export interface GuestNameConfig {
+export interface AnonymousNameConfig {
     names?: string[];
     prefixes?: string[];
     usePrefixes?: boolean;
 }
 
 /**
- * Generate a random guest name
+ * Generate a random anonymous name
  * Uses userId to ensure consistency per user
  */
-export function generateGuestName(
+export function generateAnonymousName(
     userId?: string,
-    config?: GuestNameConfig,
+    config?: AnonymousNameConfig,
 ): string {
     const names = config?.names || DEFAULT_NAMES;
     const prefixes = config?.prefixes || [];
@@ -47,7 +47,7 @@ export function generateGuestName(
 
     if (!userId) {
         const randomIndex = Math.floor(Math.random() * names.length);
-        return names[randomIndex] ?? "Guest";
+        return names[randomIndex] ?? "Anonymous";
     }
 
     // Use userId hash for consistent name per user
@@ -56,7 +56,7 @@ export function generateGuestName(
     }, 0);
 
     const nameIndex = Math.abs(hash) % names.length;
-    const name = names[nameIndex] ?? "Guest";
+    const name = names[nameIndex] ?? "Anonymous";
 
     if (usePrefixes && prefixes.length > 0) {
         const prefixIndex = Math.abs(hash >> 8) % prefixes.length;
@@ -67,13 +67,13 @@ export function generateGuestName(
 }
 
 /**
- * Get guest display name with fallback
+ * Get anonymous display name with fallback
  */
-export function getGuestDisplayName(
+export function getAnonymousDisplayName(
     userId?: string,
-    fallback = 'Guest',
-    config?: GuestNameConfig,
+    fallback = 'Anonymous',
+    config?: AnonymousNameConfig,
 ): string {
     if (!userId) return fallback;
-    return generateGuestName(userId, config);
+    return generateAnonymousName(userId, config);
 }

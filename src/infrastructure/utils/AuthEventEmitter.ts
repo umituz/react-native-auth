@@ -9,6 +9,6 @@ export function emitUserAuthenticated(userId: string): void {
   DeviceEventEmitter.emit("user-authenticated", { userId });
 }
 
-export function emitGuestModeEnabled(): void {
-  DeviceEventEmitter.emit("guest-mode-enabled");
+export function emitAnonymousModeEnabled(): void {
+  DeviceEventEmitter.emit("anonymous-mode-enabled");
 }

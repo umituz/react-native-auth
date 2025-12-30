@@ -24,9 +24,9 @@ export const selectUser = (state: AuthStore): AuthUser | null => state.user;
 export const selectLoading = (state: AuthStore): boolean => state.loading;
 
 /**
- * Select guest mode
+ * Select anonymous mode (state flag)
  */
-export const selectIsGuest = (state: AuthStore): boolean => state.isGuest;
+export const selectIsAnonymousState = (state: AuthStore): boolean => state.isAnonymous;
 
 /**
  * Select error
@@ -54,9 +54,9 @@ export const selectSetLoading = (state: AuthStore) => state.setLoading;
 export const selectSetError = (state: AuthStore) => state.setError;
 
 /**
- * Select setIsGuest action
+ * Select setIsAnonymous action
  */
-export const selectSetIsGuest = (state: AuthStore) => state.setIsGuest;
+export const selectSetIsAnonymous = (state: AuthStore) => state.setIsAnonymous;
 
 /**
  * Select showAuthModal action (from authModalStore)
@@ -77,10 +77,10 @@ export const selectUserId = (state: AuthStore): string | null => {
 };
 
 /**
- * Check if user is authenticated (not guest, not anonymous)
+ * Check if user is authenticated (not anonymous)
  */
 export const selectIsAuthenticated = (state: AuthStore): boolean => {
-  return !!state.user && !state.isGuest && !state.user.isAnonymous;
+  return !!state.user && !state.isAnonymous && !state.user.isAnonymous;
 };
 
 /**

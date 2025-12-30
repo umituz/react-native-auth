@@ -14,12 +14,12 @@ import { initialAuthState } from "../../types/auth-store.types";
 import {
   selectUser,
   selectLoading,
-  selectIsGuest,
+  selectIsAnonymousState,
   selectError,
   selectFirebaseUserId,
   selectSetLoading,
   selectSetError,
-  selectSetIsGuest,
+  selectSetIsAnonymous,
   selectUserId,
   selectIsAuthenticated,
   selectIsAnonymous,
@@ -34,12 +34,12 @@ export type { AuthState, AuthActions, UserType };
 export {
   selectUser,
   selectLoading,
-  selectIsGuest,
+  selectIsAnonymousState,
   selectError,
   selectFirebaseUserId,
   selectSetLoading,
   selectSetError,
-  selectSetIsGuest,
+  selectSetIsAnonymous,
   selectUserId,
   selectIsAuthenticated,
   selectIsAnonymous,
@@ -62,21 +62,21 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
   name: "auth-store",
   initialState: initialAuthState,
   persist: true,
-  version: 1,
+  version: 2,
   partialize: (state) => ({
-    isGuest: state.isGuest,
+    isAnonymous: state.isAnonymous,
     initialized: state.initialized,
   }),
   actions: (set, get) => ({
     setFirebaseUser: (firebaseUser) => {
-      const { isGuest } = get();
+      const { isAnonymous } = get();
 
       let user: AuthUser | null = null;
 
       if (firebaseUser) {
         if (!firebaseUser.isAnonymous) {
           user = mapToAuthUser(firebaseUser);
-        } else if (!isGuest) {
+        } else if (!isAnonymous) {
           user = mapToAuthUser(firebaseUser);
         }
       }
@@ -85,24 +85,25 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
         firebaseUser,
         user,
         loading: false,
+        isAnonymous: firebaseUser?.isAnonymous ?? false,
       });
     },
 
     setLoading: (loading) => set({ loading }),
 
-    setIsGuest: (isGuest) => {
+    setIsAnonymous: (isAnonymous) => {
       const { firebaseUser } = get();
 
       let user: AuthUser | null = null;
       if (firebaseUser) {
         if (!firebaseUser.isAnonymous) {
           user = mapToAuthUser(firebaseUser);
-        } else if (!isGuest) {
+        } else if (!isAnonymous) {
           user = mapToAuthUser(firebaseUser);
         }
       }
 
-      set({ isGuest, user });
+      set({ isAnonymous, user });
     },
 
     setError: (error) => set({ error }),
@@ -136,13 +137,6 @@ export function getUserType(): UserType {
  */
 export function getIsAuthenticated(): boolean {
   return selectIsAuthenticated(useAuthStore.getState());
-}
-
-/**
- * Check if guest without hook
- */
-export function getIsGuest(): boolean {
-  return useAuthStore.getState().isGuest;
 }
 
 /**

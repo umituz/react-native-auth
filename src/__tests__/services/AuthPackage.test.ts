@@ -48,11 +48,11 @@ describe('AuthPackage', () => {
     it('should merge custom config with defaults', () => {
       const customConfig = {
         storageKeys: {
-          guestMode: '@custom_guest_mode',
+          anonymousMode: '@custom_anonymous_mode',
           showRegister: 'custom_show_register',
         },
         features: {
-          guestMode: false,
+          anonymousMode: false,
           registration: false,
           passwordStrength: false,
         },
@@ -60,7 +60,7 @@ describe('AuthPackage', () => {
 
       const authPackage = new AuthPackage(customConfig);
       const config = authPackage.getConfig();
-      
+
       expect(config.storageKeys).toEqual(customConfig.storageKeys);
       expect(config.features).toEqual(customConfig.features);
       expect(config.validation).toEqual(DEFAULT_AUTH_PACKAGE_CONFIG.validation);
@@ -117,7 +117,7 @@ describe('AuthPackage', () => {
     });
 
     it('should return feature status from config', () => {
-      expect(authPackage.isFeatureEnabled('guestMode')).toBe(true);
+      expect(authPackage.isFeatureEnabled('anonymousMode')).toBe(true);
       expect(authPackage.isFeatureEnabled('registration')).toBe(true);
       expect(authPackage.isFeatureEnabled('passwordStrength')).toBe(true);
     });
@@ -125,15 +125,15 @@ describe('AuthPackage', () => {
     it('should return custom feature status', () => {
       const customConfig = {
         features: {
-          guestMode: false,
+          anonymousMode: false,
           registration: false,
           passwordStrength: false,
         },
       };
 
       const customPackage = new AuthPackage(customConfig);
-      
-      expect(customPackage.isFeatureEnabled('guestMode')).toBe(false);
+
+      expect(customPackage.isFeatureEnabled('anonymousMode')).toBe(false);
       expect(customPackage.isFeatureEnabled('registration')).toBe(false);
       expect(customPackage.isFeatureEnabled('passwordStrength')).toBe(false);
     });
@@ -143,12 +143,12 @@ describe('AuthPackage', () => {
     it('should initialize package globally', () => {
       const customConfig = {
         storageKeys: {
-          guestMode: '@global_guest_mode',
+          anonymousMode: '@global_anonymous_mode',
         },
       };
 
       const packageInstance = initializeAuthPackage(customConfig);
-      expect(packageInstance.getConfig().storageKeys.guestMode).toBe('@global_guest_mode');
+      expect(packageInstance.getConfig().storageKeys.anonymousMode).toBe('@global_anonymous_mode');
     });
 
     it('should return existing package instance', () => {
@@ -167,11 +167,11 @@ describe('AuthPackage', () => {
     it('should not reinitialize when already initialized', () => {
       const firstInstance = initializeAuthPackage();
       const secondInstance = initializeAuthPackage({
-        storageKeys: { guestMode: '@different' },
+        storageKeys: { anonymousMode: '@different' },
       });
-      
+
       expect(firstInstance).toBe(secondInstance);
-      expect(secondInstance.getConfig().storageKeys.guestMode).toBe('@auth_guest_mode'); // Should keep original
+      expect(secondInstance.getConfig().storageKeys.anonymousMode).toBe('@auth_anonymous_mode');
     });
 
     it('should reset package instance', () => {
@@ -204,23 +204,23 @@ describe('AuthPackage', () => {
     it('should handle empty config', () => {
       const authPackage = new AuthPackage({});
       const config = authPackage.getConfig();
-      
+
       expect(config).toEqual(DEFAULT_AUTH_PACKAGE_CONFIG);
     });
 
     it('should handle partial config', () => {
       const partialConfig = {
         features: {
-          guestMode: false,
+          anonymousMode: false,
         },
       };
 
       const authPackage = new AuthPackage(partialConfig);
       const config = authPackage.getConfig();
-      
-      expect(config.features.guestMode).toBe(false);
-      expect(config.features.registration).toBe(true); // Should keep default
-      expect(config.features.passwordStrength).toBe(true); // Should keep default
+
+      expect(config.features.anonymousMode).toBe(false);
+      expect(config.features.registration).toBe(true);
+      expect(config.features.passwordStrength).toBe(true);
     });
   });
 });

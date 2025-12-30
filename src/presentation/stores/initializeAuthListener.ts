@@ -44,9 +44,9 @@ export function initializeAuthListener(
 
   const service = getAuthService();
   if (service) {
-    const isGuest = service.getIsGuestMode();
-    if (isGuest) {
-      store.setIsGuest(true);
+    const isAnonymous = service.getIsAnonymousMode();
+    if (isAnonymous) {
+      store.setIsAnonymous(true);
     }
   }
 
@@ -84,8 +84,8 @@ export function initializeAuthListener(
     store.setFirebaseUser(user);
     store.setInitialized(true);
 
-    if (user && !user.isAnonymous && store.isGuest) {
-      store.setIsGuest(false);
+    if (user && !user.isAnonymous && store.isAnonymous) {
+      store.setIsAnonymous(false);
     }
 
     // Call optional callback

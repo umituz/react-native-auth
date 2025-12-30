@@ -8,7 +8,7 @@ import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
 
 export interface AuthPackageConfig {
   storageKeys: {
-    guestMode: string;
+    anonymousMode: string;
     showRegister: string;
   };
   validation: {
@@ -21,7 +21,7 @@ export interface AuthPackageConfig {
     localization?: any;
   };
   features: {
-    guestMode: boolean;
+    anonymousMode: boolean;
     registration: boolean;
     passwordStrength: boolean;
   };
@@ -29,7 +29,7 @@ export interface AuthPackageConfig {
 
 export const DEFAULT_AUTH_PACKAGE_CONFIG: AuthPackageConfig = {
   storageKeys: {
-    guestMode: "@auth_guest_mode",
+    anonymousMode: "@auth_anonymous_mode",
     showRegister: "auth_show_register",
   },
   validation: {
@@ -47,7 +47,7 @@ export const DEFAULT_AUTH_PACKAGE_CONFIG: AuthPackageConfig = {
     localization: undefined,
   },
   features: {
-    guestMode: true,
+    anonymousMode: true,
     registration: true,
     passwordStrength: true,
   },

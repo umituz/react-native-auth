@@ -33,14 +33,14 @@ export interface IAuthService {
   signOut(): Promise<void>;
 
   /**
-   * Set guest mode (no authentication)
+   * Set anonymous mode (no authentication)
    */
-  setGuestMode(): Promise<void>;
+  setAnonymousMode(): Promise<void>;
 
   /**
-   * Check if currently in guest mode
+   * Check if currently in anonymous mode
    */
-  getIsGuestMode(): boolean;
+  getIsAnonymousMode(): boolean;
 
   /**
    * Get current authenticated user

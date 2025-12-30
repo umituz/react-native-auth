@@ -1,14 +1,14 @@
 /**
- * Guest Mode Storage
- * Single Responsibility: Manage guest mode persistence
+ * Anonymous Mode Storage
+ * Single Responsibility: Manage anonymous mode persistence
  */
 
 import { getAuthPackage } from "../services/AuthPackage";
 
-export async function loadGuestMode(storageKey?: string): Promise<boolean> {
+export async function loadAnonymousMode(storageKey?: string): Promise<boolean> {
   try {
     const packageConfig = getAuthPackage()?.getConfig();
-    const key = storageKey ?? packageConfig?.storageKeys.guestMode ?? "@auth_guest_mode";
+    const key = storageKey ?? packageConfig?.storageKeys.anonymousMode ?? "@auth_anonymous_mode";
 
     const storageProvider = getAuthPackage()?.getStorageProvider();
     if (!storageProvider) return false;
@@ -20,15 +20,15 @@ export async function loadGuestMode(storageKey?: string): Promise<boolean> {
   }
 }
 
-export async function saveGuestMode(isGuest: boolean, storageKey?: string): Promise<void> {
+export async function saveAnonymousMode(isAnonymous: boolean, storageKey?: string): Promise<void> {
   try {
     const packageConfig = getAuthPackage()?.getConfig();
-    const key = storageKey ?? packageConfig?.storageKeys.guestMode ?? "@auth_guest_mode";
+    const key = storageKey ?? packageConfig?.storageKeys.anonymousMode ?? "@auth_anonymous_mode";
 
     const storageProvider = getAuthPackage()?.getStorageProvider();
     if (!storageProvider) return;
 
-    if (isGuest) {
+    if (isAnonymous) {
       await storageProvider.set(key, "true");
     } else {
       await storageProvider.remove(key);
@@ -38,10 +38,10 @@ export async function saveGuestMode(isGuest: boolean, storageKey?: string): Prom
   }
 }
 
-export async function clearGuestMode(storageKey?: string): Promise<void> {
+export async function clearAnonymousMode(storageKey?: string): Promise<void> {
   try {
     const packageConfig = getAuthPackage()?.getConfig();
-    const key = storageKey ?? packageConfig?.storageKeys.guestMode ?? "@auth_guest_mode";
+    const key = storageKey ?? packageConfig?.storageKeys.anonymousMode ?? "@auth_anonymous_mode";
 
     const storageProvider = getAuthPackage()?.getStorageProvider();
     if (!storageProvider) return;

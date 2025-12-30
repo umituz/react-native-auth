@@ -52,7 +52,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
 
   const { isVisible, mode, hideAuthModal, setMode, executePendingCallback, clearPendingCallback } =
     useAuthModalStore();
-  const { isAuthenticated, isGuest } = useAuth();
+  const { isAuthenticated, isAnonymous } = useAuth();
 
   useEffect(() => {
     if (isVisible) {
@@ -63,11 +63,11 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
   }, [isVisible]);
 
   useEffect(() => {
-    if (isAuthenticated && !isGuest && isVisible) {
+    if (isAuthenticated && !isAnonymous && isVisible) {
       hideAuthModal();
       executePendingCallback();
     }
-  }, [isAuthenticated, isGuest, isVisible, hideAuthModal, executePendingCallback]);
+  }, [isAuthenticated, isAnonymous, isVisible, hideAuthModal, executePendingCallback]);
 
   const handleDismiss = useCallback(() => {
     hideAuthModal();

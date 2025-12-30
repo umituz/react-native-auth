@@ -38,12 +38,12 @@ export const useSignOutMutation = () => {
     });
 };
 
-export const useGuestModeMutation = () => {
+export const useAnonymousModeMutation = () => {
     return useMutation({
         mutationFn: async (): Promise<void> => {
             const service = getAuthService();
             if (!service) throw new Error("Auth Service not initialized");
-            return service.setGuestMode();
+            return service.setAnonymousMode();
         },
     });
 };

@@ -19,13 +19,13 @@ export interface UseLoginFormResult {
   handleEmailChange: (text: string) => void;
   handlePasswordChange: (text: string) => void;
   handleSignIn: () => Promise<void>;
-  handleContinueAsGuest: () => Promise<void>;
+  handleContinueAnonymously: () => Promise<void>;
   displayError: string | null;
 }
 
 export function useLoginForm(): UseLoginFormResult {
   const { t } = useLocalization();
-  const { signIn, loading, error, continueAsGuest } = useAuth();
+  const { signIn, loading, error, continueAnonymously } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,13 +81,13 @@ export function useLoginForm(): UseLoginFormResult {
     }
   }, [email, password, t, signIn]);
 
-  const handleContinueAsGuest = useCallback(async () => {
+  const handleContinueAnonymously = useCallback(async () => {
     try {
-      await continueAsGuest();
+      await continueAnonymously();
     } catch {
-      // Silent fail - guest mode should always work
+      // Silent fail - anonymous mode should always work
     }
-  }, [continueAsGuest]);
+  }, [continueAnonymously]);
 
   const displayError = localError || error;
 
@@ -101,7 +101,7 @@ export function useLoginForm(): UseLoginFormResult {
     handleEmailChange,
     handlePasswordChange,
     handleSignIn,
-    handleContinueAsGuest,
+    handleContinueAnonymously,
     displayError,
   };
 }

@@ -11,11 +11,10 @@ import {
   useAuthStore,
   selectUser,
   selectLoading,
-  selectIsGuest,
   selectError,
   selectSetLoading,
   selectSetError,
-  selectSetIsGuest,
+  selectSetIsAnonymous,
   selectIsAuthenticated,
   selectUserId,
   selectUserType,
@@ -27,7 +26,7 @@ import {
   useSignInMutation,
   useSignUpMutation,
   useSignOutMutation,
-  useGuestModeMutation,
+  useAnonymousModeMutation,
 } from "./mutations/useAuthMutations";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 
@@ -42,11 +41,9 @@ export interface UseAuthResult {
   loading: boolean;
   /** Whether auth is ready (initialized and not loading) */
   isAuthReady: boolean;
-  /** Whether user is in guest mode */
-  isGuest: boolean;
   /** Whether user is anonymous */
   isAnonymous: boolean;
-  /** Whether user is authenticated (not guest, not anonymous) */
+  /** Whether user is authenticated (not anonymous) */
   isAuthenticated: boolean;
   /** Current error message */
   error: string | null;
@@ -56,8 +53,8 @@ export interface UseAuthResult {
   signIn: (email: string, password: string) => Promise<void>;
   /** Sign out function */
   signOut: () => Promise<void>;
-  /** Continue as guest function */
-  continueAsGuest: () => Promise<void>;
+  /** Continue anonymously function */
+  continueAnonymously: () => Promise<void>;
   /** Set error manually (for form validation, etc.) */
   setError: (error: string | null) => void;
 }
@@ -72,7 +69,6 @@ export function useAuth(): UseAuthResult {
   // State from store - using typed selectors
   const user = useAuthStore(selectUser);
   const loading = useAuthStore(selectLoading);
-  const isGuest = useAuthStore(selectIsGuest);
   const error = useAuthStore(selectError);
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const userId = useAuthStore(selectUserId);
@@ -83,13 +79,13 @@ export function useAuth(): UseAuthResult {
   // Actions from store - using typed selectors
   const setLoading = useAuthStore(selectSetLoading);
   const setError = useAuthStore(selectSetError);
-  const setIsGuest = useAuthStore(selectSetIsGuest);
+  const setIsAnonymous = useAuthStore(selectSetIsAnonymous);
 
   // Mutations
   const signInMutation = useSignInMutation();
   const signUpMutation = useSignUpMutation();
   const signOutMutation = useSignOutMutation();
-  const guestModeMutation = useGuestModeMutation();
+  const anonymousModeMutation = useAnonymousModeMutation();
 
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {
@@ -97,9 +93,7 @@ export function useAuth(): UseAuthResult {
         setLoading(true);
         setError(null);
         await signUpMutation.mutateAsync({ email, password, displayName });
-        if (isGuest) {
-          setIsGuest(false);
-        }
+        setIsAnonymous(false);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "Sign up failed";
         setError(errorMessage);
@@ -108,7 +102,7 @@ export function useAuth(): UseAuthResult {
         setLoading(false);
       }
     },
-    [isGuest, setIsGuest, setLoading, setError, signUpMutation]
+    [setIsAnonymous, setLoading, setError, signUpMutation]
   );
 
   const signIn = useCallback(
@@ -117,9 +111,7 @@ export function useAuth(): UseAuthResult {
         setLoading(true);
         setError(null);
         await signInMutation.mutateAsync({ email, password });
-        if (isGuest) {
-          setIsGuest(false);
-        }
+        setIsAnonymous(false);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "Sign in failed";
         setError(errorMessage);
@@ -128,7 +120,7 @@ export function useAuth(): UseAuthResult {
         setLoading(false);
       }
     },
-    [isGuest, setIsGuest, setLoading, setError, signInMutation]
+    [setIsAnonymous, setLoading, setError, signInMutation]
   );
 
   const signOut = useCallback(async () => {
@@ -140,17 +132,17 @@ export function useAuth(): UseAuthResult {
     }
   }, [setLoading, signOutMutation]);
 
-  const continueAsGuest = useCallback(async () => {
+  const continueAnonymously = useCallback(async () => {
     try {
       setLoading(true);
-      await guestModeMutation.mutateAsync();
-      setIsGuest(true);
+      await anonymousModeMutation.mutateAsync();
+      setIsAnonymous(true);
     } catch {
-      setIsGuest(true);
+      setIsAnonymous(true);
     } finally {
       setLoading(false);
     }
-  }, [setIsGuest, setLoading, guestModeMutation]);
+  }, [setIsAnonymous, setLoading, anonymousModeMutation]);
 
   return {
     user,
@@ -158,14 +150,13 @@ export function useAuth(): UseAuthResult {
     userType,
     loading,
     isAuthReady,
-    isGuest,
     isAnonymous,
     isAuthenticated,
     error,
     signUp,
     signIn,
     signOut,
-    continueAsGuest,
+    continueAnonymously,
     setError,
   };
 }

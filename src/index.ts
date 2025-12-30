@@ -146,9 +146,9 @@ export type { UseAppleAuthResult } from './presentation/hooks/useAppleAuth';
 
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
 
-// Domain Utils - Guest Names
-export { generateGuestName, getGuestDisplayName } from './domain/utils/guestNameGenerator';
-export type { GuestNameConfig } from './domain/utils/guestNameGenerator';
+// Domain Utils - Anonymous Names
+export { generateAnonymousName, getAnonymousDisplayName } from './domain/utils/anonymousNameGenerator';
+export type { AnonymousNameConfig } from './domain/utils/anonymousNameGenerator';
 
 // =============================================================================
 // PRESENTATION LAYER - Screens & Navigation
@@ -216,7 +216,6 @@ export {
   getUserId,
   getUserType,
   getIsAuthenticated,
-  getIsGuest,
   getIsAnonymous,
 } from './presentation/stores/authStore';
 
