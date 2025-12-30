@@ -36,8 +36,9 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   const tokens = useAppDesignTokens();
   const { t } = useLocalization();
 
-  const showGoogle = enabledProviders.includes("google");
-  const showApple = enabledProviders.includes("apple") && Platform.OS === "ios";
+  const safeEnabledProviders = enabledProviders ?? [];
+  const showGoogle = safeEnabledProviders.includes("google");
+  const showApple = safeEnabledProviders.includes("apple") && Platform.OS === "ios";
 
   if (!showGoogle && !showApple) {
     return null;
