@@ -67,6 +67,17 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     isAnonymous: state.isAnonymous,
     initialized: state.initialized,
   }),
+  migrate: (persistedState: unknown, version: number) => {
+    const state = persistedState as Partial<AuthState>;
+    if (version < 2) {
+      return {
+        ...initialAuthState,
+        isAnonymous: state.isAnonymous ?? false,
+        initialized: state.initialized ?? false,
+      };
+    }
+    return { ...initialAuthState, ...state } as AuthState;
+  },
   actions: (set, get) => ({
     setFirebaseUser: (firebaseUser) => {
       const { isAnonymous } = get();

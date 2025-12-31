@@ -70,7 +70,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
               <ActivityIndicator size="small" color={tokens.colors.textPrimary} />
             ) : (
               <>
-                <AtomicIcon name="google" size="sm" />
+                <AtomicIcon name="logo-google" size="sm" />
                 <AtomicText style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
                   {t("auth.google")}
                 </AtomicText>
@@ -94,7 +94,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
               <ActivityIndicator size="small" color={tokens.colors.textPrimary} />
             ) : (
               <>
-                <AtomicIcon name="apple" size="sm" color="primary" />
+                <AtomicIcon name="logo-apple" size="sm" color="onSurface" />
                 <AtomicText style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
                   {t("auth.apple")}
                 </AtomicText>

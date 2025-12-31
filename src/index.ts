@@ -87,6 +87,27 @@ export {
   resetAuthService,
 } from './infrastructure/services/AuthService';
 
+export {
+  ensureUserDocument,
+  markUserDeleted,
+  configureUserDocumentService,
+} from './infrastructure/services/UserDocumentService';
+
+// Unified Auth Initialization (RECOMMENDED)
+export {
+  initializeAuth,
+  isAuthInitialized,
+  resetAuthInitialization,
+} from './infrastructure/services/initializeAuth';
+
+export type { InitializeAuthOptions } from './infrastructure/services/initializeAuth';
+
+export type {
+  UserDocumentConfig,
+  UserDocumentExtras,
+  UserDocumentUser,
+} from './infrastructure/services/UserDocumentService';
+
 // =============================================================================
 // INFRASTRUCTURE LAYER - Validation
 // =============================================================================
