@@ -18,8 +18,7 @@ declare module 'expo-clipboard';
 declare module 'expo-sharing';
 declare module 'expo-file-system/build/legacy';
 declare module '@umituz/react-native-design-system-theme';
-declare module '@sentry/react-native';
-declare module '@sentry/types';
+
 
 declare module 'react-native-safe-area-context' {
   export function useSafeAreaInsets(): {
