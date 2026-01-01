@@ -1,6 +1,5 @@
 /**
  * Simple tracker for auth operations
- * Removed Sentry dependency
  */
 
 export const authTracker = {

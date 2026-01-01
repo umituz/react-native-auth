@@ -171,6 +171,10 @@ export type { UserProfile, UpdateProfileParams } from './domain/entities/UserPro
 export { generateAnonymousName, getAnonymousDisplayName } from './domain/utils/anonymousNameGenerator';
 export type { AnonymousNameConfig } from './domain/utils/anonymousNameGenerator';
 
+// Domain Utils - Migration
+export { migrateUserData, configureMigration } from './domain/utils/migration';
+export type { MigrationConfig } from './domain/utils/migration';
+
 // =============================================================================
 // PRESENTATION LAYER - Screens & Navigation
 // =============================================================================
