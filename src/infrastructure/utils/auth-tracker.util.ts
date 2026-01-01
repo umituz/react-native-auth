@@ -1,27 +1,24 @@
-import {
-    trackPackageError as sentryTrack,
-    addPackageBreadcrumb as sentryBreadcrumb
+/**
+ * Simple tracker for auth operations
+ * Removed Sentry dependency
+ */
 
 export const authTracker = {
     logOperationStarted: (operation: string, data?: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
-        (sentryBreadcrumb as any)("auth", `${operation} started`, data);
+        if (__DEV__) {
+            console.log(`[Auth] ${operation} started`, data);
+        }
     },
 
     logOperationSuccess: (operation: string, data?: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
-        (sentryBreadcrumb as any)("auth", `${operation} successful`, data);
+        if (__DEV__) {
+            console.log(`[Auth] ${operation} successful`, data);
+        }
     },
 
     logOperationError: (operation: string, error: unknown, metadata?: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
-        (sentryTrack as any)(
-            error instanceof Error ? error : new Error(`${operation} failed`),
-            {
-                packageName: "auth",
-                operation,
-                ...metadata,
-            }
-        );
+        if (__DEV__) {
+            console.error(`[Auth] ${operation} failed`, { error, ...metadata });
+        }
     }
 };
