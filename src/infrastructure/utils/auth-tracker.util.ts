@@ -1,7 +1,6 @@
 import {
     trackPackageError as sentryTrack,
     addPackageBreadcrumb as sentryBreadcrumb
-} from "@umituz/react-native-sentry";
 
 export const authTracker = {
     logOperationStarted: (operation: string, data?: Record<string, unknown>) => {
