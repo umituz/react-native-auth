@@ -13,8 +13,6 @@ import {
   type SocialAuthResult,
 } from "@umituz/react-native-firebase";
 
-declare const __DEV__: boolean;
-
 export interface UseAppleAuthResult {
   signInWithApple: () => Promise<SocialAuthResult>;
   appleLoading: boolean;
@@ -38,18 +36,7 @@ export function useAppleAuth(): UseAppleAuthResult {
       return { success: false, error: "Apple Sign-In is not available" };
     }
 
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[useAppleAuth] Apple sign-in requested");
-    }
-
     const result = await signInWithApple();
-
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[useAppleAuth] Apple sign-in result:", result);
-    }
-
     return result;
   }, [appleAvailable, signInWithApple]);
 

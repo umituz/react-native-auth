@@ -15,10 +15,10 @@ export const configureMigration = (config: MigrationConfig): void => {
   migrationConfig = config;
 };
 
-export const migrateUserData = async (
+export const migrateUserData = (
   anonymousId: string,
   authId: string
-): Promise<void> => {
+): void => {
   if (__DEV__) {
     console.log(`[Migration] Starting migration from ${anonymousId} to ${authId}`);
   }

@@ -122,42 +122,44 @@ export async function initializeAuth(
   // 4. Initialize Auth Listener (for state management)
   initializeAuthListener({
     autoAnonymousSignIn,
-    onAuthStateChange: async (user) => {
-      if (!user) {
-        // User signed out
-        previousUserId = null;
-        wasAnonymous = false;
-        onAuthStateChange?.(null);
-        return;
-      }
-
-      const currentUserId = user.uid;
-      const isCurrentlyAnonymous = user.isAnonymous ?? false;
-
-      // Detect anonymous-to-authenticated conversion
-      if (
-        previousUserId &&
-        previousUserId !== currentUserId &&
-        wasAnonymous &&
-        !isCurrentlyAnonymous &&
-        onUserConverted
-      ) {
-        try {
-          await onUserConverted(previousUserId, currentUserId);
-        } catch {
-          // Migration failed but don't block user flow
+    onAuthStateChange: (user) => {
+      void (async () => {
+        if (!user) {
+          // User signed out
+          previousUserId = null;
+          wasAnonymous = false;
+          await onAuthStateChange?.(null);
+          return;
         }
-      }
 
-      // Create/update user document in Firestore
-      await ensureUserDocument(user);
+        const currentUserId = user.uid;
+        const isCurrentlyAnonymous = user.isAnonymous ?? false;
 
-      // Update tracking state
-      previousUserId = currentUserId;
-      wasAnonymous = isCurrentlyAnonymous;
+        // Detect anonymous-to-authenticated conversion
+        if (
+          previousUserId &&
+          previousUserId !== currentUserId &&
+          wasAnonymous &&
+          !isCurrentlyAnonymous &&
+          onUserConverted
+        ) {
+          try {
+            await onUserConverted(previousUserId, currentUserId);
+          } catch {
+            // Migration failed but don't block user flow
+          }
+        }
 
-      // Call app's custom callback
-      onAuthStateChange?.(user);
+        // Create/update user document in Firestore
+        await ensureUserDocument(user);
+
+        // Update tracking state
+        previousUserId = currentUserId;
+        wasAnonymous = isCurrentlyAnonymous;
+
+        // Call app's custom callback
+        await onAuthStateChange?.(user);
+      })();
     },
   });
 

@@ -22,8 +22,6 @@ import {
   type SocialAuthResult,
 } from "@umituz/react-native-firebase";
 
-declare const __DEV__: boolean;
-
 export interface UseSocialLoginConfig extends SocialAuthConfig {}
 
 export interface UseSocialLoginResult {
@@ -64,11 +62,6 @@ export function useSocialLogin(config?: UseSocialLoginConfig): UseSocialLoginRes
       return Promise.resolve({ success: false, error: "Google Sign-In is not configured" });
     }
 
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[useSocialLogin] Use useGoogleAuth hook for Google OAuth flow");
-    }
-
     return Promise.resolve({
       success: false,
       error: "Use useGoogleAuth hook for Google OAuth flow",
@@ -87,18 +80,7 @@ export function useSocialLogin(config?: UseSocialLoginConfig): UseSocialLoginRes
       return { success: false, error: "Apple Sign-In is not available" };
     }
 
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[useSocialLogin] Apple sign-in requested");
-    }
-
     const result = await firebaseSignInWithApple();
-
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[useSocialLogin] Apple sign-in result:", result);
-    }
-
     return result;
   }, [appleAvailable, firebaseSignInWithApple]);
 

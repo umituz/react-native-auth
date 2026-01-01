@@ -14,8 +14,6 @@ import {
   type SocialAuthResult,
 } from "@umituz/react-native-firebase";
 
-declare const __DEV__: boolean;
-
 // Type declarations for expo-auth-session
 interface GoogleAuthRequestConfig {
   iosClientId: string;
@@ -59,11 +57,7 @@ try {
     WebBrowser.maybeCompleteAuthSession();
   }
 } catch {
-  // expo-auth-session not available
-  if (__DEV__) {
-    // eslint-disable-next-line no-console
-    console.log("[useGoogleAuth] expo-auth-session not available");
-  }
+  // expo-auth-session not available - silent fallback
 }
 
 export interface GoogleAuthConfig {
@@ -118,11 +112,8 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
       if (idToken) {
         setIsLoading(true);
         signInWithGoogleToken(idToken)
-          .catch((error: unknown) => {
-            if (__DEV__) {
-              // eslint-disable-next-line no-console
-              console.error("[useGoogleAuth] Firebase sign-in error:", error);
-            }
+          .catch(() => {
+            // Silent error handling
           })
           .finally(() => {
             setIsLoading(false);
@@ -152,12 +143,6 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
         const firebaseResult = await signInWithGoogleToken(
           result.authentication.idToken,
         );
-
-        if (__DEV__) {
-          // eslint-disable-next-line no-console
-          console.log("[useGoogleAuth] Sign-in successful:", firebaseResult);
-        }
-
         return firebaseResult;
       }
 

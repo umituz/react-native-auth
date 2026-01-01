@@ -3,16 +3,23 @@
  * Main container for auth screens with gradient and scroll
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useResponsive } from "@umituz/react-native-design-system";
 import { AuthGradientBackground } from "./AuthGradientBackground";
+
+/** Layout constants for auth screens */
+const AUTH_LAYOUT = {
+  VERTICAL_PADDING: 40,
+  HORIZONTAL_PADDING: 20,
+  MAX_CONTENT_WIDTH: 440,
+} as const;
 
 interface AuthContainerProps {
   children: React.ReactNode;
@@ -20,19 +27,21 @@ interface AuthContainerProps {
 
 export const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
   const insets = useSafeAreaInsets();
+  const { spacingMultiplier } = useResponsive();
+
+  const dynamicStyles = useMemo(() => ({
+    paddingTop: insets.top + (AUTH_LAYOUT.VERTICAL_PADDING * spacingMultiplier),
+    paddingBottom: insets.bottom + (AUTH_LAYOUT.VERTICAL_PADDING * spacingMultiplier),
+  }), [insets.top, insets.bottom, spacingMultiplier]);
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      behavior="padding"
     >
       <AuthGradientBackground />
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40 },
-        ]}
+        contentContainerStyle={[styles.scrollContent, dynamicStyles]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -48,12 +57,12 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: AUTH_LAYOUT.HORIZONTAL_PADDING,
   },
   content: {
     flex: 1,
     justifyContent: "center",
-    maxWidth: 440,
+    maxWidth: AUTH_LAYOUT.MAX_CONTENT_WIDTH,
     alignSelf: "center",
     width: "100%",
   },

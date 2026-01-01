@@ -187,13 +187,13 @@ export async function ensureUserDocument(
     const collectionName = userDocumentConfig.collectionName || "users";
     const userRef = doc(db, collectionName, user.uid);
     const userDoc = await getDoc(userRef);
-    const baseData = buildBaseData(user, allExtras as UserDocumentExtras);
+    const baseData = buildBaseData(user, allExtras);
 
     if (!userDoc.exists()) {
-      const createData = buildCreateData(baseData, allExtras as UserDocumentExtras);
+      const createData = buildCreateData(baseData, allExtras);
       await setDoc(userRef, createData);
     } else {
-      const updateData = buildUpdateData(baseData, allExtras as UserDocumentExtras);
+      const updateData = buildUpdateData(baseData, allExtras);
       await setDoc(userRef, updateData, { merge: true });
     }
 
