@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { useAppDesignTokens, ScreenLayout } from "@umituz/react-native-design-system";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { useAppDesignTokens, ScreenLayout, AtomicIcon, AtomicText } from "@umituz/react-native-design-system";
 
 import { ProfileSection, type ProfileSectionConfig } from "../components/ProfileSection";
 import { AccountActions, type AccountActionsConfig } from "../components/AccountActions";
@@ -15,6 +15,8 @@ export interface AccountScreenConfig {
     profile: ProfileSectionConfig;
     accountActions?: AccountActionsConfig;
     isAnonymous: boolean;
+    editProfileText?: string;
+    onEditProfile?: () => void;
 }
 
 export interface AccountScreenProps {
@@ -43,6 +45,24 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
                 signInText="Sign In"
             />
 
+            {/* Edit Profile Option */}
+            {!config.isAnonymous && config.onEditProfile && config.editProfileText && (
+                <>
+                    <View style={styles.divider} />
+                    <TouchableOpacity
+                        style={[styles.actionButton, { borderColor: tokens.colors.border }]}
+                        onPress={config.onEditProfile}
+                        activeOpacity={0.7}
+                    >
+                        <AtomicIcon name="person-outline" size="md" customColor={tokens.colors.textPrimary} />
+                        <AtomicText style={[styles.actionText, { color: tokens.colors.textPrimary }]}>
+                            {config.editProfileText}
+                        </AtomicText>
+                        <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                    </TouchableOpacity>
+                </>
+            )}
+
             {!config.isAnonymous && config.accountActions && (
                 <>
                     <View style={styles.divider} />
@@ -59,6 +79,20 @@ const styles = StyleSheet.create({
     },
     divider: {
         height: 24,
+    },
+    actionButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        borderWidth: 1,
+        gap: 12,
+    },
+    actionText: {
+        flex: 1,
+        fontSize: 16,
+        fontWeight: "500",
     },
 });
 

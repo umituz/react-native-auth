@@ -169,6 +169,10 @@ export async function ensureUserDocument(
   extras?: UserDocumentExtras,
 ): Promise<boolean> {
   const db = getFirestore();
+  if (typeof __DEV__ !== "undefined" && __DEV__) {
+    // eslint-disable-next-line no-console
+    console.log("[UserDocumentService] db:", !!db, "type:", typeof db, "constructor:", db?.constructor?.name);
+  }
   if (!db || !user.uid) return false;
 
   try {

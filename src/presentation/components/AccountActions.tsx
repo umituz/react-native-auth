@@ -11,6 +11,7 @@ import { useAppDesignTokens, AtomicIcon, AtomicText } from "@umituz/react-native
 export interface AccountActionsConfig {
     logoutText: string;
     deleteAccountText: string;
+    changePasswordText?: string;
     logoutConfirmTitle: string;
     logoutConfirmMessage: string;
     deleteConfirmTitle: string;
@@ -19,6 +20,8 @@ export interface AccountActionsConfig {
     deleteErrorMessage?: string;
     onLogout: () => Promise<void>;
     onDeleteAccount: () => Promise<void>;
+    onChangePassword?: () => void;
+    showChangePassword?: boolean;
 }
 
 export interface AccountActionsProps {
@@ -30,6 +33,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
     const {
         logoutText,
         deleteAccountText,
+        changePasswordText,
         logoutConfirmTitle,
         logoutConfirmMessage,
         deleteConfirmTitle,
@@ -38,6 +42,8 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
         deleteErrorMessage = "Failed to delete account. Please try again.",
         onLogout,
         onDeleteAccount,
+        onChangePassword,
+        showChangePassword = false,
     } = config;
 
     const handleLogout = () => {
@@ -80,6 +86,21 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
 
     return (
         <View style={styles.container}>
+            {/* Change Password */}
+            {showChangePassword && onChangePassword && changePasswordText && (
+                <TouchableOpacity
+                    style={[styles.actionButton, { borderColor: tokens.colors.border }]}
+                    onPress={onChangePassword}
+                    activeOpacity={0.7}
+                >
+                    <AtomicIcon name="key-outline" size="md" customColor={tokens.colors.textPrimary} />
+                    <AtomicText style={[styles.actionText, { color: tokens.colors.textPrimary }]}>
+                        {changePasswordText}
+                    </AtomicText>
+                    <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                </TouchableOpacity>
+            )}
+
             {/* Logout */}
             <TouchableOpacity
                 style={[styles.actionButton, { borderColor: tokens.colors.border }]}

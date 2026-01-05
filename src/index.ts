@@ -88,6 +88,13 @@ export {
 } from './infrastructure/services/AuthService';
 
 export {
+  createStorageProvider,
+  StorageProviderAdapter,
+} from './infrastructure/adapters/StorageProviderAdapter';
+
+export type { IStorageProvider } from './infrastructure/services/AuthPackage';
+
+export {
   ensureUserDocument,
   markUserDeleted,
   configureUserDocumentService,

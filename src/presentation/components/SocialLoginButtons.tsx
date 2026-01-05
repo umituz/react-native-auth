@@ -4,9 +4,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  ActivityIndicator,
 } from "react-native";
-import { useAppDesignTokens, AtomicText, AtomicIcon } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, AtomicText, AtomicIcon, AtomicSpinner } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
@@ -67,7 +66,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
             activeOpacity={0.7}
           >
             {googleLoading ? (
-              <ActivityIndicator size="small" color={tokens.colors.textPrimary} />
+              <AtomicSpinner size="sm" color={tokens.colors.textPrimary} />
             ) : (
               <>
                 <AtomicIcon name="logo-google" size="sm" />
@@ -91,7 +90,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
             activeOpacity={0.7}
           >
             {appleLoading ? (
-              <ActivityIndicator size="small" color={tokens.colors.textPrimary} />
+              <AtomicSpinner size="sm" color={tokens.colors.textPrimary} />
             ) : (
               <>
                 <AtomicIcon name="logo-apple" size="sm" color="onSurface" />

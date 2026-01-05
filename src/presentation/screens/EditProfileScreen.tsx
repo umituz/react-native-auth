@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import { View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
-import { useAppDesignTokens, AtomicText } from "@umituz/react-native-design-system";
+import { View, ScrollView, StyleSheet } from "react-native";
+import { useAppDesignTokens, AtomicText, AtomicSpinner } from "@umituz/react-native-design-system";
 import { EditProfileAvatar } from "../components/EditProfileAvatar";
 import { EditProfileForm } from "../components/EditProfileForm";
 import { EditProfileActions } from "../components/EditProfileActions";
@@ -46,7 +46,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ config }) 
     if (config.isLoading) {
         return (
             <View style={[styles.loading, { backgroundColor: tokens.colors.backgroundPrimary }]}>
-                <ActivityIndicator size="large" color={tokens.colors.primary} />
+                <AtomicSpinner size="lg" color="primary" fullContainer />
             </View>
         );
     }
