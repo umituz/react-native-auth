@@ -28,6 +28,7 @@ export function getAuthErrorLocalizationKey(error: unknown): string {
     AUTH_TOO_MANY_REQUESTS: "auth.errors.tooManyRequests",
     AUTH_USER_DISABLED: "auth.errors.userDisabled",
     AUTH_NOT_INITIALIZED: "auth.errors.authNotInitialized",
+    AUTH_INVALID_CREDENTIAL: "auth.errors.invalidCredential",
   };
 
   // Check error name for specific error types
