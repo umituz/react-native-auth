@@ -14,6 +14,7 @@ import { getFirebaseAuth } from "@umituz/react-native-firebase";
 import { initializeAuthService } from "./AuthService";
 import { configureUserDocumentService, ensureUserDocument } from "./UserDocumentService";
 import type { UserDocumentConfig } from "./UserDocumentService";
+import { collectDeviceExtras } from "@umituz/react-native-design-system";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 
@@ -101,7 +102,8 @@ export async function initializeAuth(
     collectionName: userCollection,
   };
   if (extraFields) userDocConfig.extraFields = extraFields;
-  if (collectExtras) userDocConfig.collectExtras = collectExtras;
+  // Use provided collectExtras or default to design system's implementation
+  userDocConfig.collectExtras = collectExtras || collectDeviceExtras;
 
   configureUserDocumentService(userDocConfig);
 

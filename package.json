@@ -32,7 +32,6 @@
     "url": "git+https://github.com/umituz/react-native-auth.git"
   },
   "dependencies": {
-    "@umituz/react-native-design-system": "latest",
     "@umituz/react-native-firebase": "latest",
     "@umituz/react-native-localization": "latest",
     "@umituz/react-native-storage": "latest",
@@ -69,7 +68,7 @@
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@umituz/react-native-design-system": "latest",
+    "@umituz/react-native-design-system": "^2.6.33",
     "@umituz/react-native-design-system-theme": "latest",
     "@umituz/react-native-firebase": "latest",
     "@umituz/react-native-haptics": "latest",

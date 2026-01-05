@@ -20,7 +20,7 @@ export const AuthFormCard: React.FC<AuthFormCardProps> = ({ children }) => {
         styles.formCard,
         {
           backgroundColor: tokens.colors.surface,
-          borderRadius: tokens.radius.xl,
+          borderRadius: tokens.borders.radius.xl,
           padding: tokens.spacing.lg,
         },
       ]}
