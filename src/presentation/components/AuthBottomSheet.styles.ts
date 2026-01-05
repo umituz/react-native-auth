@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 24,
-        paddingBottom: 40,
+        paddingBottom: 80,
     },
     closeButton: {
         position: "absolute",

@@ -11,7 +11,7 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
-import { useAppDesignTokens, AtomicText, AtomicIcon } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, AtomicText, AtomicIcon, AtomicKeyboardAvoidingView } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
@@ -124,16 +124,19 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       backdropComponent={renderBackdrop}
       onDismiss={handleDismiss}
       enablePanDownToClose
-      keyboardBehavior="interactive"
+      keyboardBehavior="extend"
       keyboardBlurBehavior="restore"
       backgroundStyle={[styles.background, { backgroundColor: tokens.colors.backgroundPrimary }]}
       handleIndicatorStyle={[styles.handleIndicator, { backgroundColor: tokens.colors.border }]}
     >
-      <BottomSheetScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      <AtomicKeyboardAvoidingView
+        style={{ flex: 1 }}
       >
+        <BottomSheetScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
         <TouchableOpacity
           style={styles.closeButton}
           onPress={handleClose}
@@ -177,6 +180,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           )}
         </View>
       </BottomSheetScrollView>
+    </AtomicKeyboardAvoidingView>
     </BottomSheetModal>
   );
 };

@@ -3,8 +3,8 @@
  * Single Responsibility: Render register form UI
  */
 
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import { View, StyleSheet, TextInput } from "react-native";
 import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useRegisterForm } from "../hooks/useRegisterForm";
@@ -30,6 +30,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onPrivacyPress,
 }) => {
   const { t } = useLocalization();
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+
   const {
     displayName,
     email,
@@ -61,11 +65,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           disabled={loading}
           state={fieldErrors.displayName ? "error" : "default"}
           helperText={fieldErrors.displayName || undefined}
+          returnKeyType="next"
+          onSubmitEditing={() => emailRef.current?.focus()}
+          blurOnSubmit={false}
         />
       </View>
 
       <View style={styles.inputContainer}>
         <AtomicInput
+          ref={emailRef}
           label={t("auth.email")}
           value={email}
           onChangeText={handleEmailChange}
@@ -75,20 +83,28 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           disabled={loading}
           state={fieldErrors.email ? "error" : "default"}
           helperText={fieldErrors.email || undefined}
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef.current?.focus()}
+          blurOnSubmit={false}
         />
       </View>
 
       <View style={styles.inputContainer}>
         <AtomicInput
+          ref={passwordRef}
           label={t("auth.password")}
           value={password}
           onChangeText={handlePasswordChange}
           placeholder={t("auth.passwordPlaceholder")}
           secureTextEntry
+          showPasswordToggle
           autoCapitalize="none"
           disabled={loading}
           state={fieldErrors.password ? "error" : "default"}
           helperText={fieldErrors.password || undefined}
+          returnKeyType="next"
+          onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+          blurOnSubmit={false}
         />
         {password.length > 0 && (
           <PasswordStrengthIndicator requirements={passwordRequirements} />
@@ -97,6 +113,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <View style={styles.inputContainer}>
         <AtomicInput
+          ref={confirmPasswordRef}
           label={t("auth.confirmPassword")}
           value={confirmPassword}
           onChangeText={handleConfirmPasswordChange}
@@ -104,10 +121,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             t("auth.confirmPasswordPlaceholder")
           }
           secureTextEntry
+          showPasswordToggle
           autoCapitalize="none"
           disabled={loading}
           state={fieldErrors.confirmPassword ? "error" : "default"}
           helperText={fieldErrors.confirmPassword || undefined}
+          returnKeyType="done"
+          onSubmitEditing={() => { void handleSignUp(); }}
         />
         {confirmPassword.length > 0 && (
           <PasswordMatchIndicator isMatch={passwordsMatch} />
