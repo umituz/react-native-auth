@@ -18,6 +18,8 @@ import { collectDeviceExtras } from "@umituz/react-native-design-system";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 
+import type { IStorageProvider } from "./AuthPackage";
+
 /**
  * Unified auth initialization options
  */
@@ -30,6 +32,9 @@ export interface InitializeAuthOptions {
 
   /** Callback to collect device/app info for user documents */
   collectExtras?: () => Promise<Record<string, unknown>>;
+
+  /** Storage provider for persisting auth state (e.g. anonymous mode) */
+  storageProvider?: IStorageProvider;
 
   /** Enable auto anonymous sign-in (default: true) */
   autoAnonymousSignIn?: boolean;
@@ -91,6 +96,7 @@ export async function initializeAuth(
     userCollection = "users",
     extraFields,
     collectExtras,
+    storageProvider,
     autoAnonymousSignIn = true,
     onUserConverted,
     onAuthStateChange,
@@ -115,7 +121,7 @@ export async function initializeAuth(
 
   // 3. Initialize AuthService (for email/password auth)
   try {
-    await initializeAuthService(auth, authConfig);
+    await initializeAuthService(auth, authConfig, storageProvider);
   } catch {
     // AuthService initialization failed, but we can continue
     // Email/password auth won't work, but social/anonymous will
