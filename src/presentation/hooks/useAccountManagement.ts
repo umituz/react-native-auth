@@ -4,10 +4,9 @@
  * Generic hook - reauthentication is handled via callback from calling app
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import { useCallback, useState } from "react";
 import { useAuth } from "./useAuth";
-import { deleteCurrentUser } from "@umituz/react-native-firebase";
+import { handleAccountDeletion } from "../utils/accountDeleteHandler.util";
 
 export interface UseAccountManagementOptions {
   /**
@@ -60,110 +59,7 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
-      if (__DEV__) {
-        console.log("[useAccountManagement] Calling deleteCurrentUser with autoReauthenticate: true");
-      }
-
-      const result = await deleteCurrentUser({ autoReauthenticate: true });
-
-      if (__DEV__) {
-        console.log("[useAccountManagement] First delete attempt result:", result);
-      }
-
-      if (result.success) {
-        if (__DEV__) {
-          console.log("[useAccountManagement] ✅ Delete successful on first attempt");
-        }
-        return;
-      }
-
-      // If reauthentication required
-      if (result.error?.requiresReauth) {
-        // Handle password-based reauth
-        if (result.error.code === "auth/password-reauth-required" && onPasswordRequired) {
-          if (__DEV__) {
-            console.log("[useAccountManagement] Password reauth required, prompting user");
-          }
-
-          const password = await onPasswordRequired();
-
-          if (password) {
-            if (__DEV__) {
-              console.log("[useAccountManagement] Password provided, retrying delete");
-            }
-
-            const retryResult = await deleteCurrentUser({
-              autoReauthenticate: false,
-              password,
-            });
-
-            if (__DEV__) {
-              console.log("[useAccountManagement] Retry delete with password result:", retryResult);
-            }
-
-            if (retryResult.success) {
-              if (__DEV__) {
-                console.log("[useAccountManagement] ✅ Delete successful after password reauth");
-              }
-              return;
-            }
-
-            if (retryResult.error) {
-              throw new Error(retryResult.error.message);
-            }
-          } else {
-            if (__DEV__) {
-              console.log("[useAccountManagement] Password prompt cancelled");
-            }
-            throw new Error("Password required to delete account");
-          }
-        }
-
-        // Handle Google/Apple reauth
-        if (onReauthRequired) {
-          if (__DEV__) {
-            console.log("[useAccountManagement] Reauth required, calling onReauthRequired callback");
-          }
-
-          const reauthSuccess = await onReauthRequired();
-
-          if (__DEV__) {
-            console.log("[useAccountManagement] onReauthRequired result:", reauthSuccess);
-          }
-
-          if (reauthSuccess) {
-            if (__DEV__) {
-              console.log("[useAccountManagement] Retrying delete after reauth");
-            }
-
-            const retryResult = await deleteCurrentUser({
-              autoReauthenticate: false,
-            });
-
-            if (__DEV__) {
-              console.log("[useAccountManagement] Retry delete result:", retryResult);
-            }
-
-            if (retryResult.success) {
-              if (__DEV__) {
-                console.log("[useAccountManagement] ✅ Delete successful after reauth");
-              }
-              return;
-            }
-
-            if (retryResult.error) {
-              throw new Error(retryResult.error.message);
-            }
-          }
-        }
-      }
-
-      if (result.error) {
-        if (__DEV__) {
-          console.log("[useAccountManagement] ❌ Delete failed:", result.error);
-        }
-        throw new Error(result.error.message);
-      }
+      await handleAccountDeletion({ onReauthRequired, onPasswordRequired });
     } finally {
       setIsDeletingAccount(false);
     }

@@ -11,6 +11,12 @@ import type {
   UserDocumentConfig,
   UserDocumentExtras,
 } from "./UserDocument.types";
+import {
+  getSignUpMethod,
+  buildBaseData,
+  buildCreateData,
+  buildUpdateData,
+} from "../utils/userDocumentBuilder.util";
 
 export type {
   UserDocumentUser,
@@ -24,90 +30,6 @@ let userDocumentConfig: UserDocumentConfig = {};
 
 export function configureUserDocumentService(config: UserDocumentConfig): void {
   userDocumentConfig = { ...config };
-}
-
-function getSignUpMethod(user: UserDocumentUser): string | undefined {
-  if (user.isAnonymous) return "anonymous";
-  if (user.email) {
-    const providerData = (
-      user as unknown as { providerData?: { providerId: string }[] }
-    ).providerData;
-    if (providerData && providerData.length > 0) {
-      const providerId = providerData[0].providerId;
-      if (providerId === "google.com") return "google";
-      if (providerId === "apple.com") return "apple";
-      if (providerId === "password") return "email";
-    }
-    return "email";
-  }
-  return undefined;
-}
-
-function buildBaseData(
-  user: UserDocumentUser,
-  extras?: UserDocumentExtras,
-): Record<string, unknown> {
-  const data: Record<string, unknown> = {
-    displayName: user.displayName,
-    email: user.email,
-    photoURL: user.photoURL,
-    isAnonymous: user.isAnonymous,
-  };
-
-  const fields: (keyof UserDocumentExtras)[] = [
-    'deviceId', 'platform', 'deviceModel', 'deviceBrand', 
-    'osVersion', 'appVersion', 'buildNumber', 'locale', 'timezone'
-  ];
-
-  fields.forEach(field => {
-    const val = extras?.[field];
-    if (val) data[field] = val;
-  });
-
-  return data;
-}
-
-function buildCreateData(
-  baseData: Record<string, unknown>,
-  extras?: UserDocumentExtras,
-): Record<string, unknown> {
-  const createData: Record<string, unknown> = {
-    ...baseData,
-    ...userDocumentConfig.extraFields,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    lastLoginAt: serverTimestamp(),
-  };
-
-  if (extras?.previousAnonymousUserId) {
-    createData.previousAnonymousUserId = extras.previousAnonymousUserId;
-    createData.convertedFromAnonymous = true;
-    createData.convertedAt = serverTimestamp();
-  }
-
-  if (extras?.signUpMethod) createData.signUpMethod = extras.signUpMethod;
-
-  return createData;
-}
-
-function buildUpdateData(
-  baseData: Record<string, unknown>,
-  extras?: UserDocumentExtras,
-): Record<string, unknown> {
-  const updateData: Record<string, unknown> = {
-    ...baseData,
-    lastLoginAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
-
-  if (extras?.previousAnonymousUserId) {
-    updateData.previousAnonymousUserId = extras.previousAnonymousUserId;
-    updateData.convertedFromAnonymous = true;
-    updateData.convertedAt = serverTimestamp();
-    if (extras?.signUpMethod) updateData.signUpMethod = extras.signUpMethod;
-  }
-
-  return updateData;
 }
 
 export async function ensureUserDocument(
@@ -131,8 +53,8 @@ export async function ensureUserDocument(
     const userDoc = await getDoc(userRef);
     const baseData = buildBaseData(user, allExtras);
 
-    const docData = !userDoc.exists() 
-      ? buildCreateData(baseData, allExtras) 
+    const docData = !userDoc.exists()
+      ? buildCreateData(baseData, userDocumentConfig.extraFields, allExtras)
       : buildUpdateData(baseData, allExtras);
 
     await setDoc(userRef, docData, { merge: true });
