@@ -3,15 +3,16 @@
  * Bottom sheet modal for authentication (Login/Register)
  */
 
-import React, { useEffect, useCallback, useRef, useState, useMemo } from "react";
-import { View, TouchableOpacity } from "react-native";
+import React, { useEffect, useCallback, useRef, useState } from "react";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import {
+  useAppDesignTokens,
+  AtomicText,
+  AtomicIcon,
+  AtomicKeyboardAvoidingView,
   BottomSheetModal,
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
-import { useAppDesignTokens, AtomicText, AtomicIcon, AtomicKeyboardAvoidingView } from "@umituz/react-native-design-system";
+  type BottomSheetModalRef,
+} from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
@@ -45,7 +46,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
   const { t } = useLocalization();
-  const modalRef = useRef<BottomSheetModal>(null);
+  const modalRef = useRef<BottomSheetModalRef>(null);
 
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
@@ -107,32 +108,17 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     }
   }, [onAppleSignIn]);
 
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />
-    ),
-    [],
-  );
-
-  const snapPoints = useMemo(() => ["95%"], []);
-
   return (
     <BottomSheetModal
       ref={modalRef}
-      index={0}
-      snapPoints={snapPoints}
-      backdropComponent={renderBackdrop}
       onDismiss={handleDismiss}
-      enablePanDownToClose
-      keyboardBehavior="extend"
-      keyboardBlurBehavior="restore"
-      backgroundStyle={[styles.background, { backgroundColor: tokens.colors.backgroundPrimary }]}
-      handleIndicatorStyle={[styles.handleIndicator, { backgroundColor: tokens.colors.border }]}
+      preset="full"
+      backgroundColor={tokens.colors.backgroundPrimary}
     >
       <AtomicKeyboardAvoidingView
         style={{ flex: 1 }}
       >
-        <BottomSheetScrollView
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -179,7 +165,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             />
           )}
         </View>
-      </BottomSheetScrollView>
+      </ScrollView>
     </AtomicKeyboardAvoidingView>
     </BottomSheetModal>
   );
