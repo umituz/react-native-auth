@@ -1,68 +1,31 @@
 /**
  * User Document Service
  * Generic service for creating/updating user documents in Firestore
- * Called automatically on auth state changes
  */
 
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import { getFirestore } from "@umituz/react-native-firebase";
+import type {
+  UserDocumentUser,
+  UserDocumentConfig,
+  UserDocumentExtras,
+} from "./UserDocument.types";
+
+export type {
+  UserDocumentUser,
+  UserDocumentConfig,
+  UserDocumentExtras,
+} from "./UserDocument.types";
 
 declare const __DEV__: boolean;
 
-/**
- * Minimal user interface for document creation
- * Compatible with both Firebase User and AuthUser
- */
-export interface UserDocumentUser {
-  uid: string;
-  displayName?: string | null;
-  email?: string | null;
-  photoURL?: string | null;
-  isAnonymous?: boolean;
-}
-
-/**
- * Configuration for user document service
- */
-export interface UserDocumentConfig {
-  /** Firestore collection name (default: "users") */
-  collectionName?: string;
-  /** Additional fields to store with user document */
-  extraFields?: Record<string, unknown>;
-  /** Callback to collect device/app info */
-  collectExtras?: () => Promise<Record<string, unknown>>;
-}
-
-/**
- * User document extras from device/app
- */
-export interface UserDocumentExtras {
-  deviceId?: string;
-  platform?: string;
-  deviceModel?: string;
-  deviceBrand?: string;
-  osVersion?: string;
-  appVersion?: string;
-  buildNumber?: string;
-  locale?: string;
-  timezone?: string;
-  previousAnonymousUserId?: string;
-  signUpMethod?: string;
-}
-
 let userDocumentConfig: UserDocumentConfig = {};
 
-/**
- * Configure user document service
- */
 export function configureUserDocumentService(config: UserDocumentConfig): void {
   userDocumentConfig = { ...config };
 }
 
-/**
- * Get sign-up method from auth user
- */
 function getSignUpMethod(user: UserDocumentUser): string | undefined {
   if (user.isAnonymous) return "anonymous";
   if (user.email) {
@@ -80,9 +43,6 @@ function getSignUpMethod(user: UserDocumentUser): string | undefined {
   return undefined;
 }
 
-/**
- * Build base user data from auth user
- */
 function buildBaseData(
   user: UserDocumentUser,
   extras?: UserDocumentExtras,
@@ -94,22 +54,19 @@ function buildBaseData(
     isAnonymous: user.isAnonymous,
   };
 
-  if (extras?.deviceId) data.deviceId = extras.deviceId;
-  if (extras?.platform) data.platform = extras.platform;
-  if (extras?.deviceModel) data.deviceModel = extras.deviceModel;
-  if (extras?.deviceBrand) data.deviceBrand = extras.deviceBrand;
-  if (extras?.osVersion) data.osVersion = extras.osVersion;
-  if (extras?.appVersion) data.appVersion = extras.appVersion;
-  if (extras?.buildNumber) data.buildNumber = extras.buildNumber;
-  if (extras?.locale) data.locale = extras.locale;
-  if (extras?.timezone) data.timezone = extras.timezone;
+  const fields: (keyof UserDocumentExtras)[] = [
+    'deviceId', 'platform', 'deviceModel', 'deviceBrand', 
+    'osVersion', 'appVersion', 'buildNumber', 'locale', 'timezone'
+  ];
+
+  fields.forEach(field => {
+    const val = extras?.[field];
+    if (val) data[field] = val;
+  });
 
   return data;
 }
 
-/**
- * Build create data for new user document
- */
 function buildCreateData(
   baseData: Record<string, unknown>,
   extras?: UserDocumentExtras,
@@ -128,16 +85,11 @@ function buildCreateData(
     createData.convertedAt = serverTimestamp();
   }
 
-  if (extras?.signUpMethod) {
-    createData.signUpMethod = extras.signUpMethod;
-  }
+  if (extras?.signUpMethod) createData.signUpMethod = extras.signUpMethod;
 
   return createData;
 }
 
-/**
- * Build update data for existing user document
- */
 function buildUpdateData(
   baseData: Record<string, unknown>,
   extras?: UserDocumentExtras,
@@ -152,55 +104,38 @@ function buildUpdateData(
     updateData.previousAnonymousUserId = extras.previousAnonymousUserId;
     updateData.convertedFromAnonymous = true;
     updateData.convertedAt = serverTimestamp();
-    if (extras?.signUpMethod) {
-      updateData.signUpMethod = extras.signUpMethod;
-    }
+    if (extras?.signUpMethod) updateData.signUpMethod = extras.signUpMethod;
   }
 
   return updateData;
 }
 
-/**
- * Ensure user document exists in Firestore
- * Creates new document or updates existing one
- */
 export async function ensureUserDocument(
   user: UserDocumentUser | User,
   extras?: UserDocumentExtras,
 ): Promise<boolean> {
   const db = getFirestore();
-  if (typeof __DEV__ !== "undefined" && __DEV__) {
-    // eslint-disable-next-line no-console
-    console.log("[UserDocumentService] db:", !!db, "type:", typeof db, "constructor:", db?.constructor?.name);
-  }
   if (!db || !user.uid) return false;
 
   try {
-    // Collect additional extras if configured
     let allExtras = extras || {};
     if (userDocumentConfig.collectExtras) {
       const collectedExtras = await userDocumentConfig.collectExtras();
       allExtras = { ...collectedExtras, ...allExtras };
     }
 
-    // Add sign-up method if not provided
-    if (!allExtras.signUpMethod) {
-      allExtras.signUpMethod = getSignUpMethod(user);
-    }
+    if (!allExtras.signUpMethod) allExtras.signUpMethod = getSignUpMethod(user);
 
     const collectionName = userDocumentConfig.collectionName || "users";
     const userRef = doc(db, collectionName, user.uid);
     const userDoc = await getDoc(userRef);
     const baseData = buildBaseData(user, allExtras);
 
-    if (!userDoc.exists()) {
-      const createData = buildCreateData(baseData, allExtras);
-      await setDoc(userRef, createData);
-    } else {
-      const updateData = buildUpdateData(baseData, allExtras);
-      await setDoc(userRef, updateData, { merge: true });
-    }
+    const docData = !userDoc.exists() 
+      ? buildCreateData(baseData, allExtras) 
+      : buildUpdateData(baseData, allExtras);
 
+    await setDoc(userRef, docData, { merge: true });
     return true;
   } catch (error) {
     if (typeof __DEV__ !== "undefined" && __DEV__) {
@@ -211,25 +146,17 @@ export async function ensureUserDocument(
   }
 }
 
-/**
- * Mark user as deleted (soft delete)
- */
 export async function markUserDeleted(userId: string): Promise<boolean> {
   const db = getFirestore();
   if (!db || !userId) return false;
 
   try {
-    const collectionName = userDocumentConfig.collectionName || "users";
-    const userRef = doc(db, collectionName, userId);
-    await setDoc(
-      userRef,
-      {
-        isDeleted: true,
-        deletedAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true },
-    );
+    const userRef = doc(db, userDocumentConfig.collectionName || "users", userId);
+    await setDoc(userRef, {
+      isDeleted: true,
+      deletedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
     return true;
   } catch {
     return false;
