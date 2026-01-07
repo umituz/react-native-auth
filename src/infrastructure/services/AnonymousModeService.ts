@@ -5,8 +5,8 @@
 
 import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
-import { emitAnonymousModeEnabled } from "../utils/AuthEventEmitter";
-import type { IStorageProvider } from "./AuthPackage";
+import { emitAnonymousModeEnabled } from "./AuthEventService";
+import type { IStorageProvider } from "../types/Storage.types";
 
 export class AnonymousModeService {
   private isAnonymousMode: boolean = false;
@@ -26,7 +26,7 @@ export class AnonymousModeService {
     }
   }
 
-  async save(storageProvider: IStorageProvider): Promise<void> {
+  private async save(storageProvider: IStorageProvider): Promise<void> {
     try {
       await storageProvider.set(this.storageKey, this.isAnonymousMode.toString());
     } catch {

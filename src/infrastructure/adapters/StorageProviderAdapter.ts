@@ -3,7 +3,7 @@
  * Adapts external storage implementations to our IStorageProvider interface
  */
 
-import type { IStorageProvider } from "../services/AuthPackage";
+import type { IStorageProvider } from "../types/Storage.types";
 
 /**
  * Interface that describes the shape of common storage implementations

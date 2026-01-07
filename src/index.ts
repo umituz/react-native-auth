@@ -54,7 +54,7 @@ export {
   createStorageProvider,
   StorageProviderAdapter,
 } from './infrastructure/adapters/StorageProviderAdapter';
-export type { IStorageProvider } from './infrastructure/services/AuthPackage';
+export type { IStorageProvider } from './infrastructure/types/Storage.types';
 export {
   ensureUserDocument,
   markUserDeleted,
@@ -84,6 +84,10 @@ export type {
   ValidationResult,
   PasswordStrengthResult,
   PasswordRequirements,
+  ValidationConfig,
+} from './infrastructure/utils/AuthValidation';
+export {
+  DEFAULT_VAL_CONFIG,
 } from './infrastructure/utils/AuthValidation';
 
 // PRESENTATION LAYER

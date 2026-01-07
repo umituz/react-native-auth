@@ -18,7 +18,7 @@ import { collectDeviceExtras } from "@umituz/react-native-design-system";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 
-import type { IStorageProvider } from "./AuthPackage";
+import type { IStorageProvider } from "../types/Storage.types";
 
 /**
  * Unified auth initialization options

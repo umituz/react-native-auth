@@ -14,7 +14,7 @@ import { AuthRepository } from "../repositories/AuthRepository";
 import { AnonymousModeService } from "./AnonymousModeService";
 import { authEventService } from "./AuthEventService";
 import { authTracker } from "../utils/auth-tracker.util";
-import type { IStorageProvider } from "./AuthPackage";
+import type { IStorageProvider } from "../types/Storage.types";
 
 export class AuthService implements IAuthService {
   private repository!: AuthRepository;
