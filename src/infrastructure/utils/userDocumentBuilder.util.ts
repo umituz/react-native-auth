@@ -19,7 +19,7 @@ export function getSignUpMethod(user: UserDocumentUser): string | undefined {
       user as unknown as { providerData?: { providerId: string }[] }
     ).providerData;
     if (providerData && providerData.length > 0) {
-      const providerId = providerData[0].providerId;
+      const providerId = providerData[0]?.providerId;
       if (providerId === "google.com") return "google";
       if (providerId === "apple.com") return "apple";
       if (providerId === "password") return "email";
