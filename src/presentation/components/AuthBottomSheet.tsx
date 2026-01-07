@@ -13,23 +13,22 @@ import {
   BottomSheetModal,
 } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
-import { useAuthBottomSheet } from "../hooks/useAuthBottomSheet";
+import { useAuthBottomSheet, type SocialAuthConfiguration } from "../hooks/useAuthBottomSheet";
 import { LoginForm } from "./LoginForm";
 import { RegisterForm } from "./RegisterForm";
 import { SocialLoginButtons } from "./SocialLoginButtons";
 import { styles } from "./AuthBottomSheet.styles";
-import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
 export interface AuthBottomSheetProps {
   termsUrl?: string;
   privacyUrl?: string;
   onTermsPress?: () => void;
   onPrivacyPress?: () => void;
-  /** Enabled social auth providers */
-  socialProviders?: SocialAuthProvider[];
-  /** Called when Google sign-in is requested */
+  /** Social auth configuration */
+  socialConfig?: SocialAuthConfiguration;
+  /** Called when Google sign-in is requested (overrides internal behavior) */
   onGoogleSignIn?: () => Promise<void>;
-  /** Called when Apple sign-in is requested */
+  /** Called when Apple sign-in is requested (overrides internal behavior) */
   onAppleSignIn?: () => Promise<void>;
 }
 
@@ -38,7 +37,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
   privacyUrl,
   onTermsPress,
   onPrivacyPress,
-  socialProviders = [],
+  socialConfig,
   onGoogleSignIn,
   onAppleSignIn,
 }) => {
@@ -50,13 +49,14 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     googleLoading,
     appleLoading,
     mode,
+    providers,
     handleDismiss,
     handleClose,
     handleNavigateToRegister,
     handleNavigateToLogin,
     handleGoogleSignIn,
     handleAppleSignIn,
-  } = useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn });
+  } = useAuthBottomSheet({ socialConfig, onGoogleSignIn, onAppleSignIn });
 
   return (
     <BottomSheetModal
@@ -106,9 +106,9 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             />
           )}
 
-          {socialProviders.length > 0 && (
+          {providers.length > 0 && (
             <SocialLoginButtons
-              enabledProviders={socialProviders}
+              enabledProviders={providers}
               onGooglePress={() => { void handleGoogleSignIn(); }}
               onApplePress={() => { void handleAppleSignIn(); }}
               googleLoading={googleLoading}

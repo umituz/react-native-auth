@@ -1,14 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Platform } from "react-native";
 import type { BottomSheetModalRef } from "@umituz/react-native-design-system";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
+import { useGoogleAuth, type GoogleAuthConfig } from "./useGoogleAuth";
+import { useAppleAuth } from "./useAppleAuth";
+import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
-interface UseAuthBottomSheetProps {
+declare const __DEV__: boolean;
+
+export interface SocialAuthConfiguration {
+  google?: GoogleAuthConfig;
+  apple?: { enabled: boolean };
+}
+
+interface UseAuthBottomSheetParams {
+  socialConfig?: SocialAuthConfiguration;
   onGoogleSignIn?: () => Promise<void>;
   onAppleSignIn?: () => Promise<void>;
 }
 
-export function useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn }: UseAuthBottomSheetProps) {
+export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
+  const { socialConfig, onGoogleSignIn, onAppleSignIn } = params;
+  
   const modalRef = useRef<BottomSheetModalRef>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
@@ -16,6 +30,25 @@ export function useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn }: UseAuthBot
   const { isVisible, mode, hideAuthModal, setMode, executePendingCallback, clearPendingCallback } =
     useAuthModalStore();
   const { isAuthenticated, isAnonymous } = useAuth();
+
+  // Social Auth Hooks
+  const { signInWithGoogle, googleConfigured } = useGoogleAuth(socialConfig?.google);
+  const { signInWithApple, appleAvailable } = useAppleAuth();
+
+  // Determine enabled providers
+  const providers = useMemo<SocialAuthProvider[]>(() => {
+    const result: SocialAuthProvider[] = [];
+
+    if (Platform.OS === "ios" && socialConfig?.apple?.enabled && appleAvailable) {
+      result.push("apple");
+    }
+
+    if (googleConfigured) {
+      result.push("google");
+    }
+
+    return result;
+  }, [socialConfig?.apple?.enabled, appleAvailable, googleConfigured]);
 
   // Handle visibility sync with modalRef
   useEffect(() => {
@@ -41,14 +74,13 @@ export function useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn }: UseAuthBot
   const prevIsAnonymousRef = useRef(isAnonymous);
 
   useEffect(() => {
-    // Determine if user just successfully authenticated (either A: were not authed at all, or B: were anonymous and now aren't)
     const justAuthenticated = !prevIsAuthenticatedRef.current && isAuthenticated;
     const justConvertedFromAnonymous = prevIsAnonymousRef.current && !isAnonymous && isAuthenticated;
 
     if ((justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous) {
       if (typeof __DEV__ !== "undefined" && __DEV__) {
         // eslint-disable-next-line no-console
-        console.log("[AuthBottomSheet] Auto-closing due to successful authentication transition", {
+        console.log("[useAuthBottomSheet] Auto-closing due to successful authentication transition", {
           justAuthenticated,
           justConvertedFromAnonymous,
         });
@@ -57,7 +89,6 @@ export function useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn }: UseAuthBot
       executePendingCallback();
     }
     
-    // Update refs for next render
     prevIsAuthenticatedRef.current = isAuthenticated;
     prevIsVisibleRef.current = isVisible;
     prevIsAnonymousRef.current = isAnonymous;
@@ -71,36 +102,43 @@ export function useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn }: UseAuthBot
     setMode("login");
   }, [setMode]);
 
-  const handleGoogleSignIn = useCallback(async () => {
-    if (!onGoogleSignIn) return;
+  const handleGoogleSignInInternal = useCallback(async () => {
     setGoogleLoading(true);
     try {
-      await onGoogleSignIn();
+      if (onGoogleSignIn) {
+        await onGoogleSignIn();
+      } else if (signInWithGoogle) {
+        await signInWithGoogle();
+      }
     } finally {
       setGoogleLoading(false);
     }
-  }, [onGoogleSignIn]);
+  }, [onGoogleSignIn, signInWithGoogle]);
 
-  const handleAppleSignIn = useCallback(async () => {
-    if (!onAppleSignIn) return;
+  const handleAppleSignInInternal = useCallback(async () => {
     setAppleLoading(true);
     try {
-      await onAppleSignIn();
+      if (onAppleSignIn) {
+        await onAppleSignIn();
+      } else if (signInWithApple) {
+        await signInWithApple();
+      }
     } finally {
       setAppleLoading(false);
     }
-  }, [onAppleSignIn]);
+  }, [onAppleSignIn, signInWithApple]);
 
   return {
     modalRef,
     googleLoading,
     appleLoading,
     mode,
+    providers,
     handleDismiss,
     handleClose,
     handleNavigateToRegister,
     handleNavigateToLogin,
-    handleGoogleSignIn,
-    handleAppleSignIn,
+    handleGoogleSignIn: handleGoogleSignInInternal,
+    handleAppleSignIn: handleAppleSignInInternal,
   };
 }
