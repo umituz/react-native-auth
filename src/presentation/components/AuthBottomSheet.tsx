@@ -63,13 +63,6 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     }
   }, [isVisible]);
 
-  useEffect(() => {
-    if (isAuthenticated && !isAnonymous && isVisible) {
-      hideAuthModal();
-      executePendingCallback();
-    }
-  }, [isAuthenticated, isAnonymous, isVisible, hideAuthModal, executePendingCallback]);
-
   const handleDismiss = useCallback(() => {
     hideAuthModal();
     clearPendingCallback();
@@ -79,6 +72,26 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     modalRef.current?.dismiss();
     handleDismiss();
   }, [handleDismiss]);
+
+  const prevIsAuthenticatedRef = useRef(isAuthenticated);
+  const prevIsVisibleRef = useRef(isVisible);
+
+  useEffect(() => {
+    // Only close the modal if the user was NOT authenticated and then BECOMES authenticated 
+    // while the modal is visible.
+    if (!prevIsAuthenticatedRef.current && isAuthenticated && isVisible && !isAnonymous) {
+      if (typeof __DEV__ !== "undefined" && __DEV__) {
+        // eslint-disable-next-line no-console
+        console.log("[AuthBottomSheet] Auto-closing due to successful authentication transition");
+      }
+      handleClose();
+      executePendingCallback();
+    }
+    
+    // Update ref for next render
+    prevIsAuthenticatedRef.current = isAuthenticated;
+    prevIsVisibleRef.current = isVisible;
+  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, handleClose]);
 
   const handleNavigateToRegister = useCallback(() => {
     setMode("register");

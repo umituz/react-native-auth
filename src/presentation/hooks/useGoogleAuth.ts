@@ -14,51 +14,10 @@ import {
   type SocialAuthResult,
 } from "@umituz/react-native-firebase";
 
-// Type declarations for expo-auth-session
-interface GoogleAuthRequestConfig {
-  iosClientId: string;
-  webClientId: string;
-  androidClientId: string;
-}
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
 
-interface AuthSessionAuthentication {
-  idToken?: string;
-  accessToken?: string;
-}
-
-interface AuthSessionResult {
-  type: "success" | "cancel" | "dismiss" | "error" | "locked";
-  authentication?: AuthSessionAuthentication;
-}
-
-interface AuthRequest {
-  promptAsync: () => Promise<AuthSessionResult>;
-}
-
-type UseAuthRequestReturn = [
-  AuthRequest | null,
-  AuthSessionResult | null,
-  () => Promise<AuthSessionResult>,
-];
-
-// Dynamic imports to handle optional dependencies
-type GoogleModule = { useAuthRequest: (config: GoogleAuthRequestConfig) => UseAuthRequestReturn };
-type WebBrowserModule = { maybeCompleteAuthSession: () => void };
-
-let Google: GoogleModule | null = null;
-let WebBrowser: WebBrowserModule | null = null;
-
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  Google = require("expo-auth-session/providers/google") as GoogleModule;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  WebBrowser = require("expo-web-browser") as WebBrowserModule;
-  if (WebBrowser) {
-    WebBrowser.maybeCompleteAuthSession();
-  }
-} catch {
-  // expo-auth-session not available - silent fallback
-}
+WebBrowser.maybeCompleteAuthSession();
 
 export interface GoogleAuthConfig {
   iosClientId?: string;
@@ -123,7 +82,7 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
   }, [googleResponse, signInWithGoogleToken]);
 
   const signInWithGoogle = useCallback(async (): Promise<SocialAuthResult> => {
-    if (!Google || !promptGoogleAsync) {
+    if (!promptGoogleAsync) {
       return { success: false, error: "expo-auth-session is not available" };
     }
 
