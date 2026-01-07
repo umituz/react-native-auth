@@ -4,7 +4,7 @@
  */
 
 import type { DesignTokens } from "@umituz/react-native-design-system";
-import type { IUIProvider } from "../services/AuthPackage";
+import type { IUIProvider } from "../types/UI.types";
 
 export class UIProviderAdapter implements IUIProvider {
   private theme: DesignTokens | null = null;
