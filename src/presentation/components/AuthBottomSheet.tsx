@@ -3,7 +3,7 @@
  * Bottom sheet modal for authentication (Login/Register)
  */
 
-import React, { useEffect, useCallback, useRef, useState } from "react";
+import React from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import {
   useAppDesignTokens,
@@ -11,11 +11,9 @@ import {
   AtomicIcon,
   AtomicKeyboardAvoidingView,
   BottomSheetModal,
-  type BottomSheetModalRef,
 } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
-import { useAuthModalStore } from "../stores/authModalStore";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthBottomSheet } from "../hooks/useAuthBottomSheet";
 import { LoginForm } from "./LoginForm";
 import { RegisterForm } from "./RegisterForm";
 import { SocialLoginButtons } from "./SocialLoginButtons";
@@ -46,80 +44,19 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
   const { t } = useLocalization();
-  const modalRef = useRef<BottomSheetModalRef>(null);
 
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
-
-  const { isVisible, mode, hideAuthModal, setMode, executePendingCallback, clearPendingCallback } =
-    useAuthModalStore();
-  const { isAuthenticated, isAnonymous } = useAuth();
-
-  useEffect(() => {
-    if (isVisible) {
-      modalRef.current?.present();
-    } else {
-      modalRef.current?.dismiss();
-    }
-  }, [isVisible]);
-
-  const handleDismiss = useCallback(() => {
-    hideAuthModal();
-    clearPendingCallback();
-  }, [hideAuthModal, clearPendingCallback]);
-
-  const handleClose = useCallback(() => {
-    modalRef.current?.dismiss();
-    handleDismiss();
-  }, [handleDismiss]);
-
-  const prevIsAuthenticatedRef = useRef(isAuthenticated);
-  const prevIsVisibleRef = useRef(isVisible);
-
-  useEffect(() => {
-    // Only close the modal if the user was NOT authenticated and then BECOMES authenticated 
-    // while the modal is visible.
-    if (!prevIsAuthenticatedRef.current && isAuthenticated && isVisible && !isAnonymous) {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        // eslint-disable-next-line no-console
-        console.log("[AuthBottomSheet] Auto-closing due to successful authentication transition");
-      }
-      handleClose();
-      executePendingCallback();
-    }
-    
-    // Update ref for next render
-    prevIsAuthenticatedRef.current = isAuthenticated;
-    prevIsVisibleRef.current = isVisible;
-  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, handleClose]);
-
-  const handleNavigateToRegister = useCallback(() => {
-    setMode("register");
-  }, [setMode]);
-
-  const handleNavigateToLogin = useCallback(() => {
-    setMode("login");
-  }, [setMode]);
-
-  const handleGoogleSignIn = useCallback(async () => {
-    if (!onGoogleSignIn) return;
-    setGoogleLoading(true);
-    try {
-      await onGoogleSignIn();
-    } finally {
-      setGoogleLoading(false);
-    }
-  }, [onGoogleSignIn]);
-
-  const handleAppleSignIn = useCallback(async () => {
-    if (!onAppleSignIn) return;
-    setAppleLoading(true);
-    try {
-      await onAppleSignIn();
-    } finally {
-      setAppleLoading(false);
-    }
-  }, [onAppleSignIn]);
+  const {
+    modalRef,
+    googleLoading,
+    appleLoading,
+    mode,
+    handleDismiss,
+    handleClose,
+    handleNavigateToRegister,
+    handleNavigateToLogin,
+    handleGoogleSignIn,
+    handleAppleSignIn,
+  } = useAuthBottomSheet({ onGoogleSignIn, onAppleSignIn });
 
   return (
     <BottomSheetModal
@@ -131,11 +68,6 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       <AtomicKeyboardAvoidingView
         style={{ flex: 1 }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
         <TouchableOpacity
           style={styles.closeButton}
           onPress={handleClose}
@@ -145,6 +77,12 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         >
           <AtomicIcon name="close" size="md" color="secondary" />
         </TouchableOpacity>
+
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
 
         <View style={styles.header}>
           <AtomicText type="headlineLarge" color="primary" style={styles.title}>

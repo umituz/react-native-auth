@@ -18,19 +18,9 @@
  * ```
  */
 
-import React, { useCallback, useMemo } from "react";
-import { Platform } from "react-native";
+import React from "react";
 import { AuthBottomSheet } from "./AuthBottomSheet";
-import { useGoogleAuth, type GoogleAuthConfig } from "../hooks/useGoogleAuth";
-import { useAppleAuth } from "../hooks/useAppleAuth";
-import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
-
-declare const __DEV__: boolean;
-
-export interface SocialAuthConfiguration {
-  google?: GoogleAuthConfig;
-  apple?: { enabled: boolean };
-}
+import { useAuthBottomSheetWrapper, type SocialAuthConfiguration } from "../hooks/useAuthBottomSheetWrapper";
 
 export interface AuthBottomSheetWrapperProps {
   /** Terms of Service URL */
@@ -55,51 +45,9 @@ export const AuthBottomSheetWrapper: React.FC<AuthBottomSheetWrapperProps> = ({
   onPrivacyPress,
   socialConfig,
 }) => {
-  const { signInWithGoogle, googleConfigured } = useGoogleAuth(socialConfig?.google);
-  const { signInWithApple, appleAvailable } = useAppleAuth();
-
-  const providers = useMemo<SocialAuthProvider[]>(() => {
-    const result: SocialAuthProvider[] = [];
-
-    if (Platform.OS === "ios" && socialConfig?.apple?.enabled && appleAvailable) {
-      result.push("apple");
-    }
-
-    if (googleConfigured) {
-      result.push("google");
-    }
-
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[AuthBottomSheetWrapper] Enabled providers:", result);
-    }
-
-    return result;
-  }, [socialConfig?.apple?.enabled, appleAvailable, googleConfigured]);
-
-  const handleGoogleSignIn = useCallback(async () => {
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[AuthBottomSheetWrapper] Google sign-in requested");
-    }
-    const result = await signInWithGoogle();
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[AuthBottomSheetWrapper] Google result:", result);
-    }
-  }, [signInWithGoogle]);
-
-  const handleAppleSignIn = useCallback(async () => {
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[AuthBottomSheetWrapper] Apple sign-in requested");
-    }
-    const result = await signInWithApple();
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[AuthBottomSheetWrapper] Apple result:", result);
-    }
-  }, [signInWithApple]);
+  const { providers, handleGoogleSignIn, handleAppleSignIn } = useAuthBottomSheetWrapper({
+    socialConfig,
+  });
 
   return (
     <AuthBottomSheet

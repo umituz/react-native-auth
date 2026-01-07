@@ -172,6 +172,9 @@ export type { UseGoogleAuthResult, GoogleAuthConfig as GoogleAuthHookConfig } fr
 export { useAppleAuth } from './presentation/hooks/useAppleAuth';
 export type { UseAppleAuthResult } from './presentation/hooks/useAppleAuth';
 
+export { useAuthBottomSheet } from './presentation/hooks/useAuthBottomSheet';
+export { useAuthBottomSheetWrapper } from './presentation/hooks/useAuthBottomSheetWrapper';
+
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
 
 // Domain Utils - Anonymous Names
@@ -217,10 +220,8 @@ export type { PasswordMatchIndicatorProps } from './presentation/components/Pass
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
 export type { AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
 export { AuthBottomSheetWrapper } from './presentation/components/AuthBottomSheetWrapper';
-export type {
-  AuthBottomSheetWrapperProps,
-  SocialAuthConfiguration,
-} from './presentation/components/AuthBottomSheetWrapper';
+export type { AuthBottomSheetWrapperProps } from './presentation/components/AuthBottomSheetWrapper';
+export type { SocialAuthConfiguration } from './presentation/hooks/useAuthBottomSheetWrapper';
 export { SocialLoginButtons } from './presentation/components/SocialLoginButtons';
 export type { SocialLoginButtonsProps } from './presentation/components/SocialLoginButtons';
 export { ProfileSection } from './presentation/components/ProfileSection';
