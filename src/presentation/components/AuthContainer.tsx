@@ -1,6 +1,6 @@
 /**
  * Auth Container Component
- * Main container for auth screens with gradient and scroll
+ * Main container for auth screens with background and scroll
  */
 
 import React, { useMemo } from "react";
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useResponsive } from "@umituz/react-native-design-system";
-import { AuthGradientBackground } from "./AuthGradientBackground";
+import { AuthBackground } from "./AuthBackground";
 
 /** Layout constants for auth screens */
 const AUTH_LAYOUT = {
@@ -39,7 +39,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
       style={styles.container}
       behavior="padding"
     >
-      <AuthGradientBackground />
+      <AuthBackground />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, dynamicStyles]}
         keyboardShouldPersistTaps="handled"
