@@ -86,7 +86,9 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
 
             {profile.isAnonymous && onSignIn && (
                 <View style={[styles.ctaContainer, { borderTopColor: tokens.colors.border }]}>
-                    {profile.benefits && <ProfileBenefitsList benefits={profile.benefits} />}
+                    {profile.benefits && profile.benefits.length > 0 && (
+                        <ProfileBenefitsList benefits={profile.benefits} />
+                    )}
 
                     <TouchableOpacity
                         style={[styles.ctaButton, { backgroundColor: tokens.colors.primary }]}

@@ -14,6 +14,7 @@ export interface UserProfileData {
     isAnonymous: boolean;
     avatarUrl?: string;
     accountSettingsRoute?: string;
+    benefits?: string[];
 }
 
 export interface UseUserProfileParams {
