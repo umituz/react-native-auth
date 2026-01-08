@@ -1,122 +1,286 @@
-# Auth Hooks
+# Presentation Hooks
 
-Collection of custom React hooks for the React Native Auth package. These hooks manage authentication operations and state.
+React hooks for authentication state and operations.
 
-## Available Hooks
+---
 
-### Core Hooks
-- **[`useAuth`](./useAuth.md)** - Main authentication state and operations
-- **[`useAuthRequired`](./useAuthRequired.md)** - For components requiring auth
-- **[`useRequireAuth`](./useRequireAuth.md)** - Alternative hook for route protection
+## Strategy
 
-### User Profile Hooks
-- **[`useUserProfile`](./useUserProfile.md)** - Fetch user profile data
-- **[`useProfileUpdate`](./useProfileUpdate.md)** - Profile update operations
-- **[`useProfileEdit`](./useProfileEdit.md)** - Profile editing form state
+**Purpose**: Provides React hooks for managing authentication state and operations in components. Single source of truth for auth state.
 
-### Account Management Hooks
-- **[`useAccountManagement`](./useAccountManagement.md)** - Account deletion, logout, etc.
+**When to Use**:
+- Need authentication state in component
+- Performing auth operations
+- Checking user permissions
+- Managing user profiles
 
-### Social Login Hooks
-- **[`useSocialLogin`](./useSocialLogin.md)** - General social login management
-- **[`useGoogleAuth`](./useSocialLogin.md#usegoogleauth)** - Google sign-in
-- **[`useAppleAuth`](./useSocialLogin.md#useappleauth)** - Apple sign-in
+**Location**: `src/presentation/hooks/`
 
-### Form Hooks
-- **[`useLoginForm`](./useLoginForm.md)** - Login form state management
-- **[`useRegisterForm`](./useRegisterForm.md)** - Registration form state management
+---
 
-### UI Hooks
-- **[`useAuthBottomSheet`](./useAuthBottomSheet.md)** - Auth bottom sheet management
+## Core Hooks
 
-### Mutation Hooks
-- **[`useAuthMutations`](./mutations/useAuthMutations.md)** - Auth mutation operations
+### useAuth
 
-## Usage
+**PRIMARY AUTH HOOK**
 
+**Purpose**: Core authentication state and operations
+
+**When to Use**:
+- Need auth state anywhere in app
+- Performing sign in/up/out
+- Checking authentication status
+- Getting user information
+
+**Import Path**:
+```typescript
+import { useAuth } from '@umituz/react-native-auth';
+```
+
+**File**: `useAuth.ts`
+
+**Rules**:
+- MUST initialize AuthProvider before use
+- MUST handle loading state
+- MUST check auth readiness before operations
+- MUST handle errors appropriately
+
+**MUST NOT**:
+- Use without AuthProvider
+- Ignore loading states
+- Assume user is authenticated
+
+**State Properties**:
+- `user` - Firebase user object
+- `userId` - User UID
+- `userType` - User type enum
+- `loading` - Initial auth check loading
+- `isAuthReady` - Auth check complete
+- `isAuthenticated` - User logged in
+- `isAnonymous` - Anonymous user
+- `error` - Error message
+
+**Methods**:
+- `signIn(email, password)` - Email/password login
+- `signUp(email, password, displayName)` - Create account
+- `signOut()` - Sign out
+- `continueAnonymously()` - Anonymous session
+
+**Documentation**: `useAuth.md`
+
+---
+
+### useAuthRequired & useRequireAuth
+
+**Purpose**: Require authentication for components or actions
+
+**When to Use**:
+- Protecting components/routes
+- Checking auth before actions
+- Conditional rendering based on auth
+- Showing auth modal
+
+**Import Path**:
 ```typescript
 import {
-  useAuth,
-  useUserProfile,
-  useSocialLogin
+  useAuthRequired,
+  useRequireAuth
 } from '@umituz/react-native-auth';
-
-function MyComponent() {
-  const { user, signIn, signOut } = useAuth();
-  const { profile, isLoading } = useUserProfile();
-  const { signInWithGoogle } = useSocialLogin();
-
-  // ...
-}
 ```
 
-## Hooks Documentation
+**File**: `useAuthRequired.ts`
 
-See each hook's documentation for detailed usage information and examples.
+**Rules**:
+- MUST handle loading state
+- MUST provide fallback for unauthenticated
+- MUST check auth readiness
+- MUST respect user cancellation
 
-## Quick Reference
+**Documentation**: `useAuthRequired.md`
 
-| Hook | Purpose | Returns |
-|------|---------|---------|
-| `useAuth` | Main auth state | `UseAuthResult` |
-| `useAuthRequired` | Check auth + show modal | `UseAuthRequiredResult` |
-| `useRequireAuth` | Get userId or throw | `string` |
-| `useUserProfile` | Fetch profile data | `UserProfileData \| undefined` |
-| `useProfileUpdate` | Update profile | `UseProfileUpdateReturn` |
-| `useProfileEdit` | Edit profile form | `UseProfileEditReturn` |
-| `useAccountManagement` | Account operations | `UseAccountManagementReturn` |
-| `useSocialLogin` | Social login | `UseSocialLoginResult` |
-| `useGoogleAuth` | Google auth | `UseGoogleAuthResult` |
-| `useAppleAuth` | Apple auth | `UseAppleAuthResult` |
-| `useAuthBottomSheet` | Bottom sheet | Modal ref + handlers |
+---
 
-## Best Practices
+### useUserProfile
 
-### 1. Use Appropriate Hooks
+**Purpose**: Fetch and display user profile data
 
+**When to Use**:
+- Displaying user information
+- Profile headers
+- Account settings
+- User identification
+
+**Import Path**:
 ```typescript
-// ✅ Good - Use useAuth for general auth
-function Component() {
-  const { user, signIn } = useAuth();
-}
-
-// ❌ Bad - Using useRequireAuth when you don't need userId
-function Component() {
-  const userId = useRequireAuth(); // Throws if not auth
-}
+import { useUserProfile } from '@umituz/react-native-auth';
 ```
 
-### 2. Handle Loading States
+**File**: `useUserProfile.ts`
 
+**Rules**:
+- MUST handle undefined return
+- MUST check isAnonymous before actions
+- MUST provide fallback for missing data
+- MUST handle anonymous users appropriately
+
+**Documentation**: `useUserProfile.md`
+
+---
+
+### useProfileUpdate & useProfileEdit
+
+**Purpose**: Profile update operations and form management
+
+**When to Use**:
+- Profile editing screens
+- Settings screens
+- Form state management
+- Profile modifications
+
+**Import Path**:
 ```typescript
-// ✅ Good
-function Component() {
-  const { loading, isAuthReady, user } = useAuth();
-
-  if (loading) return <LoadingSpinner />;
-  if (!isAuthReady) return <InitializingScreen />;
-  if (!user) return <LoginScreen />;
-
-  return <HomeScreen />;
-}
+import {
+  useProfileUpdate,
+  useProfileEdit
+} from '@umituz/react-native-auth';
 ```
 
-### 3. Use Selectors for Performance
+**File**: `useProfileUpdate.ts`
 
+**Rules**:
+- MUST validate before update
+- MUST handle loading state
+- MUST show errors to user
+- MUST not allow anonymous updates
+
+**Documentation**: `useProfileUpdate.md`
+
+---
+
+### useAccountManagement
+
+**Purpose**: Account operations (logout, delete)
+
+**When to Use**:
+- Account settings screens
+- Logout functionality
+- Account deletion
+- Password changes
+
+**Import Path**:
 ```typescript
-// ✅ Good - Selectors prevent unnecessary re-renders
-function Component() {
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
-}
-
-// ❌ Bad - Re-renders on any state change
-function Component() {
-  const { isAuthenticated } = useAuth();
-}
+import { useAccountManagement } from '@umituz/react-native-auth';
 ```
+
+**File**: `useAccountManagement.ts`
+
+**Rules**:
+- MUST confirm before destructive actions
+- MUST handle reauthentication
+- MUST show clear warnings
+- MUST hide for anonymous users
+
+**Documentation**: `useAccountManagement.md`
+
+---
+
+### useSocialLogin
+
+**Purpose**: Google and Apple authentication
+
+**When to Use**:
+- Social authentication needed
+- Want Google sign-in
+- Want Apple sign-in (iOS)
+- Unified social auth interface
+
+**Import Path**:
+```typescript
+import {
+  useSocialLogin,
+  useGoogleAuth,
+  useAppleAuth
+} from '@umituz/react-native-auth';
+```
+
+**File**: `useSocialLogin.ts`
+
+**Rules**:
+- MUST configure providers before use
+- MUST check provider availability
+- MUST handle loading states
+- MUST handle platform differences
+
+**Documentation**: `useSocialLogin.md`
+
+---
+
+### useAuthBottomSheet
+
+**Purpose**: Auth modal management
+
+**When to Use**:
+- Modal-based authentication
+- Login/register modal
+- Social auth in modal
+- Pending callback execution
+
+**Import Path**:
+```typescript
+import { useAuthBottomSheet } from '@umituz/react-native-auth';
+```
+
+**File**: `useAuthBottomSheet.ts`
+
+**Rules**:
+- MUST use with BottomSheetModal component
+- MUST handle modal lifecycle
+- MUST execute pending callbacks
+- MUST reset state properly
+
+**Documentation**: `useAuthBottomSheet.md`
+
+---
+
+## Hook Usage Patterns
+
+### Initialization
+
+**RULES**:
+- MUST wrap app with AuthProvider
+- MUST initialize Firebase before AuthProvider
+- MUST handle initialization errors
+- MUST not use hooks outside provider
+
+**ORDER**:
+1. Initialize Firebase
+2. Wrap with AuthProvider
+3. Use hooks in components
+
+---
+
+### Error Handling
+
+**RULES**:
+- MUST wrap hook calls in try-catch
+- MUST display error messages
+- MUST allow user retry
+- MUST not expose sensitive errors
+
+---
+
+### Performance
+
+**RULES**:
+- MUST not call hooks conditionally
+- MUST use hook dependencies correctly
+- MUST not create multiple auth listeners
+- MUST memoize expensive computations
+
+---
 
 ## Related Documentation
 
-- **[Components](../components/README.md)** - UI components
-- **[Services](../../infrastructure/services/README.md)** - Core services
-- **[Domain](../../domain/README.md)** - Domain entities
+- **Components**: `../components/README.md`
+- **Screens**: `../screens/README.md`
+- **Stores**: `../stores/README.md`

@@ -1,513 +1,394 @@
 # Application Layer
 
-React Native Auth package application layer. Defines ports and interfaces for authentication operations.
-
-## Structure
-
-```
-application/
-└── ports/
-    ├── IAuthService.ts      # Authentication service interface
-    └── IAuthProvider.ts     # Auth provider interface
-```
-
-## Overview
-
-The application layer defines the contracts (interfaces) for authentication operations. It follows the Hexagonal Architecture (Ports and Adapters) pattern:
-
-- **Ports**: Interfaces that define what the application can do
-- **Adapters**: Implementations that connect to external services (Firebase, etc.)
+Defines ports and interfaces for authentication operations following Hexagonal Architecture (Ports and Adapters).
 
 ---
 
-# IAuthService
+## Strategy
 
-Authentication service interface defining all auth operations.
+**Purpose**: Establishes contracts between domain logic and external implementations. Defines what operations the application can perform without specifying how.
 
-## Interface
+**When to Use**:
+- Implementing custom auth providers
+- Creating test doubles/mocks
+- Understanding available auth operations
+- Designing alternative implementations
 
-```typescript
-import type { IAuthService, SignUpParams, SignInParams } from '@umituz/react-native-auth';
+**Location**: `src/application/`
 
-interface IAuthService {
-  // Sign up new user
-  signUp(params: SignUpParams): Promise<AuthUser>;
-
-  // Sign in existing user
-  signIn(params: SignInParams): Promise<AuthUser>;
-
-  // Sign out current user
-  signOut(): Promise<void>;
-
-  // Get current user
-  getCurrentUser(): AuthUser | null;
-}
-
-interface SignUpParams {
-  email: string;
-  password: string;
-  displayName?: string;
-}
-
-interface SignInParams {
-  email: string;
-  password: string;
-}
-```
-
-## Usage Example
-
-### Implementing IAuthService
-
-```typescript
-import { IAuthService, SignUpParams, SignInParams } from '@umituz/react-native-auth';
-
-class FirebaseAuthService implements IAuthService {
-  constructor(private firebaseAuth: Auth) {}
-
-  async signUp(params: SignUpParams): Promise<AuthUser> {
-    const userCredential = await createUserWithEmailAndPassword(
-      this.firebaseAuth,
-      params.email,
-      params.password
-    );
-
-    // Update profile if displayName provided
-    if (params.displayName) {
-      await updateProfile(userCredential.user, {
-        displayName: params.displayName,
-      });
-    }
-
-    return this.mapToAuthUser(userCredential.user);
-  }
-
-  async signIn(params: SignInParams): Promise<AuthUser> {
-    const userCredential = await signInWithEmailAndPassword(
-      this.firebaseAuth,
-      params.email,
-      params.password
-    );
-
-    return this.mapToAuthUser(userCredential.user);
-  }
-
-  async signOut(): Promise<void> {
-    await signOut(this.firebaseAuth);
-  }
-
-  getCurrentUser(): AuthUser | null {
-    const user = this.firebaseAuth.currentUser;
-    return user ? this.mapToAuthUser(user) : null;
-  }
-
-  private mapToAuthUser(firebaseUser: FirebaseUser): AuthUser {
-    return {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      displayName: firebaseUser.displayName,
-      isAnonymous: firebaseUser.isAnonymous,
-      emailVerified: firebaseUser.emailVerified,
-      photoURL: firebaseUser.photoURL,
-      provider: firebaseUser.providerData[0]?.providerId || 'unknown',
-    };
-  }
-}
-```
-
-### Using IAuthService
-
-```typescript
-function LoginComponent({ authService }: { authService: IAuthService }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSignIn = async () => {
-    try {
-      const user = await authService.signIn({ email, password });
-      console.log('Signed in:', user.displayName);
-    } catch (error) {
-      console.error('Sign in failed:', error);
-    }
-  };
-
-  return (
-    <View>
-      <TextInput value={email} onChangeText={setEmail} placeholder="Email" />
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        secureTextEntry
-      />
-      <Button onPress={handleSignIn}>Sign In</Button>
-    </View>
-  );
-}
-```
+**Structure**:
+- `ports/` - Interface definitions
+- `IAuthService.ts` - Authentication service interface
+- `IAuthProvider.ts` - Auth provider interface
 
 ---
 
-# IAuthProvider
+## Architecture Pattern
 
-Auth provider interface for different authentication methods (Firebase, custom backend, etc.).
+### Hexagonal Architecture (Ports and Adapters)
 
-## Interface
+**PURPOSE**: Decouple business logic from external dependencies
 
-```typescript
-import type { IAuthProvider, AuthCredentials, SignUpCredentials, SocialSignInResult } from '@umituz/react-native-auth';
+**PORTS**:
+- Interfaces defining operations
+- Define what the application does
+- Independent of implementations
 
-interface IAuthProvider {
-  // Sign up with email/password
-  signUp(credentials: SignUpCredentials): Promise<AuthUser>;
+**ADAPTERS**:
+- Implementations of ports
+- Connect to external services
+- Firebase, custom backend, mocks
 
-  // Sign in with email/password
-  signIn(credentials: AuthCredentials): Promise<AuthUser>;
-
-  // Sign in with social provider
-  signInWithSocial(provider: 'google' | 'apple'): Promise<SocialSignInResult>;
-
-  // Sign out
-  signOut(): Promise<void>;
-
-  // Get current user
-  getCurrentUser(): AuthUser | null;
-}
-
-interface AuthCredentials {
-  email: string;
-  password: string;
-}
-
-interface SignUpCredentials extends AuthCredentials {
-  displayName?: string;
-}
-
-interface SocialSignInResult {
-  success: boolean;
-  user?: AuthUser;
-  error?: string;
-}
-```
-
-## Usage Example
-
-### Firebase Provider Implementation
-
-```typescript
-import { IAuthProvider } from '@umituz/react-native-auth';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
-class FirebaseAuthProvider implements IAuthProvider {
-  constructor(private firebaseAuth: Auth) {}
-
-  async signUp(credentials: SignUpCredentials): Promise<AuthUser> {
-    const userCredential = await createUserWithEmailAndPassword(
-      this.firebaseAuth,
-      credentials.email,
-      credentials.password
-    );
-
-    if (credentials.displayName) {
-      await updateProfile(userCredential.user, {
-        displayName: credentials.displayName,
-      });
-    }
-
-    return this.mapUser(userCredential.user);
-  }
-
-  async signIn(credentials: AuthCredentials): Promise<AuthUser> {
-    const userCredential = await signInWithEmailAndPassword(
-      this.firebaseAuth,
-      credentials.email,
-      credentials.password
-    );
-
-    return this.mapUser(userCredential.user);
-  }
-
-  async signInWithSocial(provider: 'google' | 'apple'): Promise<SocialSignInResult> {
-    try {
-      let authProvider: GoogleAuthProvider | OAuthProvider;
-
-      if (provider === 'google') {
-        authProvider = new GoogleAuthProvider();
-      } else {
-        authProvider = new OAuthProvider('apple.com');
-      }
-
-      const result = await signInWithPopup(this.firebaseAuth, authProvider);
-      const user = this.mapUser(result.user);
-
-      return { success: true, user };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Social sign in failed',
-      };
-    }
-  }
-
-  async signOut(): Promise<void> {
-    await signOut(this.firebaseAuth);
-  }
-
-  getCurrentUser(): AuthUser | null {
-    const user = this.firebaseAuth.currentUser;
-    return user ? this.mapUser(user) : null;
-  }
-
-  private mapUser(firebaseUser: FirebaseUser): AuthUser {
-    return {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      displayName: firebaseUser.displayName,
-      isAnonymous: firebaseUser.isAnonymous,
-      emailVerified: firebaseUser.emailVerified,
-      photoURL: firebaseUser.photoURL,
-      provider: firebaseUser.providerData[0]?.providerId || 'unknown',
-    };
-  }
-}
-```
-
-### Custom Backend Provider
-
-```typescript
-import { IAuthProvider } from '@umituz/react-native-auth';
-
-class BackendAuthProvider implements IAuthProvider {
-  constructor(private apiBaseUrl: string) {}
-
-  async signUp(credentials: SignUpCredentials): Promise<AuthUser> {
-    const response = await fetch(`${this.apiBaseUrl}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-      throw new Error('Sign up failed');
-    }
-
-    const data = await response.json();
-    return data.user; // Assuming API returns { user: AuthUser }
-  }
-
-  async signIn(credentials: AuthCredentials): Promise<AuthUser> {
-    const response = await fetch(`${this.apiBaseUrl}/auth/signin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-      throw new Error('Sign in failed');
-    }
-
-    const data = await response.json();
-    return data.user;
-  }
-
-  async signInWithSocial(provider: 'google' | 'apple'): Promise<SocialSignInResult> {
-    // Implement social sign-in with your backend
-    const response = await fetch(`${this.apiBaseUrl}/auth/social/${provider}`, {
-      method: 'POST',
-    });
-
-    const data = await response.json();
-    return data;
-  }
-
-  async signOut(): Promise<void> {
-    await fetch(`${this.apiBaseUrl}/auth/signout`, { method: 'POST' });
-  }
-
-  getCurrentUser(): AuthUser | null {
-    // Return cached user or fetch from backend
-    return null;
-  }
-}
-```
+**Rules**:
+- MUST depend on interfaces, not implementations
+- MUST define clear operation contracts
+- MUST support multiple implementations
+- MUST not leak implementation details
 
 ---
 
-# Dependency Injection
+## Ports
 
-Using interfaces allows for easy dependency injection and testing.
+### IAuthService
 
-## Provider Pattern
+**PURPOSE**: Authentication service interface defining core auth operations
 
+**IMPORT PATH**:
 ```typescript
-import { IAuthProvider } from '@umituz/react-native-auth';
-
-interface AuthProviderContextType {
-  authProvider: IAuthProvider;
-}
-
-const AuthProviderContext = createContext<AuthProviderContextType | null>(null);
-
-export function AuthProvider({ children, provider }: { children: ReactNode; provider: IAuthProvider }) {
-  return (
-    <AuthProviderContext.Provider value={{ authProvider: provider }}>
-      {children}
-    </AuthProviderContext.Provider>
-  );
-}
-
-export function useAuthProvider(): IAuthProvider {
-  const context = useContext(AuthProviderContext);
-  if (!context) {
-    throw new Error('useAuthProvider must be used within AuthProvider');
-  }
-  return context.authProvider;
-}
+import type { IAuthService } from '@umituz/react-native-auth';
 ```
 
-## App Configuration
+**OPERATIONS**:
+- `signUp(params)` - Create new user account
+- `signIn(params)` - Authenticate existing user
+- `signOut()` - End user session
+- `getCurrentUser()` - Retrieve current user
+- `resetPassword(email)` - Initiate password reset
+- `updateEmail(email)` - Change user email
+- `updatePassword(password)` - Change user password
 
-```typescript
-import { FirebaseAuthProvider } from './providers/FirebaseAuthProvider';
-import { BackendAuthProvider } from './providers/BackendAuthProvider';
+**Rules**:
+- MUST implement all defined methods
+- MUST return domain entities (AuthUser)
+- MUST throw domain errors (AuthError)
+- MUST handle async operations
+- MUST validate inputs
 
-// Choose provider based on environment
-const authProvider = __DEV__
-  ? new BackendAuthProvider('https://dev-api.example.com')
-  : new FirebaseAuthProvider(getAuth());
+**MUST NOT**:
+- Expose Firebase-specific types
+- Return raw provider responses
+- Skip error handling
+- Use synchronous operations
 
-function App() {
-  return (
-    <AuthProvider provider={authProvider}>
-      <AppNavigator />
-    </AuthProvider>
-  );
-}
-```
+**PARAMS**:
+- `SignUpParams` - email, password, displayName?
+- `SignInParams` - email, password
 
 ---
 
-# Testing with Mocks
+### IAuthProvider
 
-## Mock Implementation
+**PURPOSE**: Provider interface for different authentication backends
 
+**IMPORT PATH**:
 ```typescript
-import { IAuthProvider } from '@umituz/react-native-auth';
-
-class MockAuthProvider implements IAuthProvider {
-  private mockUser: AuthUser | null = null;
-
-  async signUp(credentials: SignUpCredentials): Promise<AuthUser> {
-    this.mockUser = {
-      uid: 'mock-123',
-      email: credentials.email,
-      displayName: credentials.displayName || 'Mock User',
-      isAnonymous: false,
-      emailVerified: false,
-      photoURL: null,
-      provider: 'password',
-    };
-    return this.mockUser;
-  }
-
-  async signIn(credentials: AuthCredentials): Promise<AuthUser> {
-    if (credentials.email === 'test@example.com' && credentials.password === 'password') {
-      this.mockUser = {
-        uid: 'mock-123',
-        email: credentials.email,
-        displayName: 'Test User',
-        isAnonymous: false,
-        emailVerified: true,
-        photoURL: null,
-        provider: 'password',
-      };
-      return this.mockUser;
-    }
-    throw new Error('Invalid credentials');
-  }
-
-  async signInWithSocial(provider: 'google' | 'apple'): Promise<SocialSignInResult> {
-    this.mockUser = {
-      uid: `mock-${provider}-123`,
-      email: `${provider}@example.com`,
-      displayName: `${provider} User`,
-      isAnonymous: false,
-      emailVerified: true,
-      photoURL: null,
-      provider: provider === 'google' ? 'google.com' : 'apple.com',
-    };
-    return { success: true, user: this.mockUser };
-  }
-
-  async signOut(): Promise<void> {
-    this.mockUser = null;
-  }
-
-  getCurrentUser(): AuthUser | null {
-    return this.mockUser;
-  }
-}
-
-// Usage in tests
-const mockProvider = new MockAuthProvider();
-render(
-  <AuthProvider provider={mockProvider}>
-    <LoginComponent />
-  </AuthProvider>
-);
+import type { IAuthProvider } from '@umituz/react-native-auth';
 ```
+
+**OPERATIONS**:
+- `signUp(credentials)` - Register new user
+- `signIn(credentials)` - Authenticate user
+- `signInWithSocial(provider)` - Social authentication
+- `signOut()` - Sign out user
+- `getCurrentUser()` - Get current user
+
+**SOCIAL PROVIDERS**:
+- `google` - Google OAuth
+- `apple` - Apple Sign-In
+- `anonymous` - Anonymous session
+
+**Rules**:
+- MUST support defined providers
+- MUST return consistent AuthUser format
+- MUST handle provider-specific errors
+- MUST normalize user data
+- MUST support multiple providers
+
+**MUST NOT**:
+- Mix provider implementations
+- Return inconsistent user shapes
+- Ignore provider constraints
+- Skip error normalization
+
+**CREDENTIALS**:
+- `AuthCredentials` - email, password
+- `SignUpCredentials` - email, password, displayName?
+- `SocialSignInResult` - success, user?, error?
 
 ---
 
-# Best Practices
+## Implementation Guidelines
 
-## 1. Always Use Interfaces
+### Creating Custom Provider
 
-```typescript
-// ✅ Good
-function authenticateUser(authProvider: IAuthProvider, credentials: AuthCredentials) {
-  return authProvider.signIn(credentials);
-}
+**RULES**:
+- MUST implement IAuthService or IAuthProvider
+- MUST map to domain AuthUser entity
+- MUST convert errors to domain errors
+- MUST follow interface contract
+- MUST handle edge cases
 
-// ❌ Bad - couples to Firebase
-function authenticateUser(auth: Auth, credentials: AuthCredentials) {
-  return signInWithEmailAndPassword(auth, credentials.email, credentials.password);
-}
-```
+**MUST NOT**:
+- Change method signatures
+- Return provider-specific types
+- Skip input validation
+- Ignore error handling
 
-## 2. Dependency Injection
+**Constraints**:
+- Async operations only
+- Consistent return types
+- Proper error mapping
+- User data normalization
 
-```typescript
-// ✅ Good - injectable
-class UserService {
-  constructor(private authProvider: IAuthProvider) {}
-}
+---
 
-// ❌ Bad - tight coupling
-import { getAuth } from 'firebase/auth';
-class UserService {
-  private auth = getAuth();
-}
-```
+### Firebase Implementation
 
-## 3. Error Handling
+**LOCATION**: `src/infrastructure/services/AuthService.ts`
 
-```typescript
-// ✅ Good - abstract errors
-async function signUp(authProvider: IAuthProvider, params: SignUpParams) {
-  try {
-    return await authProvider.signUp(params);
-  } catch (error) {
-    if (error instanceof AuthEmailAlreadyInUseError) {
-      // Handle specific error
-    }
-    throw error;
-  }
-}
-```
+**Rules**:
+- MUST implement IAuthService
+- MUST wrap Firebase SDK
+- MUST map Firebase errors to domain
+- MUST convert Firebase User to AuthUser
+- MUST handle Firebase lifecycle
+
+**MUST NOT**:
+- Expose Firebase types publicly
+- Bypass domain layer
+- Skip error mapping
+- Ignore Firebase events
+
+---
+
+### Custom Backend Implementation
+
+**USE CASES**:
+- Custom authentication server
+- Additional business logic
+- Enhanced security requirements
+- Legacy system integration
+
+**Rules**:
+- MUST implement IAuthProvider
+- MUST handle HTTP errors properly
+- MUST normalize API responses
+- MUST implement retry logic
+- MUST handle network failures
+
+**MUST NOT**:
+- Expose API details to domain
+- Skip authentication tokens
+- Ignore server errors
+- Hardcode endpoints
+
+---
+
+## Dependency Injection
+
+### Provider Pattern
+
+**PURPOSE**: Enable swapping implementations without changing application code
+
+**RULES**:
+- MUST inject interfaces, not implementations
+- MUST configure at app root
+- MUST use single instance
+- MUST not create multiple instances
+- MUST handle initialization properly
+
+**MUST NOT**:
+- Instantiate providers in components
+- Mix provider types
+- Skip initialization
+- Create circular dependencies
+
+---
+
+## Testing Strategy
+
+### Mock Implementations
+
+**PURPOSE**: Enable testing without real backend
+
+**RULES**:
+- MUST implement IAuthProvider interface
+- MUST return valid AuthUser objects
+- MUST simulate realistic behavior
+- MUST support test scenarios
+- MUST be deterministic
+
+**MUST NOT**:
+- Return invalid data
+- Have undefined behavior
+- Skip error scenarios
+- Break interface contract
+
+**USE CASES**:
+- Unit testing
+- Integration testing
+- Storybook development
+- CI/CD pipelines
+
+---
+
+## Error Handling
+
+### Error Mapping
+
+**RULES**:
+- MUST map provider errors to domain errors
+- MUST preserve error context
+- MUST use domain error types
+- MUST include helpful messages
+- MUST not expose implementation details
+
+**MUST NOT**:
+- Throw raw provider errors
+- Expose stack traces
+- Lose error context
+- Use generic error types
+
+**DOMAIN ERRORS**:
+- AuthUserNotFoundError
+- AuthWrongPasswordError
+- AuthEmailAlreadyInUseError
+- AuthWeakPasswordError
+- AuthInvalidEmailError
+- AuthNetworkError
+
+---
+
+## Best Practices
+
+### Interface Compliance
+
+**MUST**:
+- Implement all interface methods
+- Match exact signatures
+- Return promised types
+- Handle all error cases
+- Follow async patterns
+
+**MUST NOT**:
+- Modify interface definitions
+- Skip optional methods
+- Change parameter types
+- Break backward compatibility
+
+---
+
+### Error Boundaries
+
+**MUST**:
+- Wrap provider calls in try-catch
+- Map all errors to domain
+- Provide context
+- Allow retry where appropriate
+- Log appropriately
+
+**MUST NOT**:
+- Let provider errors escape
+- Expose implementation details
+- Skip error handling
+- Suppress errors silently
+
+---
+
+### User Data Normalization
+
+**MUST**:
+- Convert to AuthUser entity
+- Normalize provider data
+- Handle missing fields
+- Validate required fields
+- Preserve important metadata
+
+**MUST NOT**:
+- Return raw provider data
+- Skip null handling
+- Assume field presence
+- Lose user context
+
+---
+
+## Constraints
+
+### Platform Limitations
+
+**PROVIDER AVAILABILITY**:
+- Google: All platforms
+- Apple: iOS only
+- Anonymous: All platforms
+
+**Rules**:
+- MUST check platform before use
+- MUST provide fallback for unavailable
+- MUST not crash on unsupported
+- MUST document platform restrictions
+
+---
+
+### Security Requirements
+
+**MUST**:
+- Validate all inputs
+- Use HTTPS for remote calls
+- Securely store credentials
+- Handle tokens properly
+- Implement proper error handling
+
+**MUST NOT**:
+- Log sensitive data
+- Expose credentials
+- Skip validation
+- Use insecure protocols
+
+---
 
 ## Related Modules
 
-- **[Domain](../domain/README.md)** - Domain entities and value objects
-- **[Infrastructure](../infrastructure/README.md)** - Infrastructure implementations
-- **[Presentation](../presentation/README.md)** - UI components and hooks
+- **Domain** (`../domain/README.md`) - AuthUser entity, AuthConfig, AuthError
+- **Infrastructure** (`../infrastructure/README.md`) - Firebase implementation
+- **Presentation** (`../presentation/README.md`) - UI components and hooks
+
+---
+
+## Port Documentation
+
+### IAuthService Documentation
+
+**File**: `ports/IAuthService.ts`
+
+**Purpose**: Core authentication service interface
+
+**Implementations**:
+- `FirebaseAuthService` - Firebase implementation
+- Custom implementations allowed
+
+**See Also**: Infrastructure services documentation
+
+---
+
+### IAuthProvider Documentation
+
+**File**: `ports/IAuthProvider.ts`
+
+**Purpose**: Provider abstraction for different auth backends
+
+**Implementations**:
+- Firebase provider
+- Custom backend provider
+- Mock provider (testing)
+
+**See Also**: Infrastructure services documentation

@@ -1,399 +1,202 @@
 # Infrastructure Layer
 
-React Native Auth package infrastructure layer. Contains implementations of application interfaces and external service integrations.
+Implements application interfaces and handles external service integrations.
+
+---
+
+## Strategy
+
+**Purpose**: Provides concrete implementations of domain and application layer interfaces. Handles all external dependencies and integrations.
+
+**When to Use**:
+- Understanding Firebase integration
+- Implementing custom services
+- Debugging infrastructure issues
+- Learning about external dependencies
+
+**Location**: `src/infrastructure/`
+
+---
 
 ## Structure
 
-```
-infrastructure/
-├── providers/
-│   └── FirebaseAuthProvider.ts    # Firebase auth implementation
-├── services/
-│   ├── AuthService.ts              # Main auth service
-│   ├── initializeAuth.ts           # Auth initialization
-│   ├── UserDocumentService.ts      # User document management
-│   ├── AnonymousModeService.ts     # Anonymous user service
-│   └── AuthEventService.ts         # Event handling
-├── adapters/
-│   └── StorageProviderAdapter.ts   # Storage adapter
-└── utils/
-    └── AuthValidation.ts           # Validation utilities
-```
+### Services
 
-## Overview
+**AuthService.ts** - Main authentication service
+**Purpose**: Orchestrates all authentication operations
 
-The infrastructure layer implements the interfaces defined in the application layer and handles all external integrations:
-
-- **Firebase Authentication**: Primary auth provider implementation
-- **Firestore**: User document storage
-- **Firebase Storage**: Profile photo storage
-- **Validation**: Input validation utilities
-
----
-
-# FirebaseAuthProvider
-
-Firebase Authentication implementation of `IAuthProvider`.
-
-## Features
-
-- Email/Password authentication
-- Google sign-in
-- Apple sign-in
-- Anonymous authentication
-- User state management
-
-## Usage
-
+**IMPORT PATH**:
 ```typescript
-import { FirebaseAuthProvider } from '@umituz/react-native-auth';
-import { getAuth } from 'firebase/auth';
-
-const firebaseAuth = getAuth();
-const provider = new FirebaseAuthProvider(firebaseAuth);
-
-// Sign up
-const user = await provider.signUp({
-  email: 'user@example.com',
-  password: 'password123',
-  displayName: 'John Doe',
-});
-
-// Sign in
-const user = await provider.signIn({
-  email: 'user@example.com',
-  password: 'password123',
-});
-
-// Sign out
-await provider.signOut();
-
-// Get current user
-const currentUser = provider.getCurrentUser();
+import { AuthService, initializeAuth } from '@umituz/react-native-auth';
 ```
+
+**Rules**:
+- MUST implement IAuthService interface
+- MUST initialize before use
+- MUST handle Firebase errors
+- MUST create user documents
+- MUST not expose Firebase internals
+
+**MUST NOT**:
+- Skip initialization
+- Expose Firebase types
+- Ignore error handling
+- Create multiple instances
 
 ---
 
-# AuthService
+### UserDocumentService
 
-Main authentication service that orchestrates all auth operations.
+**Purpose**: Manages Firestore user documents
 
-## Features
-
-- User authentication flow
-- User document creation
-- Error handling
-- State management
-
-## Usage
-
+**IMPORT PATH**:
 ```typescript
 import {
-  AuthService,
-  initializeAuthService,
-  getAuthService,
-  resetAuthService,
+  ensureUserDocument,
+  markUserDeleted,
+  configureUserDocumentService
 } from '@umituz/react-native-auth';
-
-// Initialize (must be called once)
-initializeAuthService({
-  firebaseAuth: getAuth(),
-  onAuthStateChanged: (user) => {
-    console.log('Auth state changed:', user);
-  },
-});
-
-// Get service instance
-const authService = getAuthService();
-
-// Sign in
-const user = await authService.signIn({
-  email: 'user@example.com',
-  password: 'password123',
-});
-
-// Sign up
-const user = await authService.signUp({
-  email: 'user@example.com',
-  password: 'password123',
-  displayName: 'John Doe',
-});
-
-// Sign out
-await authService.signOut();
-
-// Reset (testing only)
-resetAuthService();
 ```
 
-## API
+**OPERATIONS**:
+- `ensureUserDocument(user, data?)` - Create/retrieve user document
+- `markUserDeleted(userId)` - Mark user as deleted
+- `configureUserDocumentService(config)` - Configure service
 
-### Methods
+**Rules**:
+- MUST create document on registration
+- MUST handle document existence
+- MUST use server timestamps
+- MUST support custom configuration
+- MUST not delete documents permanently
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `signIn` | `{ email, password }` | `Promise<AuthUser>` | Sign in with email/password |
-| `signUp` | `{ email, password, displayName? }` | `Promise<AuthUser>` | Create new account |
-| `signOut` | - | `Promise<void>` | Sign out current user |
-| `getCurrentUser` | - | `AuthUser \| null` | Get current user |
-| `sendPasswordResetEmail` | `email` | `Promise<void>` | Send password reset email |
+**MUST NOT**:
+- Skip document creation
+- Overwrite existing data
+- Use client timestamps
+- Hardcode collection name
+
+**CONFIGURATION**:
+- `collection` - Firestore collection name (default: 'users')
+- `timestamps` - Add createdAt/updatedAt fields
+- `userData` - Custom fields to add
 
 ---
 
-# initializeAuth
+### AnonymousModeService
 
-Initializes the authentication system and sets up Firebase Auth state listener.
+**Purpose**: Handles anonymous user authentication and upgrade
 
-## Features
-
-- Firebase Auth initialization
-- Auth state listener setup
-- Automatic user document creation
-- Error handling
-
-## Usage
-
-### Basic Initialization
-
-```typescript
-import { initializeAuth } from '@umituz/react-native-auth';
-
-function App() {
-  useEffect(() => {
-    const init = async () => {
-      await initializeAuth({
-        onAuthStateChanged: (user) => {
-          console.log('Auth state changed:', user);
-        },
-      });
-    };
-
-    init();
-  }, []);
-
-  return <AppNavigator />;
-}
-```
-
-### With Navigation Integration
-
-```typescript
-import { initializeAuth } from '@umituz/react-native-auth';
-
-function App() {
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    initializeAuth({
-      onAuthStateChanged: (user) => {
-        if (user) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home' }],
-          });
-        } else {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' }],
-          });
-        }
-      },
-      onAuthError: (error) => {
-        console.error('Auth error:', error);
-        Alert.alert('Auth Error', error.message);
-      },
-    });
-  }, []);
-
-  return <NavigationContainer>{/* Routes */}</NavigationContainer>;
-}
-```
-
-### Check Initialization Status
-
-```typescript
-import { isAuthInitialized, resetAuthInitialization } from '@umituz/react-native-auth';
-
-if (isAuthInitialized()) {
-  console.log('Auth is initialized');
-}
-
-// Reset (testing only)
-resetAuthInitialization();
-```
-
----
-
-# UserDocumentService
-
-Manages user documents in Firestore.
-
-## Features
-
-- Automatic user document creation
-- User data updates
-- Account deletion marking
-- Custom configuration
-
-## Usage
-
-### Ensure User Document
-
-```typescript
-import { ensureUserDocument } from '@umituz/react-native-auth';
-
-// After user signs in/up, ensure document exists
-const user = await signInWithEmailAndPassword(auth, email, password);
-await ensureUserDocument(user);
-```
-
-### Mark User as Deleted
-
-```typescript
-import { markUserDeleted } from '@umituz/react-native-auth';
-
-// When user deletes account
-await markUserDeleted(userId);
-```
-
-### Configure Service
-
-```typescript
-import { configureUserDocumentService } from '@umituz/react-native-auth';
-
-configureUserDocumentService({
-  collection: 'customers', // Default: 'users'
-  timestamps: true,        // Add createdAt, updatedAt
-  userData: {
-    source: 'app',
-    version: '1.0.0',
-  },
-});
-```
-
-### Custom User Data
-
-```typescript
-await ensureUserDocument(user, {
-  role: 'premium',
-  subscription: 'monthly',
-  preferences: {
-    newsletter: true,
-    notifications: true,
-  },
-});
-```
-
----
-
-# AnonymousModeService
-
-Handles anonymous user authentication.
-
-## Features
-
-- Anonymous account creation
-- Anonymous user upgrade to regular account
-- Anonymous state management
-
-## Usage
-
+**IMPORT PATH**:
 ```typescript
 import { AnonymousModeService } from '@umituz/react-native-auth';
-
-const anonymousService = new AnonymousModeService();
-
-// Sign in anonymously
-const user = await anonymousService.signInAnonymously();
-console.log('Anonymous user:', user.uid);
-
-// Convert anonymous user to regular user
-const credential = EmailAuthProvider.credential(email, password);
-await linkWithCredential(user, credential);
-console.log('User upgraded:', user.email);
 ```
+
+**OPERATIONS**:
+- `signInAnonymously()` - Create anonymous user
+- User upgrade via Firebase credential linking
+
+**Rules**:
+- MUST create temporary accounts
+- MUST support upgrade path
+- MUST warn about data loss
+- MUST handle upgrade failures
+- MUST not delete anonymous data
+
+**MUST NOT**:
+- Skip upgrade warnings
+- Lose user data on upgrade
+- Allow anonymous operations without warning
+- Make anonymous permanent
+
+**Constraints**:
+- Anonymous users have limited functionality
+- Data lost if sign out without upgrade
+- Upgrade requires credentials
+- Cannot revert to anonymous after upgrade
 
 ---
 
-# AuthEventService
+### AuthEventService
 
-Manages authentication events and provides pub/sub functionality.
+**Purpose**: Pub/sub system for authentication events
 
-## Features
-
-- Event emission
-- Event subscription
-- Type-safe events
-
-## Usage
-
+**IMPORT PATH**:
 ```typescript
 import { AuthEventService } from '@umituz/react-native-auth';
-
-const eventService = new AuthEventService();
-
-// Subscribe to events
-const unsubscribe = eventService.on('signIn', (user) => {
-  console.log('User signed in:', user);
-});
-
-// Emit events
-eventService.emit('signIn', user);
-
-// Unsubscribe
-unsubscribe();
 ```
 
-### Available Events
+**OPERATIONS**:
+- `on(event, callback)` - Subscribe to event
+- `emit(event, data)` - Emit event
+- Returns unsubscribe function
 
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `signIn` | `AuthUser` | User signed in |
-| `signUp` | `AuthUser` | New user registered |
-| `signOut` | `undefined` | User signed out |
-| `authStateChanged` | `AuthUser \| null` | Auth state changed |
+**EVENTS**:
+- `signIn` - User signed in (payload: AuthUser)
+- `signUp` - New user registered (payload: AuthUser)
+- `signOut` - User signed out (payload: undefined)
+- `authStateChanged` - Auth state changed (payload: AuthUser | null)
+
+**Rules**:
+- MUST emit events on state changes
+- MUST allow multiple subscribers
+- MUST provide unsubscribe function
+- MUST not throw in event handlers
+- MUST handle subscriber errors
+
+**MUST NOT**:
+- Skip critical events
+- Block on event handlers
+- Throw unhandled errors
+- Memory leak subscribers
 
 ---
 
-# StorageProviderAdapter
+### StorageProviderAdapter
 
-Adapter for storage providers (AsyncStorage, MMKV, etc.).
+**Purpose**: Adapter interface for storage providers
 
-## Usage
-
+**IMPORT PATH**:
 ```typescript
 import {
   createStorageProvider,
-  StorageProviderAdapter,
+  StorageProviderAdapter
 } from '@umituz/react-native-auth';
-
-// Custom implementation
-class CustomStorageAdapter implements StorageProviderAdapter {
-  async getItem(key: string): Promise<string | null> {
-    return await AsyncStorage.getItem(key);
-  }
-
-  async setItem(key: string, value: string): Promise<void> {
-    await AsyncStorage.setItem(key, value);
-  }
-
-  async removeItem(key: string): Promise<void> {
-    await AsyncStorage.removeItem(key);
-  }
-}
-
-// Create provider
-const storageProvider = createStorageProvider(new CustomStorageAdapter());
 ```
+
+**INTERFACE METHODS**:
+- `getItem(key)` - Retrieve value
+- `setItem(key, value)` - Store value
+- `removeItem(key)` - Delete value
+
+**Rules**:
+- MUST implement all methods
+- MUST handle async operations
+- MUST return null for missing keys
+- MUST handle storage errors
+- MUST support string values only
+
+**MUST NOT**:
+- Throw for missing keys
+- Skip error handling
+- Assume synchronous operations
+- Store non-string values
+
+**IMPLEMENTATIONS**:
+- AsyncStorage
+- MMKV
+- SecureStorage
+- Custom implementations
 
 ---
 
-# Validation Utilities
+## Validation Utilities
 
-Input validation utilities for authentication.
+### AuthValidation
 
-## Available Validators
+**Purpose**: Input validation for authentication
 
+**IMPORT PATH**:
 ```typescript
 import {
   validateEmail,
@@ -401,176 +204,317 @@ import {
   validatePasswordForRegister,
   validatePasswordConfirmation,
   validateDisplayName,
-  DEFAULT_VAL_CONFIG,
+  DEFAULT_VAL_CONFIG
 } from '@umituz/react-native-auth';
 ```
 
-### Email Validation
+**VALIDATORS**:
+- `validateEmail(email)` - Email format validation
+- `validatePasswordForLogin(password)` - Login password check
+- `validatePasswordForRegister(password)` - Registration password complexity
+- `validatePasswordConfirmation(password, confirmation)` - Password match
+- `validateDisplayName(name)` - Display name validation
 
+**RETURN TYPE**:
 ```typescript
-const result = validateEmail('test@example.com');
-// { isValid: true }
-
-const result = validateEmail('invalid-email');
-// { isValid: false, error: 'Invalid email format' }
+{
+  isValid: boolean;
+  error?: string;
+  // Additional fields for specific validators
+}
 ```
 
-### Password Validation (Login)
+**Rules**:
+- MUST return validation result object
+- MUST provide error messages
+- MUST use configurable rules
+- MUST support internationalization
+- MUST not throw for invalid input
 
-```typescript
-const result = validatePasswordForLogin('password123');
-// { isValid: true }
+**MUST NOT**:
+- Return boolean only
+- Skip error messages
+- Hardcode validation rules
+- Throw on validation failure
 
-const result = validatePasswordForLogin('');
-// { isValid: false, error: 'Password is required' }
-```
-
-### Password Validation (Register)
-
-```typescript
-const result = validatePasswordForRegister('MyPass123!');
-// {
-//   isValid: true,
-//   requirements: {
-//     hasMinLength: true,
-//     hasUppercase: true,
-//     hasLowercase: true,
-//     hasNumber: true,
-//     hasSpecialChar: true
-//   }
-// }
-
-const result = validatePasswordForRegister('weak');
-// {
-//   isValid: false,
-//   requirements: { ... },
-//   error: 'Password does not meet requirements'
-// }
-```
-
-### Password Confirmation
-
-```typescript
-const result = validatePasswordConfirmation('password123', 'password123');
-// { isValid: true, matches: true }
-
-const result = validatePasswordConfirmation('password123', 'different');
-// { isValid: false, matches: false, error: 'Passwords do not match' }
-```
-
-### Display Name Validation
-
-```typescript
-const result = validateDisplayName('John Doe');
-// { isValid: true }
-
-const result = validateDisplayName('');
-// { isValid: false, error: 'Display name is required' }
-```
-
-### Custom Validation Config
-
-```typescript
-import { DEFAULT_VAL_CONFIG } from '@umituz/react-native-auth';
-
-// Default config
-DEFAULT_VAL_CONFIG;
-// {
-//   password: {
-//     minLength: 8,
-//     requireUppercase: true,
-//     requireLowercase: true,
-//     requireNumber: true,
-//     requireSpecialChar: true,
-//   }
-// }
-```
+**DEFAULT CONFIG**:
+- `password.minLength` - 8 characters
+- `password.requireUppercase` - true
+- `password.requireLowercase` - true
+- `password.requireNumber` - true
+- `password.requireSpecialChar` - true
 
 ---
 
-# Error Handling
+## Firebase Integration
 
-## Firebase Error Mapping
+### FirebaseAuthProvider
 
-```typescript
-import {
-  mapFirebaseError,
-  AuthUserNotFoundError,
-  AuthWrongPasswordError,
-} from '@umituz/react-native-auth';
+**Purpose**: Firebase Authentication implementation
 
-try {
-  await signInWithEmailAndPassword(auth, email, password);
-} catch (error) {
-  const authError = mapFirebaseError(error);
+**Location**: `providers/FirebaseAuthProvider.ts`
 
-  if (authError instanceof AuthUserNotFoundError) {
-    Alert.alert('Error', 'User not found');
-  } else if (authError instanceof AuthWrongPasswordError) {
-    Alert.alert('Error', 'Wrong password');
-  }
-}
-```
+**Rules**:
+- MUST implement IAuthProvider
+- MUST wrap Firebase SDK
+- MUST handle Firebase lifecycle
+- MUST map to domain entities
+- MUST convert Firebase errors
+
+**MUST NOT**:
+- Expose Firebase types
+- Bypass error mapping
+- Skip Firebase initialization
+- Ignore auth state changes
 
 ---
 
-# Best Practices
+### Error Mapping
 
-## 1. Initialize Early
+**Purpose**: Convert Firebase errors to domain errors
 
+**IMPORT PATH**:
 ```typescript
-// ✅ Good - Initialize in app root
-function App() {
-  useEffect(() => {
-    initializeAuth();
-  }, []);
-
-  return <Navigator />;
-}
-
-// ❌ Bad - Initialize in component
-function LoginComponent() {
-  useEffect(() => {
-    initializeAuth(); // Too late!
-  }, []);
-}
+import { mapFirebaseError } from '@umituz/react-native-auth';
 ```
 
-## 2. Handle Initialization State
+**MAPPING**:
+- `auth/user-not-found` → AuthUserNotFoundError
+- `auth/wrong-password` → AuthWrongPasswordError
+- `auth/email-already-in-use` → AuthEmailAlreadyInUseError
+- `auth/weak-password` → AuthWeakPasswordError
+- `auth/invalid-email` → AuthInvalidEmailError
+- `auth/network-request-failed` → AuthNetworkError
 
+**Rules**:
+- MUST map all Firebase errors
+- MUST preserve error context
+- MUST use domain error types
+- MUST not lose error information
+- MUST handle unknown errors
+
+**MUST NOT**:
+- Throw raw Firebase errors
+- Skip error mapping
+- Lose error context
+- Use generic error type
+
+---
+
+## Initialization
+
+### initializeAuth
+
+**Purpose**: Initialize authentication system
+
+**IMPORT PATH**:
 ```typescript
-function App() {
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    initializeAuth().then(() => setIsInitialized(true));
-  }, []);
-
-  if (!isInitialized) {
-    return <LoadingScreen />;
-  }
-
-  return <AppNavigator />;
-}
+import { initializeAuth } from '@umituz/react-native-auth';
 ```
 
-## 3. Check Auth Before Operations
+**PARAMETERS**:
+- `onAuthStateChanged` - Auth state callback
+- `onAuthError` - Error callback (optional)
 
-```typescript
-async function protectedOperation() {
-  const authService = getAuthService();
-  const user = authService.getCurrentUser();
+**Rules**:
+- MUST call once at app startup
+- MUST wait for initialization
+- MUST handle initialization errors
+- MUST not call multiple times
+- MUST check initialization status
 
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
+**MUST NOT**:
+- Skip initialization
+- Call in components
+- Initialize multiple times
+- Ignore initialization status
 
-  // Proceed with operation
-}
-```
+**CHECK FUNCTIONS**:
+- `isAuthInitialized()` - Check if initialized
+- `resetAuthInitialization()` - Reset (testing only)
+
+---
+
+## Configuration
+
+### Service Configuration
+
+**AuthService Configuration**:
+- Firebase Auth instance
+- Auth state callbacks
+- Error handlers
+
+**UserDocumentService Configuration**:
+- Collection name
+- Timestamps
+- Custom user data
+
+**Validation Configuration**:
+- Password requirements
+- Email validation rules
+- Display name constraints
+
+**Rules**:
+- MUST configure before use
+- MUST use valid configuration
+- MUST handle config errors
+- MUST not change after initialization
+- MUST validate configuration
+
+**MUST NOT**:
+- Skip configuration
+- Use invalid config
+- Change after initialization
+- Ignore config errors
+
+---
+
+## Best Practices
+
+### Initialization
+
+**MUST**:
+- Initialize at app root
+- Wait for initialization
+- Handle initialization errors
+- Check initialization status
+- Configure properly
+
+**MUST NOT**:
+- Initialize in components
+- Skip initialization check
+- Ignore initialization errors
+- Initialize multiple times
+- Use default config blindly
+
+---
+
+### Error Handling
+
+**MUST**:
+- Map Firebase errors to domain
+- Provide context
+- Log appropriately
+- Show user-friendly messages
+- Handle network failures
+
+**MUST NOT**:
+- Expose Firebase errors
+- Show technical details
+- Skip error mapping
+- Suppress errors
+- Log sensitive data
+
+---
+
+### User Documents
+
+**MUST**:
+- Create document on registration
+- Use server timestamps
+- Handle existing documents
+- Configure collection name
+- Add custom fields
+
+**MUST NOT**:
+- Skip document creation
+- Overwrite data
+- Use client timestamps
+- Hardcode collection name
+- Delete documents permanently
+
+---
+
+## Security
+
+### Data Protection
+
+**MUST**:
+- Validate all inputs
+- Use HTTPS
+- Handle tokens properly
+- Secure credentials
+- Log appropriately
+
+**MUST NOT**:
+- Log passwords
+- Expose tokens
+- Skip validation
+- Store credentials insecurely
+- Log sensitive data
+
+---
+
+### Firebase Security
+
+**MUST**:
+- Use Firebase security rules
+- Enable required providers
+- Configure properly
+- Monitor usage
+- Handle errors
+
+**MUST NOT**:
+- Skip Firebase setup
+- Ignore security rules
+- Expose API keys
+- Leave unconfigured
+- Ignore Firebase errors
+
+---
+
+## Constraints
+
+### Platform Limitations
+
+**Firebase Dependencies**:
+- Requires Firebase project
+- Requires Firebase SDK
+- Requires network connection
+- Platform-specific features
+
+**Rules**:
+- MUST check platform availability
+- MUST handle platform differences
+- MUST not crash on unsupported
+- MUST document platform constraints
+
+---
+
+### Network Requirements
+
+**MUST**:
+- Handle network failures
+- Provide offline fallback
+- Show network errors
+- Allow retry
+- Check connectivity
+
+**MUST NOT**:
+- Assume always online
+- Skip network errors
+- Crash on network failure
+- Prevent offline usage
+
+---
 
 ## Related Modules
 
-- **[Domain](../domain/README.md)** - Domain entities
-- **[Application](../application/README.md)** - Application interfaces
-- **[Presentation](../presentation/README.md)** - UI components and hooks
+- **Domain** (`../domain/README.md`) - AuthUser entity, errors, config
+- **Application** (`../application/README.md`) - Interfaces and ports
+- **Presentation** (`../presentation/README.md`) - UI components
+
+---
+
+## Service Documentation
+
+### Detailed Service Docs
+
+**See**: `services/README.md` for detailed service documentation
+
+**Services Covered**:
+- AuthService
+- UserDocumentService
+- AnonymousModeService
+- AuthEventService
+- Validation utilities

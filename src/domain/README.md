@@ -1,293 +1,444 @@
 # Domain Layer
 
-React Native Auth paketinin domain katmanı. İş kurallarını, domain entity'lerini ve value object'leri içerir.
+Core business logic, domain entities, value objects, and domain rules.
 
-## Yapı
+---
 
-```
-domain/
-├── entities/
-│   ├── AuthUser.ts          # Authentication kullanıcısı
-│   └── UserProfile.ts       # Kullanıcı profili
-├── value-objects/
-│   └── AuthConfig.ts        # Auth konfigürasyonu
-├── errors/
-│   └── AuthError.ts         # Auth hataları
-└── utils/
-    ├── anonymousNameGenerator.ts  # Anonymous isim oluşturucu
-    └── migration.ts               # Veri taşıma
-```
+## Strategy
 
-## Entities
+**Purpose**: Contains business rules and domain models independent of external dependencies. Represents the core authentication logic.
+
+**When to Use**:
+- Understanding business rules
+- Working with domain entities
+- Implementing validation
+- Learning about data structures
+
+**Location**: `src/domain/`
+
+---
+
+## Structure
+
+### Entities
+
+**entities/AuthUser.ts** - Provider-agnostic user entity
+**entities/UserProfile.ts** - User profile for Firestore
+
+### Value Objects
+
+**value-objects/AuthConfig.ts** - Authentication configuration
+
+### Errors
+
+**errors/AuthError.ts** - Domain-specific error hierarchy
+
+### Utils
+
+**utils/anonymousNameGenerator.ts** - Anonymous name generation
+**utils/migration.ts** - Data migration utilities
+
+---
+
+## Domain Entities
 
 ### AuthUser
 
-Authentication işlemleri için kullanıcı entity'si.
+**PURPOSE**: Provider-agnostic user entity for authentication
 
+**IMPORT PATH**:
 ```typescript
 import type { AuthUser } from '@umituz/react-native-auth';
-
-const user: AuthUser = {
-  uid: 'user-123',
-  email: 'user@example.com',
-  displayName: 'John Doe',
-  photoURL: 'https://...',
-  isAnonymous: false,
-  provider: 'google',
-  emailVerified: true,
-};
 ```
 
-**Özellikler:**
-- Firebase User ile uyumlu
-- Provider bilgisi
-- Anonymous kontrolü
-- Email verification durumu
+**PROPERTIES**:
+- `uid: string` - Unique user identifier
+- `email: string | null` - Email address
+- `displayName: string | null` - Display name
+- `photoURL: string | null` - Profile photo URL
+- `isAnonymous: boolean` - Anonymous flag
+- `emailVerified: boolean` - Email verification status
+- `provider: AuthProviderType` - Auth provider type
 
-**Kullanım:**
-```typescript
-function getUserDisplayName(user: AuthUser): string {
-  return user.displayName || user.email || 'Anonymous';
-}
+**Rules**:
+- MUST have unique uid
+- MUST NOT have empty uid
+- Anonymous users have null email
+- Provider indicates auth method
+- Email can be null for social auth
 
-function isSocialLogin(user: AuthUser): boolean {
-  return user.provider === 'google' || user.provider === 'apple';
-}
-```
+**MUST NOT**:
+- Allow empty uid
+- Change uid after creation
+- Have anonymous user with email
+- Use invalid provider type
+
+**Documentation**: `entities/AuthUser.md`
+
+---
 
 ### UserProfile
 
-Kullanıcı profili entity'si.
+**PURPOSE**: User profile entity for Firestore document storage
 
+**IMPORT PATH**:
 ```typescript
 import type { UserProfile } from '@umituz/react-native-auth';
-
-const profile: UserProfile = {
-  displayName: 'John Doe',
-  photoURL: 'https://...',
-  bio: 'Software developer',
-  location: 'Istanbul',
-  website: 'https://johndoe.com',
-};
 ```
 
-**Güncelleme:**
-```typescript
-async function updateProfile(userId: string, updates: UpdateProfileParams) {
-  await updateDoc(doc(db, 'users', userId), updates);
-}
-```
+**PROPERTIES**:
+- `uid: string` - User ID
+- `email: string | null` - Email address
+- `displayName: string | null` - Display name
+- `photoURL: string | null` - Profile photo URL
+- `isAnonymous: boolean` - Anonymous flag
+- `createdAt: Date | null` - Account creation date
+- `lastLoginAt: Date | null` - Last login timestamp
+
+**Rules**:
+- MUST create on user registration
+- MUST include uid
+- MUST set initial timestamps
+- MUST validate updates
+- MUST handle partial updates
+
+**MUST NOT**:
+- Delete existing profiles
+- Skip validation
+- Use client timestamps
+- Overwrite without checking
+
+**Documentation**: `entities/UserProfile.md`
+
+---
 
 ## Value Objects
 
 ### AuthConfig
 
-Authentication konfigürasyonu.
+**PURPOSE**: Authentication configuration value object
 
+**IMPORT PATH**:
 ```typescript
-import { AuthConfig, DEFAULT_AUTH_CONFIG } from '@umituz/react-native-auth';
-
-const config: AuthConfig = {
-  password: {
-    minLength: 8,
-    requireUppercase: true,
-    requireLowercase: true,
-    requireNumbers: true,
-    requireSpecialChars: true,
-  },
-  social: {
-    google: {
-      iosClientId: '...',
-      webClientId: '...',
-    },
-    apple: {
-      enabled: true,
-    },
-  },
-};
+import type { AuthConfig } from '@umituz/react-native-auth';
 ```
 
-## Errors
+**COMPONENTS**:
+- `password: PasswordConfig` - Password requirements
+- `social?: SocialAuthConfig` - Social provider config
+
+**PasswordConfig**:
+- `minLength: number` - Minimum password length
+- `requireUppercase: boolean` - Require uppercase
+- `requireLowercase: boolean` - Require lowercase
+- `requireNumber: boolean` - Require number
+- `requireSpecialChar: boolean` - Require special character
+
+**Rules**:
+- MUST set minLength between 4-128
+- MUST validate password against config
+- MUST provide password config
+- MAY provide social config
+
+**MUST NOT**:
+- Set minLength < 4
+- Set minLength > 128
+- Skip validation
+
+**Documentation**: `ConfigAndErrors.md`
+
+---
+
+## Domain Errors
 
 ### AuthError Hierarchy
 
+**PURPOSE**: Type-safe error handling with clear error types
+
+**IMPORT PATH**:
 ```typescript
 import {
   AuthError,
-  AuthInitializationError,
-  AuthConfigurationError,
-  AuthValidationError,
-  AuthNetworkError,
   AuthUserNotFoundError,
   AuthWrongPasswordError,
   AuthEmailAlreadyInUseError,
   AuthWeakPasswordError,
   AuthInvalidEmailError,
+  AuthNetworkError
 } from '@umituz/react-native-auth';
 ```
 
-**Hata Yakalama:**
-```typescript
-try {
-  await signIn({ email, password });
-} catch (error) {
-  if (error instanceof AuthUserNotFoundError) {
-    // Kullanıcı bulunamadı
-  } else if (error instanceof AuthWrongPasswordError) {
-    // Şifre hatalı
-  } else if (error instanceof AuthNetworkError) {
-    // Network hatası
-  }
-}
-```
+**ERROR TYPES**:
+- `AuthUserNotFoundError` - User not found
+- `AuthWrongPasswordError` - Incorrect password
+- `AuthEmailAlreadyInUseError` - Email already registered
+- `AuthWeakPasswordError` - Password too weak
+- `AuthInvalidEmailError` - Invalid email format
+- `AuthNetworkError` - Network connection failure
 
-## Utils
+**Rules**:
+- MUST use domain errors (not Firebase)
+- MUST map Firebase errors to domain
+- MUST preserve error context
+- MUST show user-friendly messages
+- MUST not expose system details
+
+**MUST NOT**:
+- Throw Firebase errors directly
+- Expose error codes
+- Show stack traces
+- Reveal sensitive information
+
+**Documentation**: `ConfigAndErrors.md`
+
+---
+
+## Domain Utilities
 
 ### Anonymous Name Generator
 
-Anonymous kullanıcılar için rastgele isim oluşturur.
+**PURPOSE**: Generate random names for anonymous users
 
+**IMPORT PATH**:
 ```typescript
 import {
   generateAnonymousName,
   getAnonymousDisplayName
 } from '@umituz/react-native-auth';
-
-const name1 = generateAnonymousName('user-123');
-// "User_Witty_Badger_1234"
-
-const name2 = generateAnonymousName('user-456', {
-  prefix: 'Guest',
-  adjectiveCount: 1,
-  nounCount: 1,
-});
-// "Guest_Clever_Fox_456"
-
-const displayName = getAnonymousDisplayName('user-123');
-// "Witty Badger"
 ```
 
-**Konfigürasyon:**
+**FUNCTIONS**:
+- `generateAnonymousName(uid, config?)` - Generate anonymous name
+- `getAnonymousDisplayName(uid)` - Get display name only
+
+**CONFIGURATION**:
+- `prefix` - Name prefix (default: 'User')
+- `adjectiveCount` - Number of adjectives (default: 2)
+- `nounCount` - Number of nouns (default: 1)
+- `showNumbers` - Include numbers (default: true)
+
+**Rules**:
+- MUST be deterministic for same uid
+- MUST generate unique names
+- MUST be human-readable
+- MUST not contain offensive words
+- MUST support custom configuration
+
+**MUST NOT**:
+- Generate duplicate names
+- Use offensive language
+- Be non-deterministic
+- Ignore configuration
+
+---
+
+### Migration Utilities
+
+**PURPOSE**: Migrate user data between collections
+
+**IMPORT PATH**:
 ```typescript
-interface AnonymousNameConfig {
-  prefix?: string;           // Varsayılan: 'User'
-  adjectiveCount?: number;   // Varsayılan: 2
-  nounCount?: number;        // Varsayılan: 1
-  showNumbers?: boolean;     // Varsayılan: true
-}
+import {
+  migrateUserData,
+  configureMigration
+} from '@umituz/react-native-auth';
 ```
 
-### Migration
+**FUNCTIONS**:
+- `configureMigration(config)` - Configure migration
+- `migrateUserData(userId)` - Run migration
 
-Kullanıcı verilerini taşımak için utility.
+**CONFIGURATION**:
+- `from` - Source collection name
+- `to` - Target collection name
+- `transform` - Data transformation function
+- `verify` - Verification function (optional)
 
-```typescript
-import { migrateUserData, configureMigration } from '@umituz/react-native-auth';
+**Rules**:
+- MUST configure before migrating
+- MUST transform data correctly
+- MUST handle migration errors
+- MUST verify migration success
+- MUST not delete source automatically
 
-// Migration konfigürasyonu
-configureMigration({
-  from: 'legacy_users',
-  to: 'users',
-  transform: (legacyData) => ({
-    displayName: legacyData.name,
-    email: legacyData.email_address,
-    createdAt: legacyData.joined_at,
-  }),
-});
+**MUST NOT**:
+- Skip configuration
+- Lose data during migration
+- Assume identical schemas
+- Delete source without verification
 
-// Migration çalıştırma
-await migrateUserData(userId);
-```
-
-**Tam Örnek:**
-```typescript
-async function migrateLegacyUser(userId: string) {
-  configureMigration({
-    from: 'old_users_collection',
-    to: 'users',
-    transform: (old) => ({
-      displayName: old.full_name,
-      email: old.email_addr,
-      photoURL: old.profile_pic,
-      createdAt: old.created_at,
-      metadata: {
-        migratedFrom: 'legacy',
-        migratedAt: Date.now(),
-      },
-    }),
-  });
-
-  try {
-    await migrateUserData(userId);
-    console.log('Migration successful');
-  } catch (error) {
-    console.error('Migration failed:', error);
-  }
-}
-```
+---
 
 ## Type Guards
 
-Domain type'ları için guard'lar:
+### User Type Guards
 
+**PURPOSE**: Type-safe user checking
+
+**IMPORT PATH**:
 ```typescript
-function isAuthenticatedUser(user: AuthUser | null): user is AuthUser {
-  return user !== null && !user.isAnonymous;
-}
-
-function isEmailVerified(user: AuthUser): boolean {
-  return !!user.emailVerified;
-}
-
-function hasProvider(user: AuthUser, provider: string): boolean {
-  return user.provider === provider;
-}
+import {
+  isAuthenticatedUser,
+  isAnonymousUser,
+  hasEmail
+} from '@umituz/react-native-auth';
 ```
 
-## Domain Services
+**GUARDS**:
+- `isAuthenticatedUser(user)` - Check if authenticated user
+- `isAnonymousUser(user)` - Check if anonymous user
+- `hasEmail(user)` - Check if has email
 
-### User Validation
+**Rules**:
+- MUST use for type narrowing
+- MUST validate before operations
+- MUST check null cases
+- MUST return boolean
 
-```typescript
-function validateUserForRegistration(user: Partial<AuthUser>): ValidationResult {
-  const errors: string[] = [];
+**MUST NOT**:
+- Skip type guards
+- Assume user type
+- Skip null checks
+- Return non-boolean
 
-  if (!user.email) {
-    errors.push('Email is required');
-  }
-
-  if (!user.displayName || user.displayName.length < 2) {
-    errors.push('Display name must be at least 2 characters');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-}
-```
+---
 
 ## Domain Rules
 
-1. **AuthUser Rules:**
-   - Her kullanıcının unique bir `uid`'si olmalı
-   - Anonymous kullanıcıların `email`'i yoktur
-   - Social login kullanıcıları provider bilgisi taşır
+### AuthUser Rules
 
-2. **UserProfile Rules:**
-   - `displayName` en az 2 karakter olmalı
-   - `email` geçerli formatta olmalı
-   - `photoURL` geçerli URL olmalı
+**MUST**:
+- Have unique uid
+- Validate uid not empty
+- Validate email format if provided
+- Check provider is valid
+- Verify required fields
 
-3. **Password Rules:**
-   - Minimum 8 karakter
-   - En az 1 büyük harf
-   - En az 1 küçük harf
-   - En az 1 rakam
-   - En az 1 özel karakter
+**MUST NOT**:
+- Allow empty uid
+- Accept invalid email
+- Use wrong provider type
+- Have anonymous user with email
 
-## İlgili Modüller
+**Constraints**:
+- uid required
+- Email format validated
+- Provider must be known type
+- Anonymous users have null email
 
-- **[Application](../application/README.md)** - Application ports
-- **[Infrastructure](../infrastructure/README.md)** - Infrastructure implementation
-- **[Presentation](../presentation/README.md)** - UI components ve hooks
+---
+
+### UserProfile Rules
+
+**MUST**:
+- Validate display name 2-50 characters
+- Validate photo URL format
+- Use server timestamps
+- Handle partial updates
+- Preserve existing data
+
+**MUST NOT**:
+- Allow display name < 2 chars
+- Accept invalid URLs
+- Use client timestamps
+- Overwrite existing data
+
+**Constraints**:
+- Display name min 2, max 100 chars
+- Cannot be only whitespace
+- Valid URL required for photoURL
+- One profile per uid
+
+---
+
+### Password Rules
+
+**MUST**:
+- Enforce minimum length
+- Check uppercase if required
+- Check lowercase if required
+- Check number if required
+- Check special char if required
+
+**MUST NOT**:
+- Allow weak passwords
+- Skip validation checks
+- Accept passwords below minimum
+
+**Constraints**:
+- Minimum length: 4-128 chars
+- Requirements configurable
+- All requirements optional
+- Default min length: 6 (lenient)
+
+---
+
+## Best Practices
+
+### Entity Usage
+
+**MUST**:
+- Use type guards for type narrowing
+- Validate before operations
+- Handle null values appropriately
+- Follow domain rules
+- Use proper error types
+
+**MUST NOT**:
+- Skip validation
+- Assume required fields present
+- Ignore null cases
+- Use generic error types
+- Break domain rules
+
+---
+
+### Error Handling
+
+**MUST**:
+- Use domain error types
+- Map provider errors to domain
+- Provide context
+- Show user-friendly messages
+- Preserve error information
+
+**MUST NOT**:
+- Throw provider errors
+- Expose technical details
+- Lose error context
+- Show stack traces
+- Reveal sensitive data
+
+---
+
+### Configuration
+
+**MUST**:
+- Validate configuration
+- Use appropriate defaults
+- Test with production config
+- Not use dev config in production
+
+**MUST NOT**:
+- Skip validation
+- Use invalid config
+- Ignore environment differences
+- Hardcode production values
+
+---
+
+## Related Modules
+
+- **Application** (`../application/README.md`) - Ports and interfaces
+- **Infrastructure** (`../infrastructure/README.md`) - Implementations
+- **Presentation** (`../presentation/README.md`) - UI components
+
+---
+
+## Entity Documentation
+
+### Detailed Entity Docs
+
+**AuthUser**: `entities/AuthUser.md`
+**UserProfile**: `entities/UserProfile.md`
+**AuthConfig & AuthError**: `ConfigAndErrors.md`

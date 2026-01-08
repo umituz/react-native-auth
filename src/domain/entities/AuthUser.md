@@ -1,377 +1,236 @@
 # AuthUser Entity
 
-Authentication için provider-agnostic kullanıcı entity'si. Firebase User ile uyumlu, ancak herhangi bir auth provider ile kullanılabilir.
+Provider-agnostic user entity for authentication.
 
-## Tip Tanımı
+---
 
-```typescript
-import type { AuthUser, AuthProviderType } from '@umituz/react-native-auth';
+## Strategy
 
-interface AuthUser {
-  uid: string;                    // Unique kullanıcı ID'si
-  email: string | null;           // Email adresi (anonymous'da null)
-  displayName: string | null;     // Görünen ad
-  isAnonymous: boolean;           // Anonymous kullanıcı mı
-  emailVerified: boolean;         // Email doğrulanmış mı
-  photoURL: string | null;        // Profil fotoğrafı URL'si
-  provider: AuthProviderType;     // Auth provider tipi
-}
+**Purpose**: Represents authenticated user with provider-agnostic design. Compatible with Firebase User but works with any auth provider.
 
-type AuthProviderType =
-  | "google.com"      // Google ile giriş
-  | "apple.com"       // Apple ile giriş
-  | "password"        // Email/password ile giriş
-  | "anonymous"       // Anonymous kullanıcı
-  | "unknown";        // Bilinmeyen provider
-```
+**When to Use**:
+- Type-safe user representation
+- User identity management
+- Authentication operations
+- User profile display
 
-## Örnekler
+**Location**: `src/domain/entities/AuthUser.ts`
 
-### Email/Password Kullanıcısı
+---
 
-```typescript
-const emailUser: AuthUser = {
-  uid: 'user-123',
-  email: 'john@example.com',
-  displayName: 'John Doe',
-  isAnonymous: false,
-  emailVerified: true,
-  photoURL: null,
-  provider: 'password',
-};
-```
+## Type Definition
 
-### Google Kullanıcısı
+### AuthUser Interface
 
-```typescript
-const googleUser: AuthUser = {
-  uid: 'google-456',
-  email: 'jane@gmail.com',
-  displayName: 'Jane Smith',
-  isAnonymous: false,
-  emailVerified: true,
-  photoURL: 'https://lh3.googleusercontent.com/...',
-  provider: 'google.com',
-};
-```
+**PROPERTIES**:
+- `uid: string` - Unique user identifier
+- `email: string | null` - Email address
+- `displayName: string | null` - Display name
+- `isAnonymous: boolean` - Anonymous user flag
+- `emailVerified: boolean` - Email verification status
+- `photoURL: string | null` - Profile photo URL
+- `provider: AuthProviderType` - Auth provider type
 
-### Apple Kullanıcısı
+### AuthProviderType
 
-```typescript
-const appleUser: AuthUser = {
-  uid: 'apple-789',
-  email: 'user@icloud.com',
-  displayName: 'Apple User',
-  isAnonymous: false,
-  emailVerified: true,
-  photoURL: null,
-  provider: 'apple.com',
-};
-```
+**VALUES**:
+- `"google.com"` - Google authentication
+- `"apple.com"` - Apple authentication
+- `"password"` - Email/password authentication
+- `"anonymous"` - Anonymous user
+- `"unknown"` - Unknown provider
 
-### Anonymous Kullanıcı
+**Rules**:
+- MUST have unique uid
+- MUST NOT have empty uid
+- Anonymous users have null email
+- Provider indicates auth method
 
-```typescript
-const anonymousUser: AuthUser = {
-  uid: 'anon-abc',
-  email: null,
-  displayName: null,
-  isAnonymous: true,
-  emailVerified: false,
-  photoURL: null,
-  provider: 'anonymous',
-};
-```
+**Constraints**:
+- Immutable after creation
+- uid cannot be changed
+- Provider determined by auth method
 
-## Kullanım
+---
 
-### Firebase User'dan AuthUser'a Dönüşüm
+## User State Management
 
-```typescript
-import { getAuth } from 'firebase/auth';
-import type { AuthUser } from '@umituz/react-native-auth';
+### Authenticated User
 
-function firebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
-  return {
-    uid: firebaseUser.uid,
-    email: firebaseUser.email,
-    displayName: firebaseUser.displayName,
-    isAnonymous: firebaseUser.isAnonymous,
-    emailVerified: firebaseUser.emailVerified,
-    photoURL: firebaseUser.photoURL,
-    provider: firebaseUser.providerData[0]?.providerId || 'unknown',
-  };
-}
+**CHARACTERISTICS**:
+- Has valid uid
+- Has email or social auth
+- Not anonymous
+- May have email verified flag
 
-// Kullanım
-const auth = getAuth();
-const firebaseUser = auth.currentUser;
-if (firebaseUser) {
-  const user: AuthUser = firebaseUserToAuthUser(firebaseUser);
-  console.log(user.displayName);
-}
-```
+**Rules**:
+- MUST have uid set
+- MUST NOT be anonymous
+- SHOULD have email if password provider
 
-### DisplayName Alma
+**Constraints**:
+- Email can be null for social auth
+- DisplayName optional
+- photoURL optional
 
-```typescript
-function getUserDisplayName(user: AuthUser): string {
-  // Önce displayName'i dene
-  if (user.displayName) {
-    return user.displayName;
-  }
+---
 
-  // Yoksa email'i kullan
-  if (user.email) {
-    // Email'den isim çıkar
-    const name = user.email.split('@')[0];
-    return name.charAt(0).toUpperCase() + name.slice(1);
-  }
+### Anonymous User
 
-  // Hiçbiri yoksa varsayılan
-  return 'Kullanıcı';
-}
+**CHARACTERISTICS**:
+- Has valid uid
+- No email
+- isAnonymous = true
+- provider = "anonymous"
 
-// Kullanım
-const name = getUserDisplayName(user);
-console.log(name); // "John" veya "Johndoe"
-```
+**Rules**:
+- MUST have isAnonymous = true
+- MUST have null email
+- provider MUST be "anonymous"
 
-### Provider Kontrolü
+**Constraints**:
+- Limited functionality
+- Data lost on sign out
+- Can be upgraded to registered account
 
-```typescript
-function isSocialLogin(user: AuthUser): boolean {
-  return user.provider === 'google.com' || user.provider === 'apple.com';
-}
+---
 
-function isEmailPasswordUser(user: AuthUser): boolean {
-  return user.provider === 'password';
-}
+## Provider Types
 
-function canChangePassword(user: AuthUser): boolean {
-  // Sadece email/password kullanıcıları şifre değiştirebilir
-  return user.provider === 'password';
-}
+### Google User
 
-// Kullanım
-if (isSocialLogin(user)) {
-  console.log('Social login ile giriş yaptı');
-}
+**PROPERTIES**:
+- provider: "google.com"
+- emailVerified: true (typically)
+- Has Google account data
 
-if (canChangePassword(user)) {
-  // Şifre değiştirme butonunu göster
-}
-```
+**Rules**:
+- MUST use Google provider
+- MUST have verified email
+- Auto-verifies email
 
-### Email Doğrulama Kontrolü
+---
 
-```typescript
-function requireEmailVerification(user: AuthUser): void {
-  if (user.provider === 'password' && !user.emailVerified) {
-    throw new Error('Email doğrulanması gerekiyor');
-  }
-}
+### Apple User
 
-function shouldShowVerifyEmailBanner(user: AuthUser): boolean {
-  return (
-    !user.isAnonymous &&
-    user.provider === 'password' &&
-    !user.emailVerified
-  );
-}
-```
+**PROPERTIES**:
+- provider: "apple.com"
+- Email may be hidden (user choice)
+- iOS only
 
-### Avatar URL Alma
+**Rules**:
+- MUST use Apple provider
+- iOS platform only
+- Respect user privacy choices
 
-```typescript
-function getUserAvatar(user: AuthUser): string | null {
-  // Önce photoURL'yi dene
-  if (user.photoURL) {
-    return user.photoURL;
-  }
+**Constraints**:
+- Email may be private relay
+- Not available on Android/Web
 
-  // Anonymous ise null döndür
-  if (user.isAnonymous) {
-    return null;
-  }
+---
 
-  // Default avatar oluştur (örn: UI Avatars)
-  if (user.email) {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}&background=random`;
-  }
+### Email/Password User
 
-  return null;
-}
-```
+**PROPERTIES**:
+- provider: "password"
+- emailVerified may be false initially
+- Standard auth flow
 
-### User İsim Oluşturma
+**Rules**:
+- MUST have email
+- Email may require verification
+- Can change password
 
-```typescript
-function getUserInitials(user: AuthUser): string {
-  if (user.displayName) {
-    const names = user.displayName.trim().split(' ');
-    if (names.length >= 2) {
-      return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-    }
-    return names[0][0].toUpperCase();
-  }
+**Constraints**:
+- Email required
+- Password managed by user
 
-  if (user.email) {
-    return user.email[0].toUpperCase();
-  }
+---
 
-  return '?';
-}
+## User Display
 
-// Kullanım
-const initials = getUserInitials(user);
-console.log(initials); // "JD" veya "J" veya "?"
-```
+### Display Name Priority
+
+**RULES**:
+1. Use displayName if available
+2. Fall back to email username
+3. Fall back to "User" for anonymous
+4. MUST NOT expose sensitive data
+
+**CONSTRAINTS**:
+- Display name: User-controlled
+- Email: Only first part before @
+- Anonymous: Generated or "Guest"
+
+---
+
+### Profile Photo
+
+**RULES**:
+- MUST provide fallback if null
+- MUST handle loading state
+- MUST not break if missing
+
+**FALLBACK OPTIONS**:
+- Default avatar generator
+- User initials
+- Placeholder icon
+- Null (no avatar)
+
+---
 
 ## Type Guards
 
-```typescript
-function isAuthenticatedUser(user: AuthUser | null): user is AuthUser {
-  return user !== null && !user.isAnonymous;
-}
+### User Type Checks
 
-function isAnonymousUser(user: AuthUser | null): user is AuthUser {
-  return user !== null && user.isAnonymous;
-}
+**isAuthenticatedUser(user)**
+- Checks if user exists and not anonymous
+- Type guard for TypeScript
 
-function hasEmail(user: AuthUser | null): user is AuthUser {
-  return user !== null && user.email !== null;
-}
+**isAnonymousUser(user)**
+- Checks if anonymous user
+- Type guard for TypeScript
 
-// Kullanım
-if (isAuthenticatedUser(user)) {
-  // TypeScript burada user'ın AuthUser olduğunu bilir
-  console.log(user.email);
-}
-```
+**hasEmail(user)**
+- Checks if has email
+- Type guard for TypeScript
 
-## Firebase ile Entegrasyon
+**Rules**:
+- MUST use for type narrowing
+- MUST validate before operations
+- MUST check null cases
 
-### Auth State Değişikliği Dinleme
+---
 
-```typescript
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import type { AuthUser } from '@umituz/react-native-auth';
+## Validation
 
-function useAuthUser() {
-  const [user, setUser] = useState<AuthUser | null>(null);
+### User Validation Rules
 
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        const authUser: AuthUser = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          isAnonymous: firebaseUser.isAnonymous,
-          emailVerified: firebaseUser.emailVerified,
-          photoURL: firebaseUser.photoURL,
-          provider: firebaseUser.providerData[0]?.providerId || 'unknown',
-        };
-        setUser(authUser);
-      } else {
-        setUser(null);
-      }
-    });
+**MUST**:
+- Validate uid is not empty
+- Validate email format if provided
+- Check provider is valid
+- Verify required fields
 
-    return unsubscribe;
-  }, []);
+**MUST NOT**:
+- Allow empty uid
+- Accept invalid email format
+- Use wrong provider type
 
-  return user;
-}
-```
+**Constraints**:
+- uid required
+- Email format validated
+- Provider must be known type
 
-### User Meta Verileri
+---
 
-```typescript
-interface ExtendedAuthUser extends AuthUser {
-  createdAt?: number;
-  lastSignInAt?: number;
-  metadata?: {
-    lastSignInTime?: string;
-    creationTime?: string;
-  };
-}
+## Related Entities
 
-function enrichAuthUser(user: AuthUser, firebaseUser: FirebaseUser): ExtendedAuthUser {
-  return {
-    ...user,
-    metadata: {
-      lastSignInTime: firebaseUser.metadata.lastSignInTime,
-      creationTime: firebaseUser.metadata.creationTime,
-    },
-  };
-}
-```
+- **UserProfile** (`./UserProfile.md`) - User profile entity
+- **AuthConfig** (`./ConfigAndErrors.md`) - Configuration
+- **AuthError** (`./ConfigAndErrors.md`) - Error handling
 
-## Validasyon
+## Related Infrastructure
 
-### User Validasyonu
-
-```typescript
-function validateAuthUser(user: AuthUser): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-
-  if (!user.uid || user.uid.length === 0) {
-    errors.push('User ID is required');
-  }
-
-  if (!user.isAnonymous && !user.email) {
-    errors.push('Email is required for non-anonymous users');
-  }
-
-  if (user.email && !isValidEmail(user.email)) {
-    errors.push('Invalid email format');
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-}
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-```
-
-## Testler
-
-### Mock User Oluşturma
-
-```typescript
-function createMockAuthUser(overrides?: Partial<AuthUser>): AuthUser {
-  return {
-    uid: 'mock-user-123',
-    email: 'mock@example.com',
-    displayName: 'Mock User',
-    isAnonymous: false,
-    emailVerified: true,
-    photoURL: null,
-    provider: 'password',
-    ...overrides,
-  };
-}
-
-// Testlerde kullanım
-const mockUser = createMockAuthUser({
-  provider: 'google.com',
-  photoURL: 'https://example.com/avatar.jpg',
-});
-```
-
-## İlgili Entity'ler
-
-- **[`UserProfile`](./UserProfile.md)** - Kullanıcı profili entity'si
-- **[`AuthError`](../errors/AuthError.md)** - Auth hataları
-
-## İlgili Type'lar
-
-- **[`AuthProviderType`](#tip-tanımı)** - Provider tipi
-- **[`UpdateProfileParams`](../UserProfile.md)** - Profil güncelleme parametreleri
+- **AuthService** (`../../infrastructure/services/AuthService.ts`) - Auth operations
+- **Firebase Auth** - Firebase integration

@@ -1,619 +1,684 @@
 # Presentation Layer
 
-React Native Auth package presentation layer. Contains React components, hooks, providers, stores, and navigation.
+React components, hooks, providers, stores, and navigation for authentication UI.
+
+---
+
+## Strategy
+
+**Purpose**: Provides all UI components and React hooks for authentication features in React Native applications.
+
+**When to Use**:
+- Building authentication UI
+- Need auth hooks and components
+- Integrating auth into navigation
+- Managing auth state in UI
+
+**Location**: `src/presentation/`
+
+---
 
 ## Structure
 
-```
-presentation/
-├── providers/
-│   └── AuthProvider.tsx           # Auth context provider
-├── hooks/
-│   ├── useAuth.ts                 # Main auth hook
-│   ├── useAuthRequired.ts         # Auth-required hook
-│   ├── useRequireAuth.ts          # Route protection hook
-│   ├── useUserProfile.ts          # User profile hook
-│   ├── useProfileUpdate.ts        # Profile update hook
-│   ├── useProfileEdit.ts          # Profile edit hook
-│   ├── useAccountManagement.ts    # Account management hook
-│   ├── useSocialLogin.ts          # Social login hook
-│   ├── useGoogleAuth.ts           # Google auth hook
-│   ├── useAppleAuth.ts            # Apple auth hook
-│   ├── useAuthBottomSheet.ts      # Auth bottom sheet hook
-│   ├── useLoginForm.ts            # Login form hook
-│   ├── useRegisterForm.ts         # Register form hook
-│   └── mutations/
-│       └── useAuthMutations.ts    # Auth mutation hooks
-├── components/
-│   ├── AuthContainer.tsx          # Main container
-│   ├── AuthHeader.tsx             # Header component
-│   ├── AuthFormCard.tsx           # Form card
-│   ├── LoginForm.tsx              # Login form
-│   ├── RegisterForm.tsx           # Register form
-│   ├── EditProfileForm.tsx        # Edit profile form
-│   ├── EditProfileAvatar.tsx      # Edit profile avatar
-│   ├── PasswordStrengthIndicator.tsx  # Password strength
-│   ├── PasswordMatchIndicator.tsx     # Password match
-│   ├── SocialLoginButtons.tsx     # Social login buttons
-│   ├── ProfileSection.tsx         # Profile section
-│   ├── AccountActions.tsx         # Account actions
-│   ├── AuthBottomSheet.tsx        # Bottom sheet modal
-│   ├── AuthLegalLinks.tsx         # Legal links
-│   ├── AuthDivider.tsx            # Divider
-│   ├── AuthLink.tsx               # Navigation link
-│   ├── AuthErrorDisplay.tsx       # Error display
-│   ├── AuthBackground.tsx         # Background component
-│   └── icons/
-│       ├── GoogleIconSvg.tsx      # Google icon
-│       └── AppleIconSvg.tsx       # Apple icon
-├── screens/
-│   ├── LoginScreen.tsx            # Login screen
-│   ├── RegisterScreen.tsx         # Register screen
-│   ├── AccountScreen.tsx          # Account screen
-│   └── EditProfileScreen.tsx      # Edit profile screen
-├── navigation/
-│   └── AuthNavigator.tsx          # Auth navigator
-├── stores/
-│   ├── authStore.ts               # Auth state store (Zustand)
-│   └── authModalStore.ts          # Auth modal store
-└── utils/
-    └── accountDeleteHandler.util.ts  # Account deletion handler
-```
+### Providers
+**providers/AuthProvider.tsx** - Root auth context provider
 
-## Overview
+### Hooks
+**hooks/useAuth.ts** - Main auth hook
+**hooks/useAuthRequired.ts** - Auth requirement checking
+**hooks/useUserProfile.ts** - Profile data fetching
+**hooks/useProfileUpdate.ts** - Profile updates
+**hooks/useAccountManagement.ts** - Account operations
+**hooks/useSocialLogin.ts** - Social auth management
+**hooks/useAuthBottomSheet.ts** - Modal management
 
-The presentation layer provides all UI components and React hooks for authentication features in your React Native app.
+### Components
+**components/** - Pre-built UI components
+- Form components (LoginForm, RegisterForm)
+- Password indicators
+- Social login buttons
+- Profile components
+- Layout components
+
+### Screens
+**screens/** - Complete authentication screens
+- LoginScreen
+- RegisterScreen
+- AccountScreen
+- EditProfileScreen
+
+### Stores
+**stores/authStore.ts** - Auth state (Zustand)
+**stores/authModalStore.ts** - Modal state
 
 ---
 
-# Providers
+## Providers
 
-## AuthProvider
+### AuthProvider
 
-Root provider that wraps your app and provides authentication context.
+**PURPOSE**: Root provider that wraps app and provides authentication context
 
+**IMPORT PATH**:
 ```typescript
 import { AuthProvider } from '@umituz/react-native-auth';
-
-function App() {
-  return (
-    <AuthProvider>
-      <AppNavigator />
-    </AuthProvider>
-  );
-}
 ```
+
+**Rules**:
+- MUST wrap app root
+- MUST initialize before using hooks
+- MUST be ancestor of all auth hooks
+- MUST not nest multiple providers
+- MUST configure properly
+
+**MUST NOT**:
+- Skip provider initialization
+- Use hooks without provider
+- Create multiple instances
+- Nest AuthProvider inside itself
 
 ---
 
-# Hooks
+## Hooks
 
-## Core Hooks
+### Core Hooks
 
-### useAuth
+#### useAuth
 
-Main authentication hook for managing auth state and operations.
+**PURPOSE**: Main authentication hook for auth state and operations
 
+**IMPORT PATH**:
 ```typescript
 import { useAuth } from '@umituz/react-native-auth';
-
-function MyComponent() {
-  const {
-    user,
-    userId,
-    userType,
-    loading,
-    isAuthReady,
-    isAnonymous,
-    isAuthenticated,
-    error,
-    signIn,
-    signUp,
-    signOut,
-    continueAnonymously,
-    setError,
-  } = useAuth();
-
-  if (loading) return <LoadingSpinner />;
-
-  if (!isAuthenticated) {
-    return <LoginScreen />;
-  }
-
-  return (
-    <View>
-      <Text>Welcome, {user?.email}</Text>
-      <Button onPress={signOut}>Sign Out</Button>
-    </View>
-  );
-}
 ```
 
-### useAuthRequired
+**RETURNS**:
+- `user: AuthUser | null` - Current user
+- `userId: string | null` - User ID
+- `loading: boolean` - Loading state
+- `isAuthReady: boolean` - Auth initialized
+- `isAuthenticated: boolean` - Authenticated status
+- `isAnonymous: boolean` - Anonymous user
+- `signIn()` - Sign in function
+- `signUp()` - Sign up function
+- `signOut()` - Sign out function
+- `setError()` - Set error state
 
-Check auth requirements and show modal if needed.
+**Rules**:
+- MUST use within AuthProvider
+- MUST handle loading state
+- MUST check auth readiness
+- MUST handle errors appropriately
+- MUST not call operations during loading
 
+**MUST NOT**:
+- Use outside AuthProvider
+- Skip loading checks
+- Ignore error handling
+- Call operations prematurely
+
+**Documentation**: `hooks/useAuth.md`
+
+---
+
+#### useAuthRequired
+
+**PURPOSE**: Check auth requirements and show modal if needed
+
+**IMPORT PATH**:
 ```typescript
 import { useAuthRequired } from '@umituz/react-native-auth';
-
-function LikeButton() {
-  const { isAllowed, checkAndRequireAuth } = useAuthRequired();
-
-  const handleLike = () => {
-    if (checkAndRequireAuth()) {
-      // User is authenticated, proceed
-      likePost();
-    }
-    // Otherwise, auth modal is shown automatically
-  };
-
-  return (
-    <Button onPress={handleLike}>
-      {isAllowed ? 'Like' : 'Sign in to like'}
-    </Button>
-  );
-}
 ```
 
-### useRequireAuth
+**RETURNS**:
+- `isAllowed: boolean` - Operation allowed
+- `checkAndRequireAuth()` - Check and show modal
 
-Get userId or throw if not authenticated (for protected components).
+**Rules**:
+- MUST use before protected operations
+- MUST show modal for anonymous users
+- MUST execute callback after auth
+- MUST handle modal state
 
+**MUST NOT**:
+- Skip auth check
+- Show modal for authenticated users
+- Execute operation without auth
+- Ignore modal state
+
+**Documentation**: `hooks/useAuthRequired.md`
+
+---
+
+#### useRequireAuth
+
+**PURPOSE**: Get userId or throw if not authenticated
+
+**IMPORT PATH**:
 ```typescript
 import { useRequireAuth } from '@umituz/react-native-auth';
-
-function UserProfile() {
-  const userId = useRequireAuth(); // Guaranteed to be string
-
-  useEffect(() => {
-    fetchUserData(userId);
-  }, [userId]);
-
-  return <ProfileContent userId={userId} />;
-}
 ```
 
-## User Profile Hooks
+**RETURNS**:
+- `userId: string` - Guaranteed user ID
 
-### useUserProfile
+**Rules**:
+- MUST only use in protected components
+- MUST handle thrown error
+- MUST guarantee parent auth check
+- MUST not use in optional auth contexts
 
-Fetch user profile data for display.
+**MUST NOT**:
+- Use in public components
+- Skip error handling
+- Assume auth without check
+- Use for optional features
 
+---
+
+### User Profile Hooks
+
+#### useUserProfile
+
+**PURPOSE**: Fetch user profile data for display
+
+**IMPORT PATH**:
 ```typescript
 import { useUserProfile } from '@umituz/react-native-auth';
-
-function ProfileHeader() {
-  const profile = useUserProfile({
-    accountRoute: '/account',
-    anonymousDisplayName: 'Guest User',
-  });
-
-  if (!profile) return <LoadingSpinner />;
-
-  return (
-    <View>
-      <Avatar source={{ uri: profile.avatarUrl }} />
-      <Text>{profile.displayName}</Text>
-      {profile.isAnonymous && <Text>Guest</Text>}
-    </View>
-  );
-}
 ```
 
-### useProfileUpdate
+**PARAMETERS**:
+- `accountRoute` - Account screen route
+- `anonymousDisplayName` - Guest display name
 
-Profile update operations.
+**RETURNS**:
+- Profile object or null
+- Loading state
+- Error state
 
+**Rules**:
+- MUST handle loading state
+- MUST provide anonymous fallback
+- MUST handle errors gracefully
+- MUST not mutate profile data
+
+**MUST NOT**:
+- Skip loading check
+- Return undefined for anonymous
+- Throw on errors
+- Modify returned profile
+
+**Documentation**: `hooks/useUserProfile.md`
+
+---
+
+#### useProfileUpdate
+
+**PURPOSE**: Profile update operations
+
+**IMPORT PATH**:
 ```typescript
 import { useProfileUpdate } from '@umituz/react-native-auth';
-
-function ProfileSettings() {
-  const { updateProfile, isUpdating, error } = useProfileUpdate();
-
-  const handleUpdate = async (data: UpdateProfileParams) => {
-    try {
-      await updateProfile(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  return <ProfileForm onSave={handleUpdate} />;
-}
 ```
 
-### useProfileEdit
+**RETURNS**:
+- `updateProfile()` - Update function
+- `isUpdating` - Loading state
+- `error` - Error state
 
-Profile editing form state management.
+**Rules**:
+- MUST validate before update
+- MUST handle loading state
+- MUST show success/error feedback
+- MUST not update during loading
 
-```typescript
-import { useProfileEdit } from '@umituz/react-native-auth';
+**MUST NOT**:
+- Skip validation
+- Update while loading
+- Ignore errors
+- Update without user action
 
-function EditProfileScreen() {
-  const {
-    formState,
-    setDisplayName,
-    setEmail,
-    setPhotoURL,
-    resetForm,
-    validateForm,
-  } = useProfileEdit({
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-    photoURL: user?.photoURL || null,
-  });
+**Documentation**: `hooks/useProfileUpdate.md`
 
-  const handleSave = () => {
-    const { isValid, errors } = validateForm();
-    if (!isValid) {
-      Alert.alert('Error', errors.join('\n'));
-      return;
-    }
-    updateProfile(formState);
-  };
+---
 
-  return <EditProfileForm {...props} />;
-}
-```
+### Account Management Hooks
 
-## Account Management Hooks
+#### useAccountManagement
 
-### useAccountManagement
+**PURPOSE**: Account operations (logout, delete)
 
-Account management operations (logout, delete).
-
+**IMPORT PATH**:
 ```typescript
 import { useAccountManagement } from '@umituz/react-native-auth';
-
-function AccountSettings() {
-  const { logout, deleteAccount, isLoading, isDeletingAccount } = useAccountManagement({
-    onReauthRequired: async () => {
-      const result = await reauthenticateWithGoogle();
-      return result.success;
-    },
-    onPasswordRequired: async () => {
-      const password = await showPasswordPrompt();
-      return password;
-    },
-  });
-
-  return (
-    <View>
-      <Button onPress={logout}>Sign Out</Button>
-      <Button onPress={deleteAccount}>Delete Account</Button>
-    </View>
-  );
-}
 ```
 
-## Social Login Hooks
+**PARAMETERS**:
+- `onReauthRequired` - Reauth callback
+- `onPasswordRequired` - Password prompt callback
 
-### useSocialLogin
+**RETURNS**:
+- `logout()` - Sign out function
+- `deleteAccount()` - Delete account function
+- `isLoading` - Loading state
+- `isDeletingAccount` - Delete loading state
 
-General social login management.
+**Rules**:
+- MUST confirm before logout
+- MUST double-confirm deletion
+- MUST require reauthentication for deletion
+- MUST handle reauth callbacks
+- MUST not show for anonymous users
 
+**MUST NOT**:
+- Skip confirmation dialogs
+- Delete without reauth
+- Allow anonymous deletion
+- Ignore callback requirements
+
+**Documentation**: `hooks/useAccountManagement.md`
+
+---
+
+### Social Login Hooks
+
+#### useSocialLogin
+
+**PURPOSE**: Social login management
+
+**IMPORT PATH**:
 ```typescript
 import { useSocialLogin } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  const {
-    signInWithGoogle,
-    signInWithApple,
-    googleLoading,
-    appleLoading,
-    googleConfigured,
-    appleAvailable,
-  } = useSocialLogin({
-    google: { webClientId: '...', iosClientId: '...' },
-    apple: { enabled: true },
-  });
-
-  return (
-    <View>
-      <Button onPress={signInWithGoogle} disabled={googleLoading}>
-        Google
-      </Button>
-      <Button onPress={signInWithApple} disabled={appleLoading}>
-        Apple
-      </Button>
-    </View>
-  );
-}
 ```
 
-### useGoogleAuth
+**PARAMETERS**:
+- Social provider configuration
 
-Google OAuth flow with expo-auth-session.
+**RETURNS**:
+- `signInWithGoogle()` - Google sign in
+- `signInWithApple()` - Apple sign in
+- `googleLoading` - Google loading state
+- `appleLoading` - Apple loading state
+- `googleConfigured` - Google available
+- `appleAvailable` - Apple available
 
+**Rules**:
+- MUST configure providers
+- MUST check availability
+- MUST handle platform differences
+- MUST check loading states
+- MUST handle errors
+
+**MUST NOT**:
+- Skip provider configuration
+- Show unavailable providers
+- Ignore platform constraints
+- Call while loading
+
+**Documentation**: `hooks/useSocialLogin.md`
+
+---
+
+#### useGoogleAuth
+
+**PURPOSE**: Google OAuth flow
+
+**IMPORT PATH**:
 ```typescript
 import { useGoogleAuth } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  const { signInWithGoogle, googleLoading, googleConfigured } = useGoogleAuth({
-    iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
-    webClientId: Config.GOOGLE_WEB_CLIENT_ID,
-  });
-
-  return (
-    <Button onPress={signInWithGoogle} disabled={googleLoading}>
-      Sign in with Google
-    </Button>
-  );
-}
 ```
 
-### useAppleAuth
+**PARAMETERS**:
+- `iosClientId` - iOS client ID
+- `androidClientId` - Android client ID
+- `webClientId` - Web client ID
 
-Apple Sign-In functionality.
+**RETURNS**:
+- `signInWithGoogle()` - Sign in function
+- `googleLoading` - Loading state
+- `googleConfigured` - Configured status
 
+**Rules**:
+- MUST provide at least one client ID
+- MUST check configuration
+- MUST use expo-auth-session
+- MUST handle errors properly
+
+**MUST NOT**:
+- Skip client IDs
+- Use without configuration
+- Ignore loading state
+- Skip error handling
+
+---
+
+#### useAppleAuth
+
+**PURPOSE**: Apple Sign-In functionality
+
+**IMPORT PATH**:
 ```typescript
 import { useAppleAuth } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  const { signInWithApple, appleLoading, appleAvailable } = useAppleAuth();
-
-  if (!appleAvailable) return null;
-
-  return (
-    <Button onPress={signInWithApple} disabled={appleLoading}>
-      Sign in with Apple
-    </Button>
-  );
-}
 ```
 
-## UI Hooks
+**RETURNS**:
+- `signInWithApple()` - Sign in function
+- `appleLoading` - Loading state
+- `appleAvailable` - Available on iOS
 
-### useAuthBottomSheet
+**Rules**:
+- MUST check platform availability
+- MUST only use on iOS
+- MUST respect Apple guidelines
+- MUST handle private relay emails
 
-Authentication bottom sheet management.
+**MUST NOT**:
+- Use on Android
+- Use on Web
+- Require as only auth method
+- Skip availability check
 
+---
+
+### UI Hooks
+
+#### useAuthBottomSheet
+
+**PURPOSE**: Authentication bottom sheet management
+
+**IMPORT PATH**:
 ```typescript
 import { useAuthBottomSheet } from '@umituz/react-native-auth';
-
-function AuthBottomSheet() {
-  const {
-    modalRef,
-    mode,
-    providers,
-    googleLoading,
-    appleLoading,
-    handleDismiss,
-    handleGoogleSignIn,
-    handleAppleSignIn,
-  } = useAuthBottomSheet({
-    socialConfig: {
-      google: { webClientId: '...', iosClientId: '...' },
-      apple: { enabled: true },
-    },
-  });
-
-  return (
-    <BottomSheetModal ref={modalRef} onDismiss={handleDismiss}>
-      {mode === 'login' ? (
-        <LoginForm onGoogleSignIn={handleGoogleSignIn} />
-      ) : (
-        <RegisterForm onGoogleSignIn={handleGoogleSignIn} />
-      )}
-    </BottomSheetModal>
-  );
-}
 ```
+
+**PARAMETERS**:
+- Social provider configuration
+- Default callbacks
+
+**RETURNS**:
+- `modalRef` - Modal reference
+- `mode` - Current mode (login/register)
+- `handleDismiss()` - Dismiss handler
+- `handleGoogleSignIn()` - Google handler
+- `handleAppleSignIn()` - Apple handler
+- Loading states
+
+**Rules**:
+- MUST configure social providers
+- MUST auto-close on success
+- MUST execute pending callbacks
+- MUST handle modal state properly
+
+**MUST NOT**:
+- Skip auto-close
+- Leave modal open after auth
+- Ignore pending callbacks
+- Lose callback references
+
+**Documentation**: `hooks/useAuthBottomSheet.md`
 
 ---
 
-# Components
+## Components
 
-## Layout Components
+### Layout Components
 
-### AuthContainer
+#### AuthContainer
 
-Main auth layout container with background component and scroll.
+**PURPOSE**: Main auth layout container
 
+**IMPORT PATH**:
 ```typescript
 import { AuthContainer } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  return (
-    <AuthContainer>
-      <AuthHeader title="Sign In" />
-      <LoginForm />
-      <SocialLoginButtons />
-    </AuthContainer>
-  );
-}
 ```
 
-### AuthHeader
+**Rules**:
+- MUST wrap auth screen content
+- MUST provide consistent layout
+- MUST handle keyboard avoidance
+- MUST support design system
 
-Header component for auth screens.
-
-```typescript
-import { AuthHeader } from '@umituz/react-native-auth';
-
-<AuthHeader
-  title="Welcome Back"
-  subtitle="Sign in to continue"
-/>
-```
-
-### AuthFormCard
-
-Form card container with consistent styling.
-
-```typescript
-import { AuthFormCard } from '@umituz/react-native-auth';
-
-<AuthFormCard>
-  <LoginForm />
-</AuthFormCard>
-```
-
-## Form Components
-
-### LoginForm & RegisterForm
-
-Pre-built authentication forms.
-
-```typescript
-import { LoginForm, RegisterForm } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  const navigation = useNavigation();
-
-  return (
-    <LoginForm onNavigateToRegister={() => navigation.navigate('Register')} />
-  );
-}
-
-function RegisterScreen() {
-  const navigation = useNavigation();
-
-  return (
-    <RegisterForm
-      onNavigateToLogin={() => navigation.navigate('Login')}
-      onTermsPress={() => navigation.navigate('Terms')}
-      onPrivacyPress={() => navigation.navigate('Privacy')}
-    />
-  );
-}
-```
-
-## Password Indicators
-
-### PasswordStrengthIndicator
-
-Visual password strength indicator.
-
-```typescript
-import { PasswordStrengthIndicator } from '@umituz/react-native-auth';
-
-function RegisterForm() {
-  const [password, setPassword] = useState('');
-  const requirements = validatePasswordRequirements(password);
-
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        secureTextEntry
-      />
-      <PasswordStrengthIndicator requirements={requirements} />
-    </View>
-  );
-}
-```
-
-### PasswordMatchIndicator
-
-Password matching indicator.
-
-```typescript
-import { PasswordMatchIndicator } from '@umituz/react-native-auth';
-
-function RegisterForm() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const passwordsMatch = password === confirmPassword && password.length > 0;
-
-  return (
-    <View>
-      <TextInput value={password} onChangeText={setPassword} />
-      <TextInput value={confirmPassword} onChangeText={setConfirmPassword} />
-      {confirmPassword.length > 0 && (
-        <PasswordMatchIndicator isMatch={passwordsMatch} />
-      )}
-    </View>
-  );
-}
-```
-
-## Social Login Components
-
-### SocialLoginButtons
-
-Social login button group.
-
-```typescript
-import { SocialLoginButtons } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  const { signInWithGoogle, googleLoading } = useGoogleAuth({ ... });
-  const { signInWithApple, appleLoading } = useAppleAuth();
-
-  return (
-    <SocialLoginButtons
-      enabledProviders={['google', 'apple']}
-      onGooglePress={signInWithGoogle}
-      onApplePress={signInWithApple}
-      googleLoading={googleLoading}
-      appleLoading={appleLoading}
-    />
-  );
-}
-```
-
-## Profile Components
-
-### ProfileSection
-
-User profile display component.
-
-```typescript
-import { ProfileSection } from '@umituz/react-native-auth';
-
-function SettingsScreen() {
-  const profile = useUserProfile();
-
-  return (
-    <ProfileSection
-      profile={{
-        displayName: profile?.displayName,
-        userId: profile?.userId,
-        isAnonymous: profile?.isAnonymous || false,
-        avatarUrl: profile?.avatarUrl,
-      }}
-      onPress={() => navigation.navigate('EditProfile')}
-      onSignIn={() => navigation.navigate('Login')}
-    />
-  );
-}
-```
-
-### AccountActions
-
-Account management actions component.
-
-```typescript
-import { AccountActions } from '@umituz/react-native-auth';
-
-function AccountSettings() {
-  const { logout, deleteAccount } = useAccountManagement();
-
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'This action cannot be undone. Continue?',
-    onLogout: logout,
-    onDeleteAccount: deleteAccount,
-  };
-
-  return <AccountActions config={config} />;
-}
-```
+**MUST NOT**:
+- Use without content
+- Override layout styles
+- Break responsive design
+- Skip keyboard handling
 
 ---
 
-# Screens
+#### AuthHeader
 
-Pre-built authentication screens.
+**PURPOSE**: Header component for auth screens
 
+**IMPORT PATH**:
+```typescript
+import { AuthHeader } from '@umituz/react-native-auth';
+```
+
+**PROPS**:
+- `title` - Screen title
+- `subtitle` - Screen subtitle (optional)
+
+**Rules**:
+- MUST provide clear title
+- MUST use proper typography
+- MUST support design system
+- MUST be optional
+
+**MUST NOT**:
+- Skip title
+- Use unclear text
+- Override styles improperly
+
+---
+
+### Form Components
+
+#### LoginForm & RegisterForm
+
+**PURPOSE**: Pre-built authentication forms
+
+**IMPORT PATH**:
+```typescript
+import { LoginForm, RegisterForm } from '@umituz/react-native-auth';
+```
+
+**REQUIRED PROPS** (LoginForm):
+- `onNavigateToRegister` - Navigation callback
+
+**REQUIRED PROPS** (RegisterForm):
+- `onNavigateToLogin` - Navigation callback
+- `termsUrl` or `onTermsPress` - Terms link
+- `privacyUrl` or `onPrivacyPress` - Privacy link
+
+**Rules**:
+- MUST provide all required props
+- MUST handle navigation callbacks
+- MUST validate before submission
+- MUST not override internal validation
+
+**MUST NOT**:
+- Skip required props
+- Override validation logic
+- Bypass internal state
+- Modify form behavior
+
+**Documentation**: `components/LoginForm.md`
+
+---
+
+### Password Indicators
+
+#### PasswordStrengthIndicator
+
+**PURPOSE**: Visual password requirements display
+
+**IMPORT PATH**:
+```typescript
+import { PasswordStrengthIndicator } from '@umituz/react-native-auth';
+```
+
+**PROPS**:
+- `requirements` - PasswordRequirements object
+
+**Rules**:
+- MUST calculate requirements object
+- MUST update on password change
+- MUST show before user types
+- MUST not hide requirements
+
+**MUST NOT**:
+- Show without requirements
+- Hide after first input
+- Skip validation
+- Use ambiguous colors
+
+**Documentation**: `components/PasswordIndicators.md`
+
+---
+
+#### PasswordMatchIndicator
+
+**PURPOSE**: Password confirmation feedback
+
+**IMPORT PATH**:
+```typescript
+import { PasswordMatchIndicator } from '@umituz/react-native-auth';
+```
+
+**PROPS**:
+- `isMatch` - Match status boolean
+
+**Rules**:
+- MUST only show when confirm field has input
+- MUST update in real-time
+- MUST use clear visual feedback
+- MUST not use ambiguous colors
+
+**MUST NOT**:
+- Show before confirm input
+- Use ambiguous colors
+- Skip real-time updates
+- Hide feedback
+
+**Documentation**: `components/PasswordIndicators.md`
+
+---
+
+### Social Login Components
+
+#### SocialLoginButtons
+
+**PURPOSE**: Social authentication buttons
+
+**IMPORT PATH**:
+```typescript
+import { SocialLoginButtons } from '@umituz/react-native-auth';
+```
+
+**REQUIRED PROPS**:
+- `enabledProviders` - Provider array
+- `onGooglePress` - Google handler
+- `onApplePress` - Apple handler
+
+**OPTIONAL PROPS**:
+- `googleLoading` - Loading state
+- `appleLoading` - Loading state
+- `disabled` - Disable all
+
+**Rules**:
+- MUST check provider availability
+- MUST handle platform differences
+- MUST respect Apple guidelines
+- MUST not show unavailable providers
+
+**Platform Behavior**:
+- iOS: Google + Apple
+- Android: Google only
+- Web: Google only
+
+**MUST NOT**:
+- Show unavailable providers
+- Ignore platform constraints
+- Skip loading states
+- Override platform behavior
+
+**Documentation**: `components/SocialLoginButtons.md`
+
+---
+
+### Profile Components
+
+#### ProfileSection
+
+**PURPOSE**: User profile display
+
+**IMPORT PATH**:
+```typescript
+import { ProfileSection } from '@umituz/react-native-auth';
+```
+
+**REQUIRED PROPS**:
+- `profile` - ProfileSectionConfig object
+
+**OPTIONAL PROPS**:
+- `onPress` - Press handler (authenticated)
+- `onSignIn` - Sign-in handler (anonymous)
+
+**Rules**:
+- MUST handle authenticated vs anonymous
+- MUST show avatar fallback
+- MUST indicate anonymous status
+- MUST not expose sensitive info
+
+**MUST NOT**:
+- Show sensitive data publicly
+- Skip anonymous handling
+- Break avatar fallback
+- Expose internal IDs
+
+**Documentation**: `components/ProfileComponents.md`
+
+---
+
+#### AccountActions
+
+**PURPOSE**: Account management buttons
+
+**IMPORT PATH**:
+```typescript
+import { AccountActions } from '@umituz/react-native-auth';
+```
+
+**REQUIRED PROPS**:
+- `config` - AccountActionsConfig object
+
+**Rules**:
+- MUST confirm before sign out
+- MUST double-confirm deletion
+- MUST require re-authentication for deletion
+- MUST hide for anonymous users
+
+**MUST NOT**:
+- Skip confirmations
+- Allow anonymous deletion
+- Delete without reauth
+- Show for anonymous users
+
+**Documentation**: `components/ProfileComponents.md`
+
+---
+
+## Screens
+
+### Pre-built Screens
+
+**LoginScreen** - Complete login screen
+**RegisterScreen** - Registration screen
+**AccountScreen** - Account settings screen
+**EditProfileScreen** - Profile editing screen
+
+**IMPORT PATH**:
 ```typescript
 import {
   LoginScreen,
@@ -621,150 +686,153 @@ import {
   AccountScreen,
   EditProfileScreen,
 } from '@umituz/react-native-auth';
-
-// Use in navigation
-<Stack.Screen
-  name="Login"
-  component={LoginScreen}
-  options={{ headerShown: false }}
-/>
-<Stack.Screen
-  name="Register"
-  component={RegisterScreen}
-/>
-<Stack.Screen
-  name="Account"
-  component={AccountScreen}
-/>
-<Stack.Screen
-  name="EditProfile"
-  component={EditProfileScreen}
-/>
 ```
+
+**Rules**:
+- MUST configure navigation properly
+- MUST integrate with app navigation
+- MUST handle callbacks appropriately
+- MUST not bypass AuthProvider
+
+**MUST NOT**:
+- Use without navigation setup
+- Skip AuthProvider
+- Ignore navigation callbacks
+- Modify internal screen logic
+
+**Documentation**: `screens/README.md`
 
 ---
 
-# Stores
+## Stores
 
-## authStore
+### authStore
 
-Main authentication state store (Zustand).
+**PURPOSE**: Main authentication state (Zustand)
 
+**IMPORT PATH**:
 ```typescript
 import {
   useAuthStore,
   selectIsAuthenticated,
-  selectUserId,
-  getIsAuthenticated,
-  getUserId,
+  selectUserId
 } from '@umituz/react-native-auth';
-
-function Component() {
-  // Selectors prevent unnecessary re-renders
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
-  const userId = useAuthStore(selectUserId);
-
-  return <View>{/* ... */}</View>;
-}
 ```
 
-## authModalStore
+**STATE**:
+- `user` - Current user
+- `loading` - Loading state
+- `isAuthReady` - Ready state
+- `error` - Error state
 
-Auth modal state store.
+**RULES**:
+- MUST use hooks (not direct store access)
+- MUST use selectors for specific values
+- MUST not mutate state directly
+- MUST rely on useAuth hook instead
 
+**MUST NOT**:
+- Access store directly in components
+- Mutate state externally
+- Skip selector usage
+- Bypass useAuth hook
+
+---
+
+### authModalStore
+
+**PURPOSE**: Auth modal state management
+
+**IMPORT PATH**:
 ```typescript
 import { useAuthModalStore } from '@umituz/react-native-auth';
-
-function Component() {
-  const { showAuthModal, isVisible, mode, hideAuthModal } = useAuthModalStore();
-
-  const handleAuthRequired = () => {
-    showAuthModal(() => {
-      // Callback after successful auth
-      performAction();
-    }, 'login');
-  };
-
-  return <View>{/* ... */}</View>;
-}
 ```
+
+**STATE**:
+- `isVisible` - Modal visibility
+- `mode` - Login/register mode
+- `pendingCallback` - Callback after auth
+
+**RULES**:
+- MUST use useAuthRequired hook instead
+- MUST not manage manually
+- MUST let hooks handle state
+- MUST not access directly
+
+**MUST NOT**:
+- Access store directly
+- Manage modal manually
+- Skip hook usage
+- Mutate state externally
 
 ---
 
-# Navigation
+## Best Practices
 
-## AuthNavigator
+### Hook Usage
 
-Pre-configured authentication navigator.
+**MUST**:
+- Use useAuth for primary operations
+- Check loading states
+- Handle errors appropriately
+- Use specific hooks for specific tasks
+- Follow hook rules
 
-```typescript
-import { AuthNavigator } from '@umituz/react-native-auth';
-
-function App() {
-  return (
-    <NavigationContainer>
-      <AuthNavigator />
-    </NavigationContainer>
-  );
-}
-```
+**MUST NOT**:
+- Access store directly
+- Skip loading checks
+- Use hooks without provider
+- Ignore error handling
+- Break hook rules
 
 ---
 
-# Best Practices
+### Component Usage
 
-## 1. Use Hooks Over Direct Store Access
+**MUST**:
+- Follow design system integration
+- Provide required props
+- Handle callbacks appropriately
+- Validate before submission
+- Support accessibility
 
-```typescript
-// ✅ Good
-function Component() {
-  const { user, signIn } = useAuth();
+**MUST NOT**:
+- Skip required props
+- Override internal logic
+- Break validation
+- Ignore accessibility
+- Modify component behavior
 
-  return <View>{/* ... */}</View>;
-}
+---
 
-// ❌ Bad
-function Component() {
-  const user = useAuthStore((state) => state.user);
+### State Management
 
-  return <View>{/* ... */}</View>;
-}
-```
+**MUST**:
+- Use hooks over store access
+- Use selectors for optimization
+- Let hooks manage state
+- Follow React best practices
+- Handle loading states
 
-## 2. Wrap with AuthProvider
+**MUST NOT**:
+- Access store directly
+- Mutate state externally
+- Skip loading states
+- Ignore React rules
+- Bypass hook abstraction
 
-```typescript
-// ✅ Good
-function App() {
-  return (
-    <AuthProvider>
-      <Navigator />
-    </AuthProvider>
-  );
-}
-
-// ❌ Bad - Missing provider
-function App() {
-  return <Navigator />;
-}
-```
-
-## 3. Handle Loading States
-
-```typescript
-// ✅ Good
-function Component() {
-  const { loading, isAuthReady, user } = useAuth();
-
-  if (loading) return <LoadingSpinner />;
-  if (!isAuthReady) return <InitializingScreen />;
-
-  return <View>{/* ... */}</View>;
-}
-```
+---
 
 ## Related Modules
 
-- **[Domain](../domain/README.md)** - Domain entities and business rules
-- **[Application](../application/README.md)** - Application interfaces
-- **[Infrastructure](../infrastructure/README.md)** - Infrastructure implementations
+- **Domain** (`../domain/README.md`) - AuthUser entity, errors
+- **Application** (`../application/README.md`) - Service interfaces
+- **Infrastructure** (`../infrastructure/README.md`) - Service implementations
+
+---
+
+## Subdirectories
+
+- **Hooks**: `hooks/README.md`
+- **Components**: `components/README.md`
+- **Screens**: `screens/README.md`

@@ -1,198 +1,196 @@
 # Auth Screens
 
-React Native Auth paketi için hazır ekran component'leri.
+Pre-built screen components for authentication flows.
 
-## Mevcut Screen'ler
+---
 
-- **[`LoginScreen`](./LoginScreen.tsx)** - Giriş ekranı
-- **[`RegisterScreen`](./RegisterScreen.tsx)** - Kayıt ekranı
-- **[`AccountScreen`](./AccountScreen.tsx)** - Hesap ayarları ekranı
-- **[`EditProfileScreen`](./EditProfileScreen.tsx)** - Profil düzenleme ekranı
+## Strategy
 
-## Kullanım
+**Purpose**: Provides complete authentication screens ready to use in navigation.
+
+**When to Use**:
+- Need complete auth screens
+- Want consistent auth UI
+- Rapid development
+- Standard auth flows
+
+**Location**: `src/presentation/screens/`
+
+---
+
+## Available Screens
 
 ### LoginScreen
 
+**Purpose**: Complete login screen with form and social options
+
+**When to Use**:
+- App login entry point
+- Need login screen
+- Want pre-built solution
+
+**Import Path**:
 ```typescript
 import { LoginScreen } from '@umituz/react-native-auth';
-
-function App() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
-}
 ```
+
+**File**: `LoginScreen.tsx`
+
+**Rules**:
+- MUST configure navigation
+- MUST handle auth callbacks
+- MUST integrate with app navigation
+- MUST NOT bypass AuthProvider
+
+---
 
 ### RegisterScreen
 
+**Purpose**: Complete registration screen with validation
+
+**When to Use**:
+- User registration flow
+- Account creation
+- Need pre-built solution
+
+**Import Path**:
 ```typescript
 import { RegisterScreen } from '@umituz/react-native-auth';
-
-function App() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
-}
 ```
+
+**File**: `RegisterScreen.tsx`
+
+**Rules**:
+- MUST configure navigation
+- MUST provide legal links
+- MUST handle registration success
+- MUST NOT bypass AuthProvider
+
+---
 
 ### AccountScreen
 
+**Purpose**: Account settings and profile management
+
+**When to Use**:
+- Account settings page
+- Profile management
+- Account operations
+
+**Import Path**:
 ```typescript
 import { AccountScreen } from '@umituz/react-native-auth';
-
-function App() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Account"
-        component={AccountScreen}
-        options={{ title: 'Hesabım' }}
-      />
-    </Stack.Navigator>
-  );
-}
 ```
+
+**File**: `AccountScreen.tsx`
+
+**Configuration**:
+- Can customize with config prop
+- Show/hide features
+- Add custom actions
+
+**Rules**:
+- MUST only show to authenticated users
+- MUST handle anonymous users separately
+- MUST configure properly
+
+---
 
 ### EditProfileScreen
 
+**Purpose**: Profile editing screen
+
+**When to Use**:
+- Profile editing
+- User settings
+- Profile photo update
+
+**Import Path**:
 ```typescript
 import { EditProfileScreen } from '@umituz/react-native-auth';
-
-function App() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="EditProfile"
-        component={EditProfileScreen}
-        options={{ title: 'Profili Düzenle' }}
-      />
-    </Stack.Navigator>
-  );
-}
 ```
 
-## AuthNavigator
+**File**: `EditProfileScreen.tsx`
 
-Tüm auth ekranlarını içeren hazır navigator:
+**Configuration**:
+- Show/hide avatar editing
+- Allow/disallow email change
+- Custom validation rules
 
-```typescript
-import { AuthNavigator } from '@umituz/react-native-auth';
+**Rules**:
+- MUST validate before saving
+- MUST handle photo uploads
+- MUST show errors appropriately
 
-function App() {
-  return (
-    <NavigationContainer>
-      <AuthNavigator />
-    </NavigationContainer>
-  );
-}
-```
+---
 
-## Konfigürasyon
+## Navigation Integration
 
-### AccountScreen Konfigürasyonu
+### Navigation Setup
 
-```typescript
-import { AccountScreen } from '@umituz/react-native-auth';
+**RULES**:
+- MUST wrap with NavigationContainer
+- MUST use proper stack navigator
+- MUST set screen options
+- MUST handle navigation callbacks
 
-function SettingsScreen() {
-  return (
-    <AccountScreen
-      config={{
-        showChangePassword: true,
-        benefits: ['Premium içeriklere erişim', 'Reklamsız deneyim'],
-      }}
-    />
-  );
-}
-```
+**SCREEN OPTIONS**:
+- `headerShown: false` - Hide default header
+- `gestureEnabled: false` - Disable gestures (optional)
+- Custom header components
 
-### EditProfileScreen Konfigürasyonu
+---
 
-```typescript
-import { EditProfileScreen } from '@umituz/react-native-auth';
+## Configuration
 
-function ProfileSettings() {
-  return (
-    <EditProfileScreen
-      config={{
-        showAvatar: true,
-        allowEmailChange: false,
-        maxDisplayNameLength: 50,
-      }}
-    />
-  );
-}
-```
+### Screen Configuration
 
-## Tam Örnek
+**ACCOUNT SCREEN**:
+- `showChangePassword` - Show password change option
+- `benefits` - List of account benefits
+- Custom actions
 
-```typescript
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {
-  AuthNavigator,
-  LoginScreen,
-  RegisterScreen,
-  AccountScreen,
-  EditProfileScreen,
-} from '@umituz/react-native-auth';
+**EDIT PROFILE SCREEN**:
+- `showAvatar` - Enable avatar editing
+- `allowEmailChange` - Allow email modification
+- `maxDisplayNameLength` - Validation limit
 
-const Stack = createNativeStackNavigator();
+**Rules**:
+- MUST pass valid config
+- MUST handle config changes
+- MUST not pass invalid options
 
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {/* Auth ekranları */}
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{ headerShown: false }}
-        />
+---
 
-        {/* Hesap ekranları */}
-        <Stack.Screen
-          name="Account"
-          component={AccountScreen}
-          options={{ title: 'Hesabım' }}
-        />
-        <Stack.Screen
-          name="EditProfile"
-          component={EditProfileScreen}
-          options={{ title: 'Profili Düzenle' }}
-        />
+## Best Practices
 
-        {/* Diğer ekranlar */}
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-```
+### Screen Composition
 
-## İlgili Component'ler
+**RULES**:
+- SHOULD use pre-built screens when possible
+- MUST configure screens properly
+- MUST handle navigation state
+- MUST integrate with AuthProvider
 
-- **[Auth Components](../components/README.md)** - Auth UI component'leri
-- **[Auth Hooks](../hooks/README.md)** - Auth hook'ları
+**MUST NOT**:
+- Bypass AuthProvider
+- Break navigation flow
+- Ignore configuration options
 
-## İlgili Navigation
+---
 
-- **[AuthNavigator](../navigation/AuthNavigator.tsx)** - Auth navigator
+### Error Handling
+
+**RULES**:
+- MUST handle auth errors in screens
+- MUST show user-friendly messages
+- MUST allow user retry
+- MUST not crash on errors
+
+---
+
+## Related Documentation
+
+- **Components**: `../components/README.md`
+- **Hooks**: `../hooks/README.md`
+- **Services**: `../../infrastructure/services/README.md`
