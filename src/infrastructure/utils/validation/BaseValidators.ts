@@ -4,7 +4,7 @@ import { ValidationResult } from './types';
  * Validate required field (not null, undefined, or empty string)
  */
 export const validateRequired = (
-  value: any,
+  value: unknown,
   fieldName: string = "Field",
   errorKey?: string
 ): ValidationResult => {

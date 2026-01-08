@@ -17,6 +17,7 @@ export interface AccountScreenConfig {
     isAnonymous: boolean;
     editProfileText?: string;
     onEditProfile?: () => void;
+    onSignIn?: () => void;
 }
 
 export interface AccountScreenProps {
@@ -25,12 +26,6 @@ export interface AccountScreenProps {
 
 export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
-
-    const handleLogout = () => {
-        if (config.accountActions?.onLogout) {
-            void config.accountActions.onLogout();
-        }
-    };
 
     return (
         <ScreenLayout
@@ -41,7 +36,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
         >
             <ProfileSection
                 profile={config.profile}
-                onSignIn={config.profile.isAnonymous ? handleLogout : undefined}
+                onSignIn={config.isAnonymous ? config.onSignIn : undefined}
                 signInText="Sign In"
             />
 
