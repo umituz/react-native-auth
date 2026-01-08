@@ -1,575 +1,378 @@
 # Profile Components
 
-Components for user profile display and account management.
-
-## Components
-
-- **[`ProfileSection`](#profilesection)** - Profile display section
-- **[`AccountActions`](#accountactions)** - Account management actions
+Components for displaying user profile information and managing account actions.
 
 ---
 
 ## ProfileSection
 
-Component that displays user profile information including avatar, name, and user ID.
+Displays user profile information including avatar, name, and authentication status.
 
-### Usage
+### Strategy
 
+**Purpose**: Show user profile information with different layouts for authenticated vs anonymous users.
+
+**When to Use**:
+- Settings screens showing user info
+- Profile headers in navigation
+- Account management sections
+- User identification in UI
+
+**Import Path**:
 ```typescript
 import { ProfileSection } from '@umituz/react-native-auth';
-
-function SettingsScreen() {
-  const profile = useUserProfile({
-    accountRoute: 'AccountSettings',
-  });
-
-  const navigation = useNavigation();
-
-  return (
-    <View>
-      <ProfileSection
-        profile={{
-          displayName: profile?.displayName,
-          userId: profile?.userId,
-          isAnonymous: profile?.isAnonymous || false,
-          avatarUrl: profile?.avatarUrl,
-          accountSettingsRoute: profile?.accountSettingsRoute,
-        }}
-        onPress={() => navigation.navigate('EditProfile')}
-        onSignIn={() => navigation.navigate('Login')}
-        signInText="Sign In"
-        anonymousText="Guest"
-      />
-    </View>
-  );
-}
 ```
 
-### Props
+**Component Location**: `src/presentation/components/ProfileSection.tsx`
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `profile` | `ProfileSectionConfig` | Yes | Profile configuration |
-| `onPress` | `() => void` | No | Press handler (for authenticated users) |
-| `onSignIn` | `() => void` | No | Sign-in handler (for anonymous users) |
-| `signInText` | `string` | No | "Sign In" button text |
-| `anonymousText` | `string` | No | Anonymous user label |
+**Data Hook**: `src/presentation/hooks/useUserProfile.ts`
 
-#### ProfileSectionConfig
+### Rules
 
+**MUST**:
+- Pass profile object with required fields
+- Provide different handlers for authenticated vs anonymous users
+- Show avatar fallback if no photo available
+- Display authentication status clearly
+- Handle navigation to profile editing
+
+**MUST NOT**:
+- Show sensitive information (user ID, email publicly)
+- Allow anonymous users to access profile editing
+- Display generic avatar for authenticated users without photo
+- Hardcode profile data (use useUserProfile hook)
+
+### Constraints
+
+**AUTHENTICATED USER DISPLAY**:
+- Show display name or email
+- Show avatar if available
+- Show "Edit Profile" or settings access
+- Hide authentication prompts
+
+**ANONYMOUS USER DISPLAY**:
+- Show "Guest" or anonymous label
+- Show generic placeholder avatar
+- Show "Sign In" or "Create Account" prompt
+- Hide profile editing options
+
+**REQUIRED PROPERTIES**:
 ```typescript
-interface ProfileSectionConfig {
-  displayName?: string;        // Display name
-  userId?: string;             // User ID
-  isAnonymous: boolean;        // Is anonymous user
-  avatarUrl?: string;          // Profile photo URL
-  accountSettingsRoute?: string; // Account settings route
-  benefits?: string[];         // Benefits list
+{
+  displayName?: string;
+  isAnonymous: boolean;
+  avatarUrl?: string;
+  accountSettingsRoute?: string;
 }
 ```
 
-### Examples
-
-#### Authenticated User
-
-```typescript
-function ProfileSection() {
-  const { user } = useAuth();
-
-  const profile = {
-    displayName: user?.displayName || user?.email,
-    userId: user?.uid,
-    isAnonymous: false,
-    avatarUrl: user?.photoURL,
-    accountSettingsRoute: 'AccountSettings',
-  };
-
-  const navigation = useNavigation();
-
-  return (
-    <ProfileSection
-      profile={profile}
-      onPress={() => navigation.navigate('EditProfile')}
-    />
-  );
-}
-```
-
-#### Anonymous User
-
-```typescript
-function ProfileSection() {
-  const { user } = useAuth();
-
-  const profile = {
-    displayName: 'Guest User',
-    userId: undefined,
-    isAnonymous: true,
-    avatarUrl: undefined,
-  };
-
-  const navigation = useNavigation();
-
-  return (
-    <ProfileSection
-      profile={profile}
-      onSignIn={() => navigation.navigate('Login')}
-      signInText="Sign In"
-    />
-  );
-}
-```
-
-#### With Benefits
-
-```typescript
-function PremiumProfileSection() {
-  const { user } = useAuth();
-
-  const profile = {
-    displayName: user?.displayName,
-    userId: user?.uid,
-    isAnonymous: false,
-    avatarUrl: user?.photoURL,
-    benefits: [
-      'Access to premium content',
-      'Ad-free experience',
-      'Exclusive discounts',
-    ],
-  };
-
-  return <ProfileSection profile={profile} />;
-}
-```
-
-#### Dynamic Profile
-
-```typescript
-function DynamicProfileSection() {
-  const { user } = useAuth();
-  const navigation = useNavigation();
-  const profile = useUserProfile();
-
-  const handlePress = () => {
-    if (profile?.isAnonymous) {
-      navigation.navigate('Login');
-    } else {
-      navigation.navigate('EditProfile');
-    }
-  };
-
-  return (
-    <ProfileSection
-      profile={{
-        displayName: profile?.displayName,
-        userId: profile?.userId,
-        isAnonymous: profile?.isAnonymous || false,
-        avatarUrl: profile?.avatarUrl,
-        benefits: profile?.isAnonymous
-          ? ['Create an account to access more features']
-          : ['Get premium membership', 'Access exclusive content'],
-      }}
-      onPress={handlePress}
-    />
-  );
-}
-```
-
-#### With Custom Avatar
-
-```typescript
-function ProfileSectionWithCustomAvatar() {
-  const { user } = useAuth();
-  const navigation = useNavigation();
-
-  const profile = {
-    displayName: user?.displayName || 'User',
-    userId: user?.uid,
-    isAnonymous: user?.isAnonymous || false,
-    avatarUrl: user?.photoURL || 'https://example.com/default-avatar.png',
-    accountSettingsRoute: 'AccountSettings',
-  };
-
-  return (
-    <ProfileSection
-      profile={profile}
-      onPress={() => navigation.navigate('EditProfile')}
-    />
-  );
-}
-```
-
-#### With Edit Indicator
-
-```typescript
-function ProfileSectionWithEditIndicator() {
-  const profile = useUserProfile();
-  const navigation = useNavigation();
-
-  return (
-    <View>
-      <ProfileSection
-        profile={{
-          displayName: profile?.displayName,
-          userId: profile?.userId,
-          isAnonymous: profile?.isAnonymous || false,
-          avatarUrl: profile?.avatarUrl,
-          accountSettingsRoute: 'AccountSettings',
-        }}
-        onPress={() => navigation.navigate('EditProfile')}
-      />
-      <TouchableOpacity
-        style={styles.editButton}
-        onPress={() => navigation.navigate('EditProfile')}
-      >
-        <Text>Edit Profile</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-```
+**PLATFORM SUPPORT**:
+- iOS: ✅ Fully supported
+- Android: ✅ Fully supported
+- Web: ✅ Fully supported
 
 ---
 
 ## AccountActions
 
-Component for account management operations including sign out, password change, and account deletion.
+Provides buttons for account management operations like sign out and account deletion.
 
-### Usage
+### Strategy
 
+**Purpose**: Safe account management with proper confirmations and error handling.
+
+**When to Use**:
+- Account settings screens
+- Logout functionality
+- Account deletion flows
+- Password change access
+
+**Import Path**:
 ```typescript
 import { AccountActions } from '@umituz/react-native-auth';
-
-function AccountSettingsScreen() {
-  const { logout, deleteAccount } = useAccountManagement();
-  const navigation = useNavigation();
-
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    changePasswordText: 'Change Password',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'This action cannot be undone. Continue?',
-    deleteErrorTitle: 'Error',
-    deleteErrorMessage: 'Account could not be deleted. Please try again.',
-    onLogout: async () => {
-      await logout();
-      navigation.replace('Login');
-    },
-    onDeleteAccount: async () => {
-      await deleteAccount();
-      navigation.replace('Login');
-    },
-    showChangePassword: true,
-    onChangePassword: () => {
-      navigation.navigate('ChangePassword');
-    },
-  };
-
-  return (
-    <View>
-      <AccountActions config={config} />
-    </View>
-  );
-}
 ```
 
-### Props
+**Component Location**: `src/presentation/components/AccountActions.tsx`
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `config` | `AccountActionsConfig` | Yes | Account actions configuration |
+**Management Hook**: `src/presentation/hooks/useAccountManagement.ts`
 
-#### AccountActionsConfig
+### Rules
 
-```typescript
-interface AccountActionsConfig {
-  logoutText: string;                  // "Sign Out" button text
-  deleteAccountText: string;           // "Delete Account" button text
-  changePasswordText?: string;         // "Change Password" button text
-  logoutConfirmTitle: string;          // Sign out confirmation title
-  logoutConfirmMessage: string;        // Sign out confirmation message
-  deleteConfirmTitle: string;          // Delete confirmation title
-  deleteConfirmMessage: string;        // Delete confirmation message
-  deleteErrorTitle?: string;           // Delete error title
-  deleteErrorMessage?: string;         // Delete error message
-  onLogout: () => Promise<void>;       // Sign out handler
-  onDeleteAccount: () => Promise<void>; // Delete handler
-  onChangePassword?: () => void;       // Change password handler
-  showChangePassword?: boolean;        // Show change password button
-}
-```
+**MUST**:
+- Require confirmation before sign out
+- Require confirmation before account deletion
+- Show clear warnings for account deletion
+- Provide error messages for failures
+- Handle loading states during operations
+- Hide deletion option for anonymous users
 
-### Examples
+**MUST NOT**:
+- Allow account deletion without confirmation
+- Delete account without recent authentication
+- Show account actions to anonymous users
+- Allow immediate destructive actions
+- Expose internal error messages
 
-#### Basic Usage
+### Constraints
 
-```typescript
-function SimpleAccountActions() {
-  const { logout, deleteAccount } = useAccountManagement();
+**SIGN OUT REQUIREMENTS**:
+- Confirmation dialog required
+- Clear sign-out message
+- Cancel option must be available
+- Non-destructive (can sign back in)
 
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'Are you sure you want to delete your account?',
-    onLogout: logout,
-    onDeleteAccount: deleteAccount,
-  };
+**ACCOUNT DELETION REQUIREMENTS**:
+- Double confirmation required (warning + confirm)
+- Clear warning about irreversibility
+- Recent authentication required (Firebase requirement)
+- Error handling for re-authentication failures
+- Cannot delete anonymous accounts
 
-  return <AccountActions config={config} />;
-}
-```
+**PASSWORD CHANGE**:
+- Optional feature (configurable)
+- Only for email/password users
+- Requires current password
+- Not available for social auth users
 
-#### With Password Change
+**OPERATION SAFETY**:
+- Disable buttons during operation
+- Show loading indicators
+- Prevent concurrent operations
+- Allow retry on failure
+- Log security events
 
-```typescript
-function AccountActionsWithPasswordChange() {
-  const { logout, deleteAccount } = useAccountManagement();
-  const navigation = useNavigation();
+---
 
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    changePasswordText: 'Change Password',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'Are you sure you want to delete your account?',
-    onLogout: async () => {
-      await logout();
-      navigation.replace('Login');
-    },
-    onDeleteAccount: async () => {
-      await deleteAccount();
-      navigation.replace('Login');
-    },
-    showChangePassword: true,
-    onChangePassword: () => {
-      navigation.navigate('ChangePassword');
-    },
-  };
+## Anonymous User Handling
 
-  return <AccountActions config={config} />;
-}
-```
+### Strategy
 
-#### With Custom Error Handling
+**Purpose**: Differentiate experience between authenticated and anonymous users appropriately.
 
-```typescript
-function AccountActionsWithErrorHandling() {
-  const { logout, deleteAccount } = useAccountManagement();
-  const navigation = useNavigation();
+### Rules
 
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'This action cannot be undone. Continue?',
-    deleteErrorTitle: 'Account Deletion Failed',
-    deleteErrorMessage: 'An error occurred while deleting your account. Please try again later or contact support.',
-    onLogout: async () => {
-      try {
-        await logout();
-        navigation.replace('Login');
-      } catch (error) {
-        Alert.alert('Error', 'Failed to sign out');
-      }
-    },
-    onDeleteAccount: async () => {
-      try {
-        await deleteAccount();
-        Alert.alert('Success', 'Your account has been deleted');
-        navigation.replace('Login');
-      } catch (error) {
-        // Error is automatically shown (deleteErrorMessage)
-        throw error;
-      }
-    },
-  };
+**MUST**:
+- Hide account deletion for anonymous users
+- Show "Create Account" prompt instead of sign out
+- Indicate guest status clearly
+- Guide anonymous users toward registration
 
-  return <AccountActions config={config} />;
-}
-```
+**MUST NOT**:
+- Show account deletion to anonymous users
+- Allow sign out of anonymous session (unless upgrading)
+- Treat anonymous users as authenticated
+- Hide anonymous status from user
 
-#### For Anonymous Users
+### Constraints
 
-```typescript
-function AccountActionsAnonymous() {
-  const { isAnonymous } = useAuth();
+**ANONYMOUS USER LIMITATIONS**:
+- Cannot delete anonymous account
+- Cannot change password (no password set)
+- Cannot access profile editing
+- Limited account settings access
 
-  if (isAnonymous) {
-    return (
-      <Button onPress={() => navigation.navigate('Register')}>
-        Create Account
-      </Button>
-    );
-  }
+**UPGRADE PATH**:
+- Anonymous → Registered: Link credentials
+- Preserves anonymous account data
+- Requires email/password or social auth
+- Seamless transition for user
 
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'Are you sure you want to delete your account?',
-    onLogout: logout,
-    onDeleteAccount: deleteAccount,
-  };
+---
 
-  return <AccountActions config={config} />;
-}
-```
+## Security & Privacy
 
-#### With Loading States
+### Strategy
 
-```typescript
-function AccountActionsWithLoading() {
-  const { logout, deleteAccount, isLoading, isDeletingAccount } = useAccountManagement();
-  const navigation = useNavigation();
+**Purpose**: Protect user information and prevent unauthorized account access.
 
-  const config = {
-    logoutText: isLoading ? 'Signing out...' : 'Sign Out',
-    deleteAccountText: isDeletingAccount ? 'Deleting...' : 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'This cannot be undone. Continue?',
-    onLogout: async () => {
-      await logout();
-      navigation.replace('Login');
-    },
-    onDeleteAccount: async () => {
-      await deleteAccount();
-      navigation.replace('Login');
-    },
-  };
+### Rules
 
-  return (
-    <AccountActions
-      config={config}
-      isLoading={isLoading}
-      isDeletingAccount={isDeletingAccount}
-    />
-  );
-}
-```
+**MUST**:
+- Never display full user ID in UI
+- Never expose sensitive tokens
+- Require recent auth for destructive actions
+- Log account management events
+- Validate permissions before actions
 
-#### With Analytics
+**MUST NOT**:
+- Show user ID or internal identifiers
+- Display raw email publicly
+- Allow account deletion without re-auth
+- Skip confirmation dialogs
+- Log sensitive data
 
-```typescript
-function AccountActionsWithAnalytics() {
-  const { logout, deleteAccount } = useAccountManagement();
-  const analytics = useAnalytics();
+### Constraints
 
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'This cannot be undone.',
-    onLogout: async () => {
-      analytics.trackEvent('account_logout');
-      await logout();
-    },
-    onDeleteAccount: async () => {
-      analytics.trackEvent('account_delete_initiated');
-      await deleteAccount();
-      analytics.trackEvent('account_delete_completed');
-    },
-  };
+**INFORMATION DISPLAY**:
+- Display name: OK
+- Email: Only to account owner
+- User ID: Never in UI
+- Auth tokens: Never in logs
 
-  return <AccountActions config={config} />;
-}
-```
+**RE-AUTHENTICATION**:
+- Required for: Account deletion, password change
+- Timeout: Usually 5 minutes in Firebase
+- Methods: Re-sign in with existing credentials
+- Failure: Block destructive action
 
-## Combined Usage
+**EVENT LOGGING**:
+- Log: Account views, settings access
+- Log: Sign out, deletion attempts
+- Never log: Passwords, tokens, full emails
+- Purpose: Security audit, debugging
 
-```typescript
-function AccountSettingsScreen() {
-  const profile = useUserProfile();
-  const { logout, deleteAccount } = useAccountManagement();
-  const navigation = useNavigation();
+---
 
-  return (
-    <ScrollView>
-      {/* Profile section */}
-      <ProfileSection
-        profile={{
-          displayName: profile?.displayName,
-          userId: profile?.userId,
-          isAnonymous: profile?.isAnonymous || false,
-          avatarUrl: profile?.avatarUrl,
-        }}
-        onPress={() => navigation.navigate('EditProfile')}
-      />
+## Navigation Integration
 
-      {/* Account actions */}
-      {!profile?.isAnonymous && (
-        <AccountActions
-          config={{
-            logoutText: 'Sign Out',
-            deleteAccountText: 'Delete Account',
-            logoutConfirmTitle: 'Sign Out',
-            logoutConfirmMessage: 'Are you sure you want to sign out?',
-            deleteConfirmTitle: 'Delete Account',
-            deleteConfirmMessage: 'This action cannot be undone. Continue?',
-            onLogout: async () => {
-              await logout();
-              navigation.replace('Login');
-            },
-            onDeleteAccount: async () => {
-              await deleteAccount();
-              navigation.replace('Login');
-            },
-          }}
-        />
-      )}
-    </ScrollView>
-  );
-}
-```
+### Strategy
 
-## Styling
+**Purpose**: Proper navigation flow for profile-related screens.
 
-Components use design system tokens:
+### Rules
 
-```typescript
-{
-  colors: {
-    primary: tokens.colors.primary,
-    danger: tokens.colors.error,
-    text: tokens.colors.textPrimary,
-    background: tokens.colors.background,
-  },
-  spacing: tokens.spacing,
-}
-```
+**MUST**:
+- Provide navigation callbacks for all actions
+- Handle back navigation properly
+- Pass profile data to edit screens
+- Return to proper screen after actions
 
-## Accessibility
+**MUST NOT**:
+- Hardcode navigation paths
+- Break back navigation stack
+- Lose unsaved changes
+- Leave modals open after actions
 
-Components include accessibility features:
+### Constraints
 
-- ✅ Screen reader labels
-- ✅ Accessibility hints
-- ✅ Proper touch targets
-- ✅ High contrast support
-- ✅ Semantic button labels
+**NAVIGATION FLOWS**:
+- Profile → Edit Profile → Back to Profile
+- Profile → Account Settings → Back to Profile
+- Sign Out → Login Screen (replace stack)
+- Delete Account → Welcome/Login (replace stack)
 
-## Related Components
+**STACK MANAGEMENT**:
+- Sign out: Replace entire stack
+- Delete account: Replace entire stack
+- Edit profile: Push onto stack
+- Settings: Push onto stack
 
-- [`EditProfileForm`](./README.md) - Profile editing form
-- [`EditProfileAvatar`](./README.md) - Profile photo editing
+---
+
+## Error Handling
+
+### Strategy
+
+**Purpose**: Clear user feedback for account action failures.
+
+### Rules
+
+**MUST**:
+- Show user-friendly error messages
+- Provide retry options after failures
+- Distinguish error types clearly
+- Guide users to resolution
+- Log errors for debugging
+
+**MUST NOT**:
+- Show raw error codes to users
+- Expose technical details
+- Block retry indefinitely
+- Crash on errors
+
+### Constraints
+
+**ERROR CATEGORIES**:
+- Network errors: "Check your connection"
+- Re-auth required: "Please sign in again"
+- Permission denied: "You don't have permission"
+- Rate limited: "Please try again later"
+
+**RECOVERY OPTIONS**:
+- Retry button for temporary failures
+- Sign-in prompt for re-auth
+- Support contact for persistent issues
+- Graceful degradation
+
+---
+
+## Design System Integration
+
+### Strategy
+
+**Purpose**: Consistent styling with application design system.
+
+### Rules
+
+**MUST**:
+- Use design system color tokens
+- Follow design system spacing
+- Use design system typography
+- Match design system component styles
+- Respect design system dark mode
+
+**MUST NOT**:
+- Hardcode colors or sizes
+- Use custom styles outside system
+- Break responsive layouts
+- Ignore accessibility tokens
+
+### Constraints
+
+**STYLE TOKENS**:
+- Colors: Primary, danger, background, text
+- Spacing: Consistent gaps and padding
+- Typography: System fonts and sizes
+- Icons: Design system icon set
+- Avatar sizes: Defined in system
+
+**DARK MODE**:
+- Automatically support dark mode
+- Use system color tokens
+- Test contrast in both modes
+- No hardcoded colors
+
+---
+
+## Accessibility Requirements
+
+### Strategy
+
+**Purpose**: Ensure profile components are accessible to all users.
+
+### Rules
+
+**MUST**:
+- Provide accessibility labels for buttons
+- Announce state changes to screen readers
+- Support keyboard navigation (web)
+- Maintain proper focus order
+- Use semantic HTML elements (web)
+
+**MUST NOT**:
+- Rely on color alone for meaning
+- Hide important information from screen readers
+- Break keyboard navigation
+- Use low contrast colors
+
+### Constraints
+
+**SCREEN READER**:
+- Announce user name and status
+- Announce button actions clearly
+- Provide hints for destructive actions
+- Announce loading states
+
+**VISUAL ACCESSIBILITY**:
+- Minimum contrast: 4.5:1 for text
+- Touch targets: 44x44px minimum
+- Clear focus indicators
+- Not color-dependent
+
+---
 
 ## Related Hooks
 
-- [`useUserProfile`](../hooks/useUserProfile.md) - Profile data hook
-- [`useAccountManagement`](../hooks/useAccountManagement.md) - Account management hook
-- [`useAuth`](../hooks/useAuth.md) - Main auth state management
+- **`useUserProfile`** (`src/presentation/hooks/useUserProfile.ts`) - Profile data management
+- **`useAccountManagement`** (`src/presentation/hooks/useAccountManagement.ts`) - Account operations
+- **`useAuth`** (`src/presentation/hooks/useAuth.ts`) - Authentication state
