@@ -87,6 +87,41 @@ export type {
   ValidationConfig,
 } from './infrastructure/utils/AuthValidation';
 export {
+  validateRequired,
+  validatePattern,
+} from './infrastructure/utils/validation/BaseValidators';
+export {
+  validateMinLength,
+  validateMaxLength,
+  validatePhone,
+} from './infrastructure/utils/validation/StringValidators';
+export {
+  validateNumberRange,
+  validatePositiveNumber,
+  validateAge,
+} from './infrastructure/utils/validation/NumberValidators';
+export {
+  validateDateOfBirth,
+  validateDateRange,
+} from './infrastructure/utils/validation/DateValidators';
+export {
+  validateEnum,
+  validateTags,
+} from './infrastructure/utils/validation/CollectionValidators';
+export {
+  batchValidate,
+} from './infrastructure/utils/validation/FormValidators';
+export {
+  SECURITY_LIMITS,
+  sanitizeWhitespace,
+  sanitizeEmail,
+  sanitizePassword,
+  sanitizeName,
+  sanitizeText,
+  containsDangerousChars,
+  isWithinLengthLimit,
+} from './infrastructure/utils/validation/sanitization';
+export {
   DEFAULT_VAL_CONFIG,
 } from './infrastructure/utils/AuthValidation';
 

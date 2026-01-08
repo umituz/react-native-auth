@@ -35,8 +35,7 @@
     "@umituz/react-native-firebase": "latest",
     "@umituz/react-native-localization": "latest",
     "@umituz/react-native-storage": "latest",
-    "@umituz/react-native-tanstack": "latest",
-    "@umituz/react-native-validation": "^1.4.7"
+    "@umituz/react-native-tanstack": "latest"
   },
   "peerDependencies": {
     "@react-navigation/native": ">=6.0.0",

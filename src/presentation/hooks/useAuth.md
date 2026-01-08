@@ -1,255 +1,299 @@
 # useAuth
 
-Primary authentication hook for managing auth state and operations.
+Primary authentication hook for managing authentication state and operations.
 
-## Features
+---
 
-- Centralized Zustand store for auth state
-- Email/password authentication
-- Anonymous mode support
-- Type-safe API
-- Automatic error handling
+## Strategy
 
-## Usage
+**Purpose**: Centralized authentication state management using Zustand with Firebase integration. Single source of truth for all authentication-related state and operations.
 
+**When to Use**:
+- Need to check if user is authenticated
+- Require user information in components
+- Need to perform sign in/sign up operations
+- Want to handle anonymous users
+- Need authentication state across app
+
+**Import Path**:
 ```typescript
 import { useAuth } from '@umituz/react-native-auth';
-
-function MyComponent() {
-  const {
-    user,
-    userId,
-    userType,
-    loading,
-    isAuthReady,
-    isAnonymous,
-    isAuthenticated,
-    error,
-    signIn,
-    signUp,
-    signOut,
-    continueAnonymously,
-    setError,
-  } = useAuth();
-
-  // Handle loading state
-  if (loading) return <LoadingSpinner />;
-
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <LoginScreen />;
-  }
-
-  return (
-    <View>
-      <Text>Welcome, {user?.email}</Text>
-      <Button onPress={signOut}>Sign Out</Button>
-    </View>
-  );
-}
 ```
 
-## API
+**Hook Location**: `src/presentation/hooks/useAuth.ts`
 
-### Return Value
+**Store Location**: `src/presentation/stores/authStore.ts`
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `user` | `AuthUser \| null` | Current authenticated user |
-| `userId` | `string \| null` | Current user ID (uid) |
-| `userType` | `UserType` | Current user type |
-| `loading` | `boolean` | Whether auth state is loading |
-| `isAuthReady` | `boolean` | Whether auth is ready (initialized and not loading) |
-| `isAnonymous` | `boolean` | Whether user is anonymous |
-| `isAuthenticated` | `boolean` | Whether user is authenticated (not anonymous) |
-| `error` | `string \| null` | Current error message |
-| `signIn` | `(email, password) => Promise<void>` | Sign in function |
-| `signUp` | `(email, password, displayName?) => Promise<void>` | Sign up function |
-| `signOut` | `() => Promise<void>` | Sign out function |
-| `continueAnonymously` | `() => Promise<void>` | Continue anonymously function |
-| `setError` | `(error: string \| null) => void` | Set error manually |
+---
 
-## Examples
+## State Properties
 
-### Login Form
+### Authentication State
 
-```typescript
-function LoginForm() {
-  const { signIn, loading, error } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+**AVAILABLE PROPERTIES**:
+- `user` - Full Firebase user object or null
+- `userId` - User UID string or undefined
+- `userType` - User type enum ('anonymous' | 'email' | 'social')
+- `loading` - Boolean for initial auth check
+- `isAuthReady` - Boolean indicating initial check complete
+- `isAnonymous` - Boolean for anonymous user
+- `isAuthenticated` - Boolean for authenticated user
+- `error` - Error string or null
 
-  const handleLogin = async () => {
-    try {
-      await signIn(email, password);
-      // Navigate to home on success
-    } catch (err) {
-      // Error is automatically set in error state
-    }
-  };
+**STATE RULES**:
+- MUST check `isAuthReady` before using auth state
+- MUST handle `loading` state appropriately
+- MUST NOT assume user is authenticated without checking
+- MUST handle `null` user values
 
-  return (
-    <View>
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        secureTextEntry
-      />
-      {error && <Text style={{ color: 'red' }}>{error}</Text>}
-      <Button onPress={handleLogin} disabled={loading}>
-        {loading ? 'Signing in...' : 'Sign In'}
-      </Button>
-    </View>
-  );
-}
-```
+**STATE CONSTRAINTS**:
+- `loading` is `true` only during initial auth check
+- `isAuthReady` becomes `true` after first auth check
+- `user` is `null` for unauthenticated users
+- `userId` is `undefined` for anonymous users
+- `error` is auto-cleared after successful operations
 
-### Registration Form
+---
 
-```typescript
-function RegisterForm() {
-  const { signUp, loading, error } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+## Authentication Methods
 
-  const handleRegister = async () => {
-    try {
-      await signUp(email, password, displayName);
-      // Success - user is automatically signed in
-    } catch (err) {
-      // Error handling
-    }
-  };
+### signIn
 
-  return (
-    <View>
-      <TextInput
-        value={displayName}
-        onChangeText={setDisplayName}
-        placeholder="Full Name"
-      />
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        keyboardType="email-address"
-      />
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        secureTextEntry
-      />
-      {error && <Text style={{ color: 'red' }}>{error}</Text>}
-      <Button onPress={handleRegister} disabled={loading}>
-        {loading ? 'Creating account...' : 'Sign Up'}
-      </Button>
-    </View>
-  );
-}
-```
+**Purpose**: Authenticate user with email and password.
 
-### Anonymous Mode
+**Parameters**:
+- `email: string` - User email address
+- `password: string` - User password
 
-```typescript
-function AnonymousPrompt() {
-  const { continueAnonymously, loading } = useAuth();
+**Rules**:
+- MUST validate email format before calling
+- MUST validate password is not empty
+- MUST handle loading state during call
+- MUST display error messages on failure
+- MUST NOT expose password in logs/errors
 
-  return (
-    <View>
-      <Text>Continue without an account?</Text>
-      <Button onPress={continueAnonymously} disabled={loading}>
-        {loading ? 'Starting...' : 'Continue as Guest'}
-      </Button>
-    </View>
-  );
-}
-```
+**Constraints**:
+- Requires Firebase project configured
+- Email must exist in Firebase Auth
+- Password must match Firebase record
+- Throws on network errors
+- Auto-updates auth state on success
 
-### Auth State Checking
+---
 
-```typescript
-function ProtectedContent() {
-  const { isAuthenticated, isAuthReady, user } = useAuth();
+### signUp
 
-  // Show loading while auth initializes
-  if (!isAuthReady) {
-    return <LoadingScreen />;
-  }
+**Purpose**: Create new user account with email, password, and display name.
 
-  // Redirect if not authenticated
-  if (!isAuthenticated) {
-    return <LoginScreen />;
-  }
+**Parameters**:
+- `email: string` - User email address
+- `password: string` - User password
+- `displayName: string` - User display name
 
-  // Show protected content
-  return (
-    <View>
-      <Text>Welcome, {user?.email}</Text>
-      <ProtectedContent />
-    </View>
-  );
-}
-```
+**Rules**:
+- MUST validate email format before calling
+- MUST validate password meets requirements
+- MUST validate display name not empty
+- MUST handle loading state during call
+- MUST display error messages on failure
+- MUST NOT proceed if email already exists
 
-### Sign Out
+**Constraints**:
+- Email must be unique in Firebase Auth
+- Password must meet complexity requirements
+- Creates Firebase Auth user
+- Creates user document in Firestore
+- Auto-signs in after successful creation
+- Sends email verification (if enabled)
 
-```typescript
-function ProfileScreen() {
-  const { user, signOut } = useAuth();
-  const navigation = useNavigation();
+---
 
-  const handleSignOut = async () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          onPress: async () => {
-            try {
-              await signOut();
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-              });
-            } catch (error) {
-              Alert.alert('Error', 'Failed to sign out');
-            }
-          },
-        },
-      ]
-    );
-  };
+### signOut
 
-  return (
-    <View>
-      <Text>{user?.email}</Text>
-      <Button onPress={handleSignOut}>Sign Out</Button>
-    </View>
-  );
-}
-```
+**Purpose**: Sign out current user and clear auth state.
 
-## Important Notes
+**Parameters**: None
 
-1. **initializeAuthListener()**: Must be called once in app root
-2. **Centralized State**: All components share the same state via Zustand
-3. **Error Handling**: Errors are automatically set in the `error` state
-4. **Loading States**: `loading` is true during operations
+**Rules**:
+- MUST confirm with user before signing out
+- MUST handle loading state during call
+- MUST clear local user data after sign out
+- MUST navigate to login screen after sign out
+- MUST handle errors gracefully
+
+**Constraints**:
+- Clears Firebase Auth session
+- Resets auth store state
+- Anonymous users: Loses all data
+- Authenticated users: Can sign back in
+- No server-side data deletion
+
+---
+
+### continueAnonymously
+
+**Purpose**: Create anonymous user session without credentials.
+
+**Parameters**: None
+
+**Rules**:
+- MUST inform user about anonymous limitations
+- MUST offer upgrade path to full account
+- MUST handle loading state during call
+- MUST display error messages on failure
+- MUST NOT expose this as primary auth method
+
+**Constraints**:
+- Creates temporary Firebase Auth user
+- No email/password required
+- User ID persists until sign out
+- Can be upgraded to full account
+- Data lost if user signs out
+- Limited functionality compared to registered users
+
+---
+
+## Error Handling
+
+### setError
+
+**Purpose**: Manually set or clear auth error state.
+
+**Parameters**:
+- `error: string | null` - Error message or null to clear
+
+**Rules**:
+- MUST use user-friendly error messages
+- MUST clear errors after successful operations
+- MUST NOT expose technical error details
+- MUST localize error messages
+
+**Constraints**:
+- Auto-cleared by auth operations
+- Displays in UI components
+- Overwrites previous error
+- null clears current error
+
+---
+
+## Loading States
+
+### Strategy
+
+**Purpose**: Proper loading state management for better UX.
+
+**Rules**:
+- MUST show loading indicator during `loading = true`
+- MUST NOT block UI for authentication operations
+- MUST disable buttons during operations
+- MUST handle loading errors gracefully
+
+**Constraints**:
+- `loading` = true only during initial auth check
+- Individual operations handle their own loading
+- `isAuthReady` ensures initial check complete
+- Operation loading is method-specific
+
+---
+
+## Anonymous Users
+
+### Strategy
+
+**Purpose**: Support anonymous users who can upgrade to registered accounts.
+
+**Rules**:
+- MUST clearly indicate anonymous status
+- MUST offer upgrade path
+- MUST explain limitations
+- MUST preserve data during upgrade
+
+**Constraints**:
+- Cannot access all features
+- Data lost if sign out occurs
+- Must upgrade to keep data
+- Limited account settings
+- No password recovery possible
+
+**UPGRADE PROCESS**:
+- User initiates account creation
+- Link credentials to anonymous account
+- Preserve existing user ID
+- Migrate any existing data
+- Seamless transition for user
+
+---
+
+## Security Requirements
+
+### Strategy
+
+**Purpose**: Ensure secure authentication handling.
+
+**Rules**:
+- MUST NEVER log passwords or tokens
+- MUST handle errors without exposing details
+- MUST use secure storage for tokens
+- MUST implement proper error handling
+- MUST validate all inputs
+
+**MUST NOT**:
+- Store passwords in AsyncStorage
+- Log auth responses with sensitive data
+- Expose tokens in error messages
+- Bypass Firebase security rules
+- Disable Firebase security features
+
+**Constraints**:
+- Firebase manages token refresh
+- Tokens stored securely by Firebase SDK
+- App cannot access refresh tokens
+- ID tokens available for API calls
+- Session managed automatically
+
+---
+
+## Platform Support
+
+### Strategy
+
+**Purpose**: Ensure consistent behavior across platforms.
+
+**Constraints**:
+- iOS: ✅ Fully supported
+- Android: ✅ Fully supported
+- Web: ✅ Fully supported
+
+**PLATFORM-SPECIFIC**:
+- Web: Requires proper Firebase config
+- iOS: Requires Info.plist configuration
+- Android: Requires google-services.json
+
+---
+
+## Integration Points
+
+### Firebase Integration
+
+**Requirements**:
+- Firebase Auth must be initialized
+- Firestore must be initialized (for user documents)
+- Firebase config must be provided
+- Auth persistence enabled by default
+
+**Firebase Dependencies**:
+- `@react-native-firebase/app`
+- `@react-native-firebase/auth`
+- `@react-native-firebase/firestore`
+
+---
 
 ## Related Hooks
 
-- [`useAuthRequired`](./useAuthRequired.md) - For components requiring auth
-- [`useRequireAuth`](./useAuthRequired.md#userequireauth) - Route protection
-- [`useUserProfile`](./useUserProfile.md) - User profile data
+- **`useUserProfile`** (`src/presentation/hooks/useUserProfile.ts`) - Display profile data
+- **`useAuthRequired`** (`src/presentation/hooks/useAuthRequired.ts`) - Require auth for components
+- **`useAccountManagement`** (`src/presentation/hooks/useAccountManagement.ts`) - Account operations
+
+## Related Stores
+
+- **`authStore`** (`src/presentation/stores/authStore.ts`) - Auth state management

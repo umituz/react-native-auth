@@ -1,414 +1,464 @@
 # useAuthBottomSheet
 
-Hook for authentication bottom sheet management. Handles login/register modal display and social authentication.
+Hook for authentication bottom sheet modal management.
 
-## Features
+---
 
-- Bottom sheet modal management
-- Login/Register mode switching
-- Social authentication integration
-- Auto-close on successful auth
-- Pending callback management
+## Strategy
 
-## Usage
+**Purpose**: Manages authentication modal (bottom sheet) with login/register forms, social authentication, and auto-close behavior. Integrates with auth modal store for global state management.
 
+**When to Use**:
+- Need modal-based authentication flow
+- Want to show login/register on demand
+- Need social auth in modal
+- Want auto-close after successful auth
+- Require pending callback execution
+
+**Import Path**:
 ```typescript
 import { useAuthBottomSheet } from '@umituz/react-native-auth';
-import { BottomSheetModal } from '@umituz/react-native-design-system';
-
-function AuthBottomSheet() {
-  const {
-    modalRef,
-    mode,
-    providers,
-    googleLoading,
-    appleLoading,
-    handleDismiss,
-    handleClose,
-    handleNavigateToRegister,
-    handleNavigateToLogin,
-    handleGoogleSignIn,
-    handleAppleSignIn,
-  } = useAuthBottomSheet({
-    socialConfig: {
-      google: {
-        iosClientId: 'your-ios-client-id',
-        webClientId: 'your-web-client-id',
-      },
-      apple: { enabled: true },
-    },
-  });
-
-  return (
-    <BottomSheetModal ref={modalRef} onDismiss={handleDismiss}>
-      {mode === 'login' ? (
-        <LoginForm
-          onRegisterPress={handleNavigateToRegister}
-          onGoogleSignIn={handleGoogleSignIn}
-          onAppleSignIn={handleAppleSignIn}
-          googleLoading={googleLoading}
-          appleLoading={appleLoading}
-        />
-      ) : (
-        <RegisterForm
-          onLoginPress={handleNavigateToLogin}
-          onGoogleSignIn={handleGoogleSignIn}
-          onAppleSignIn={handleAppleSignIn}
-          googleLoading={googleLoading}
-          appleLoading={appleLoading}
-        />
-      )}
-    </BottomSheetModal>
-  );
-}
 ```
 
-## API
+**Hook Location**: `src/presentation/hooks/useAuthBottomSheet.ts`
 
-### Parameters
+**Modal Store**: `src/presentation/stores/authModalStore.ts`
 
-| Param | Type | Required | Description |
-|-------|------|----------|-------------|
-| `socialConfig` | `SocialAuthConfiguration` | No | Social auth configuration |
-| `onGoogleSignIn` | `() => Promise<void>` | No | Custom Google sign-in handler |
-| `onAppleSignIn` | `() => Promise<void>` | No | Custom Apple sign-in handler |
+**Modal Component**: `@umituz/react-native-design-system`'s `BottomSheetModal`
 
-### SocialAuthConfiguration
+---
 
-```typescript
-interface SocialAuthConfiguration {
-  google?: GoogleAuthConfig;
-  apple?: { enabled: boolean };
-}
-```
+## Core Functionality
 
-### Return Value
+### Modal Reference
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `modalRef` | `RefObject<BottomSheetModalRef>` | Bottom sheet modal reference |
-| `mode` | `'login' \| 'register'` | Current mode |
-| `providers` | `SocialAuthProvider[]` | Available social providers |
-| `googleLoading` | `boolean` | Google loading state |
-| `appleLoading` | `boolean` | Apple loading state |
-| `handleDismiss` | `() => void` | Dismiss modal |
-| `handleClose` | `() => void` | Close modal and cleanup |
-| `handleNavigateToRegister` | `() => void` | Switch to register mode |
-| `handleNavigateToLogin` | `() => void` | Switch to login mode |
-| `handleGoogleSignIn` | `() => Promise<void>` | Google sign-in handler |
-| `handleAppleSignIn` | `() => Promise<void>` | Apple sign-in handler |
+**Purpose**: Ref object for controlling bottom sheet modal.
 
-## Examples
+**PROPERTIES**:
+- Type: `RefObject<BottomSheetModalRef>`
+- Used to: Open, close, and control modal
 
-### Basic Auth Bottom Sheet
+**Rules**:
+- MUST pass to BottomSheetModal component
+- MUST use for programmatic control
+- MUST not create multiple refs
 
-```typescript
-function AuthModal() {
-  const {
-    modalRef,
-    mode,
-    handleDismiss,
-    handleNavigateToRegister,
-    handleNavigateToLogin,
-  } = useAuthBottomSheet();
+**Constraints**:
+- Single modal instance
+- Managed by authModalStore
+- Ref persists across renders
 
-  return (
-    <BottomSheetModal ref={modalRef} snapPoints={['80%']} onDismiss={handleDismiss}>
-      <View>
-        {mode === 'login' ? (
-          <>
-            <Text>Sign In</Text>
-            <LoginForm />
-            <Button onPress={handleNavigateToRegister}>
-              Don't have an account? Sign Up
-            </Button>
-          </>
-        ) : (
-          <>
-            <Text>Sign Up</Text>
-            <RegisterForm />
-            <Button onPress={handleNavigateToLogin}>
-              Already have an account? Sign In
-            </Button>
-          </>
-        )}
-      </View>
-    </BottomSheetModal>
-  );
-}
-```
+---
 
-### With Social Login
+### Mode Management
 
-```typescript
-function AuthBottomSheetWithSocial() {
-  const {
-    modalRef,
-    mode,
-    providers,
-    googleLoading,
-    appleLoading,
-    handleDismiss,
-    handleNavigateToRegister,
-    handleNavigateToLogin,
-    handleGoogleSignIn,
-    handleAppleSignIn,
-  } = useAuthBottomSheet({
-    socialConfig: {
-      google: {
-        webClientId: Config.GOOGLE_WEB_CLIENT_ID,
-        iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
-      },
-      apple: { enabled: Platform.OS === 'ios' },
-    },
-  });
+**Purpose**: Tracks current modal mode (login or register).
 
-  return (
-    <BottomSheetModal ref={modalRef} snapPoints={['90%']} onDismiss={handleDismiss}>
-      <View>
-        {mode === 'login' ? (
-          <>
-            <LoginForm />
+**VALUES**:
+- `'login'` - Show login form
+- `'register'` - Show registration form
 
-            {/* Social login buttons */}
-            {providers.includes('google') && (
-              <SocialButton
-                provider="google"
-                onPress={handleGoogleSignIn}
-                loading={googleLoading}
-              />
-            )}
+**Rules**:
+- MUST display appropriate form based on mode
+- MUST switch forms when mode changes
+- MUST preserve mode during modal open
+- MUST reset to default on close
 
-            {providers.includes('apple') && (
-              <SocialButton
-                provider="apple"
-                onPress={handleAppleSignIn}
-                loading={appleLoading}
-              />
-            )}
+**Constraints**:
+- Controlled by authModalStore
+- Default mode: `'login'`
+- Switchable via navigation handlers
+- Auto-reset on modal close
 
-            <Button onPress={handleNavigateToRegister}>
-              Sign Up
-            </Button>
-          </>
-        ) : (
-          <>
-            <RegisterForm />
+---
 
-            {/* Social login buttons */}
-            {providers.includes('google') && (
-              <SocialButton
-                provider="google"
-                onPress={handleGoogleSignIn}
-                loading={googleLoading}
-              />
-            )}
+### Provider Detection
 
-            {providers.includes('apple') && (
-              <SocialButton
-                provider="apple"
-                onPress={handleAppleSignIn}
-                loading={appleLoading}
-              />
-            )}
+**Purpose**: Automatically determines which social providers are available.
 
-            <Button onPress={handleNavigateToLogin}>
-              Sign In
-            </Button>
-          </>
-        )}
-      </View>
-    </BottomSheetModal>
-  );
-}
-```
+**VALUES**:
+- Type: `SocialAuthProvider[]`
+- Possible: `['google']`, `['apple']`, `['google', 'apple']`, `[]`
 
-### Custom Social Login Handlers
+**Rules**:
+- MUST check provider availability
+- MUST respect platform limitations
+- MUST filter based on configuration
+- MUST update on config changes
 
-```typescript
-function AuthBottomSheetWithCustomHandlers() {
-  const { showAuthModal } = useAuthModalStore();
+**Constraints**:
+- Platform-dependent:
+  - iOS: Google + Apple (if configured)
+  - Android: Google only
+  - Web: Google only
+- Configuration-dependent
+- Auto-calculated from config
 
-  const handleCustomGoogleSignIn = async () => {
-    try {
-      const result = await customGoogleSignInFlow();
+---
 
-      if (result.success) {
-        // Modal auto-closes on successful auth
-        console.log('Google sign-in successful');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Google sign-in failed');
-    }
-  };
+## Navigation Handlers
 
-  const handleCustomAppleSignIn = async () => {
-    try {
-      const result = await customAppleSignInFlow();
+### handleNavigateToRegister
 
-      if (result.success) {
-        console.log('Apple sign-in successful');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Apple sign-in failed');
-    }
-  };
+**Purpose**: Switch modal from login to register mode.
 
-  const {
-    modalRef,
-    mode,
-    googleLoading,
-    appleLoading,
-    handleDismiss,
-    handleNavigateToRegister,
-    handleNavigateToLogin,
-    handleGoogleSignIn,
-    handleAppleSignIn,
-  } = useAuthBottomSheet({
-    onGoogleSignIn: handleCustomGoogleSignIn,
-    onAppleSignIn: handleCustomAppleSignIn,
-  });
+**Rules**:
+- MUST change mode to `'register'`
+- MUST keep modal open
+- MUST update form display
 
-  return (
-    <BottomSheetModal ref={modalRef} onDismiss={handleDismiss}>
-      {/* Auth form content */}
-    </BottomSheetModal>
-  );
-}
-```
+**Constraints**:
+- No modal close/open cycle
+- Smooth form transition
+- Preserves any input data (if applicable)
 
-### Triggering Auth Modal
+---
 
-```typescript
-function RequireAuthButton() {
-  const { showAuthModal } = useAuthModalStore();
-  const { isAuthenticated } = useAuth();
+### handleNavigateToLogin
 
-  const handlePress = () => {
-    if (!isAuthenticated) {
-      // Show login modal
-      showAuthModal(undefined, 'login');
-      return;
-    }
+**Purpose**: Switch modal from register to login mode.
 
-    // Perform auth-required action
-    console.log('Action successful');
-  };
+**Rules**:
+- MUST change mode to `'login'`
+- MUST keep modal open
+- MUST update form display
 
-  return (
-    <Button onPress={handlePress}>
-      Auth Required Action
-    </Button>
-  );
-}
-```
+**Constraints**:
+- No modal close/open cycle
+- Smooth form transition
+- Clears register form data
 
-### With Pending Callback
+---
 
-```typescript
-function AddToFavoritesButton() {
-  const { showAuthModal } = useAuthModalStore();
-  const { isAuthenticated } = useAuth();
+### handleDismiss
 
-  const handleAddToFavorites = async () => {
-    if (!isAuthenticated) {
-      // Save callback to run after successful auth
-      showAuthModal(async () => {
-        await addToFavorites(postId);
-        Alert.alert('Success', 'Added to favorites');
-      }, 'login');
-      return;
-    }
+**Purpose**: Handle modal dismiss event (user swipes down or taps backdrop).
 
-    // User authenticated, perform action directly
-    await addToFavorites(postId);
-    Alert.alert('Success', 'Added to favorites');
-  };
+**Rules**:
+- MUST reset modal state
+- MUST clear mode to default
+- MUST clear any pending callbacks
+- MUST handle cleanup
 
-  return (
-    <Button onPress={handleAddToFavorites}>
-      Add to Favorites
-    </Button>
-  );
-}
-```
+**Constraints**:
+- Called by BottomSheetModal onDismiss
+- Auto-executed on user action
+- Cleanup required
+
+---
+
+### handleClose
+
+**Purpose**: Programmatically close modal and cleanup.
+
+**Rules**:
+- MUST close modal
+- MUST reset modal state
+- MUST clear pending callbacks
+- MUST execute cleanup
+
+**Constraints**:
+- Programmatic close
+- Same cleanup as dismiss
+- Safe to call multiple times
+
+---
+
+## Social Authentication
+
+### handleGoogleSignIn
+
+**Purpose**: Initiate Google OAuth flow from modal.
+
+**Rules**:
+- MUST call Google auth function
+- MUST handle loading state
+- MUST display errors to user
+- MUST auto-close modal on success
+
+**MUST NOT**:
+- Call if provider not configured
+- Leave loading state indefinitely
+- Ignore auth results
+
+**Constraints**:
+- Uses configured Google client IDs
+- Auto-closes on successful auth
+- Stays open on failure (for retry)
+- Loading state managed automatically
+
+---
+
+### handleAppleSignIn
+
+**Purpose**: Initiate Apple Sign-In flow from modal.
+
+**Rules**:
+- MUST call Apple auth function
+- MUST handle loading state
+- MUST display errors to user
+- MUST auto-close modal on success
+
+**MUST NOT**:
+- Call if provider not available
+- Call on non-iOS platforms
+- Leave loading state indefinitely
+
+**Constraints**:
+- iOS only (hidden on other platforms)
+- Requires Apple Developer account
+- Auto-closes on successful auth
+- Stays open on failure (for retry)
+
+---
 
 ## Auto-Close Behavior
 
-The hook automatically closes the modal after successful authentication:
+### Strategy
 
-- **Not authenticated → Authenticated**: User signs in/logs in
-- **Anonymous → Authenticated**: Anonymous user registers
+**Purpose**: Automatically close modal after successful authentication.
 
+**Rules**:
+- MUST close modal on successful auth
+- MUST execute pending callback after close
+- MUST not close on auth failure
+- MUST not close if user cancels
+
+**MUST NOT**:
+- Stay open after successful auth
+- Close prematurely during auth flow
+- Execute callback before auth complete
+
+### Constraints
+
+**AUTO-CLOSE TRIGGERS**:
+- Anonymous → Authenticated: Close modal
+- Unauthenticated → Authenticated: Close modal
+- Authenticated → Authenticated (reauth): No close needed
+
+**PENDING CALLBACKS**:
+- Stored in authModalStore
+- Executed after successful auth
+- Cleared after execution
+- Can be action (navigate, API call, etc.)
+
+**NO-CLOSE SCENARIOS**:
+- Authentication failure
+- User cancellation
+- Network errors
+- Validation errors
+
+---
+
+## Pending Callbacks
+
+### Strategy
+
+**Purpose**: Execute callback after successful authentication.
+
+**Use Cases**:
+- Retry protected action after auth
+- Navigate to intended destination
+- Trigger post-auth operations
+- Restore user flow
+
+**Rules**:
+- MUST store callback before showing modal
+- MUST execute after successful auth
+- MUST clear after execution
+- MUST handle callback errors
+
+**MUST NOT**:
+- Execute callback before auth
+- Forget callback after auth
+- Execute multiple times
+- Lose callback context
+
+### Constraints
+
+**CALLBACK TYPES**:
+- Navigation function
+- Async operation
+- State update
+- Any void-returning function
+
+**EXECUTION TIMING**:
+- After successful authentication
+- Before modal close
+- Before UI updates
+- Can be async
+
+**ERROR HANDLING**:
+- Catch callback errors
+- Show error to user
+- Don't block auth completion
+- Log errors for debugging
+
+---
+
+## Configuration
+
+### Social Authentication Config
+
+**socialConfig** parameter structure:
+
+**GOOGLE CONFIG**:
 ```typescript
-// User signs in
-// → useAuth store updates
-// → useAuthBottomSheet detects this
-// → Modal auto-closes
-// → Pending callback executes
+google?: {
+  iosClientId?: string;
+  webClientId?: string;
+  androidClientId?: string;
+}
 ```
+At least one client ID required
 
-## Provider Detection
-
-The hook automatically determines which providers are available:
-
+**APPLE CONFIG**:
 ```typescript
-const { providers } = useAuthBottomSheet({
-  socialConfig: {
-    google: { webClientId: '...' },
-    apple: { enabled: true },
-  },
-});
-
-// iOS: ['apple', 'google'] or ['google']
-// Android: ['google']
-// Web: ['google']
-```
-
-## Error Handling
-
-```typescript
-function AuthBottomSheetWithErrorHandling() {
-  const {
-    modalRef,
-    mode,
-    handleGoogleSignIn,
-    handleAppleSignIn,
-  } = useAuthBottomSheet({
-    socialConfig: {
-      google: { webClientId: Config.GOOGLE_WEB_CLIENT_ID },
-      apple: { enabled: true },
-    },
-  });
-
-  const handleGoogleSignInWithErrorHandling = async () => {
-    try {
-      await handleGoogleSignIn();
-    } catch (error) {
-      // Additional error handling if needed
-      Alert.alert('Error', 'Something went wrong');
-    }
-  };
-
-  return (
-    <BottomSheetModal ref={modalRef}>
-      <Button onPress={handleGoogleSignInWithErrorHandling}>
-        Sign in with Google
-      </Button>
-    </BottomSheetModal>
-  );
+apple?: {
+  enabled: boolean;
 }
 ```
 
-## Related Components
+**Rules**:
+- MUST provide client IDs for Google
+- MUST enable Apple explicitly if needed
+- MUST match Firebase console configuration
 
-- [`AuthBottomSheet`](../components/AuthBottomSheet.md) - Bottom sheet component
-- [`useAuthModalStore`](../stores/authModalStore.md) - Auth modal state store
-- [`LoginForm`](../components/LoginForm.md) - Login form component
-- [`RegisterForm`](../components/RegisterForm.md) - Register form component
+**Constraints**:
+- Google: Requires at least one client ID
+- Apple: Only works on iOS
+- Both: Require Firebase setup
+
+---
+
+## Loading States
+
+### Strategy
+
+**Purpose**: Proper loading indication during authentication.
+
+**Rules**:
+- MUST show loading during auth operation
+- MUST disable auth buttons during loading
+- MUST re-enable after completion
+- MUST handle concurrent operations
+
+**MUST NOT**:
+- Allow multiple concurrent auth operations
+- Leave loading state indefinitely
+- Allow button press during loading
+
+### Constraints
+
+**LOADING STATES**:
+- `googleLoading: boolean` - Google auth in progress
+- `appleLoading: boolean` - Apple auth in progress
+
+**VISUAL FEEDBACK**:
+- Disable buttons during loading
+- Show spinner/indicator
+- Prevent mode switch during loading
+- Clear errors on new operation
+
+---
+
+## Error Handling
+
+### Strategy
+
+**Purpose**: Graceful error handling in modal context.
+
+**Rules**:
+- MUST display errors in modal
+- MUST keep modal open on error
+- MUST allow retry after error
+- MUST clear errors on new operation
+
+**MUST NOT**:
+- Close modal on error
+- Show raw error messages
+- Block retry indefinitely
+- Lose user context
+
+### Constraints
+
+**ERROR DISPLAY**:
+- In-modal error message
+- Clear retry option
+- User-friendly text
+- Localized messages
+
+**ERROR RECOVERY**:
+- User can retry same operation
+- Can switch to different provider
+- Can switch to login/register
+- Manual dismiss if desired
+
+---
+
+## Modal Lifecycle
+
+### Strategy
+
+**Purpose**: Proper modal lifecycle management.
+
+**OPENING**:
+1. Trigger: `showAuthModal` called
+2. Mode: Set to 'login' or 'register'
+3. Callback: Stored if provided
+4. Modal: Opens with animation
+
+**DURING AUTH**:
+1. User fills form or clicks social button
+2. Loading state shown
+3. Auth operation executed
+4. Success or failure determined
+
+**CLOSING**:
+1. Success: Auto-close + callback execution
+2. Failure: Stays open for retry
+3. Dismiss: Cleanup + reset
+4. Cancel: Cleanup + reset
+
+**Rules**:
+- MUST follow lifecycle sequence
+- MUST cleanup on every close
+- MUST reset state appropriately
+- MUST not leak memory
+
+---
+
+## Integration Points
+
+### Store Integration
+
+**authModalStore** manages:
+- Modal open/close state
+- Current mode (login/register)
+- Pending callback
+- Social auth configuration
+
+**Rules**:
+- MUST use store for modal state
+- MUST not duplicate state locally
+- MUST subscribe to store updates
+- MUST trigger store actions
+
+---
 
 ## Related Hooks
 
-- [`useGoogleAuth`](./useSocialLogin.md#usegoogleauth) - Google auth hook
-- [`useAppleAuth`](./useSocialLogin.md#useappleauth) - Apple auth hook
-- [`useAuth`](./useAuth.md) - Main auth state management
+- **`useAuth`** (`src/presentation/hooks/useAuth.ts`) - Authentication state
+- **`useSocialLogin`** (`src/presentation/hooks/useSocialLogin.md`) - Social authentication
+- **`useAuthRequired`** (`src/presentation/hooks/useAuthRequired.md`) - Auth requirement checks
+
+## Related Components
+
+- **`AuthBottomSheet`** (`src/presentation/components/AuthBottomSheet.tsx`) - Modal component
+- **`LoginForm`** (`src/presentation/components/LoginForm.md`) - Login form
+- **`RegisterForm`** (`src/presentation/components/LoginForm.md`) - Registration form
+- **`SocialLoginButtons`** (`src/presentation/components/SocialLoginButtons.md`) - Social auth UI
+
+## Related Stores
+
+- **`authModalStore`** (`src/presentation/stores/authModalStore.ts`) - Modal state management

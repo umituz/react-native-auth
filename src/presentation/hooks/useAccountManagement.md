@@ -2,385 +2,336 @@
 
 Hook for account management operations (logout, delete account).
 
-## Features
+---
 
-- Sign out functionality
-- Account deletion with reauthentication
-- Reauthentication callback support
-- Loading state management
+## Strategy
 
-## Usage
+**Purpose**: Provides safe account management operations including sign out and account deletion with proper confirmations and reauthentication.
 
+**When to Use**:
+- Account settings screens
+- Logout functionality
+- Account deletion flows
+- Need user account operations
+
+**Import Path**:
 ```typescript
 import { useAccountManagement } from '@umituz/react-native-auth';
-
-function AccountSettings() {
-  const { logout, deleteAccount, isLoading, isDeletingAccount } = useAccountManagement({
-    onReauthRequired: async () => {
-      // Show Google/Apple sign-in UI
-      const result = await reauthenticateWithGoogle();
-      return result.success;
-    },
-    onPasswordRequired: async () => {
-      // Show password prompt
-      const password = await showPasswordPrompt();
-      return password;
-    },
-  });
-
-  return (
-    <View>
-      <Button onPress={logout}>Sign Out</Button>
-      <Button onPress={deleteAccount}>Delete Account</Button>
-    </View>
-  );
-}
 ```
 
-## API
+**Hook Location**: `src/presentation/hooks/useAccountManagement.ts`
 
-### Parameters
+---
 
-| Param | Type | Required | Description |
-|-------|------|----------|-------------|
-| `onReauthRequired` | `() => Promise<boolean>` | No | Callback for Google/Apple reauthentication |
-| `onPasswordRequired` | `() => Promise<string \| null>` | No | Callback for password reauthentication |
+## Core Operations
 
-### Return Value
+### logout
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `logout` | `() => Promise<void>` | Sign out function |
-| `deleteAccount` | `() => Promise<void>` | Delete account function |
-| `isLoading` | `boolean` | General loading state |
-| `isDeletingAccount` | `boolean` | Account deletion loading state |
+**Purpose**: Sign out user and clear authentication state.
 
-## Examples
+**Rules**:
+- MUST confirm with user before signing out
+- MUST handle loading state during operation
+- MUST clear local user data after sign out
+- MUST navigate to login screen after sign out
+- MUST handle errors gracefully
 
-### Simple Account Settings
+**MUST NOT**:
+- Sign out without user confirmation
+- Clear user data before sign out complete
+- Block app functionality on error
+- Lose navigation context
 
-```typescript
-function AccountSettingsScreen() {
-  const { logout, deleteAccount, isDeletingAccount } = useAccountManagement();
+**Constraints**:
+- Clears Firebase Auth session
+- Resets auth store state
+- Anonymous users: Loses all data
+- Authenticated users: Can sign back in
+- No server-side data deletion
 
-  return (
-    <ScrollView style={styles.container}>
-      <Section title="Session">
-        <MenuItem
-          title="Sign Out"
-          icon="log-out"
-          onPress={logout}
-        />
-      </Section>
+---
 
-      <Section title="Danger Zone">
-        <MenuItem
-          title="Delete Account"
-          icon="trash"
-          onPress={deleteAccount}
-          destructive
-          disabled={isDeletingAccount}
-        />
-        {isDeletingAccount && <ActivityIndicator />}
-      </Section>
-    </ScrollView>
-  );
-}
-```
+### deleteAccount
 
-### With Reauthentication
+**Purpose**: Permanently delete user account and all associated data.
 
-```typescript
-function AccountSettingsScreen() {
-  const { logout, deleteAccount } = useAccountManagement({
-    onReauthRequired: async () => {
-      try {
-        // Reauthenticate with Google
-        const result = await signInWithGooglePopup();
+**Rules**:
+- MUST require double confirmation
+- MUST show clear warning about irreversibility
+- MUST require recent authentication
+- MUST handle reauthentication if needed
+- MUST provide error messages on failure
+- MUST hide option for anonymous users
 
-        if (result.user) {
-          Alert.alert('Success', 'Please continue with account deletion');
-          return true;
-        }
+**MUST NOT**:
+- Delete account without confirmation
+- Delete without recent authentication
+- Show to anonymous users
+- Expose technical error details
+- Allow account recovery
 
-        return false;
-      } catch (error) {
-        Alert.alert('Error', 'Reauthentication failed');
-        return false;
-      }
-    },
-    onPasswordRequired: async () => {
-      return new Promise((resolve) => {
-        // Show password prompt
-        Alert.prompt(
-          'Enter Password',
-          'Please enter your password to delete your account',
-          [
-            {
-              text: 'Cancel',
-              onPress: () => resolve(null),
-              style: 'cancel',
-            },
-            {
-              text: 'OK',
-              onPress: (password) => resolve(password || null),
-            },
-          ],
-          'secure-text'
-        );
-      });
-    },
-  });
+**Constraints**:
+- Firebase requirement: Recent authentication (< 5 minutes)
+- Double confirmation: Warning + Confirm
+- Permanent deletion: Cannot undo
+- Reauthentication: May be required
+- Anonymous accounts: Cannot be deleted
 
-  // ...
-}
-```
-
-### Custom Reauthentication UI
-
-```typescript
-function DeleteAccountScreen() {
-  const [showReauth, setShowReauth] = useState(false);
-
-  const { deleteAccount, isDeletingAccount } = useAccountManagement({
-    onReauthRequired: async () => {
-      setShowReauth(true);
-      return new Promise((resolve) => {
-        // Custom reauthentication UI
-        const handleResult = (success: boolean) => {
-          setShowReauth(false);
-          resolve(success);
-        };
-
-        showCustomReauthUI(handleResult);
-      });
-    },
-    onPasswordRequired: async () => {
-      setShowReauth(true);
-      return new Promise((resolve) => {
-        // Custom password prompt
-        showPasswordPrompt((password) => {
-          setShowReauth(false);
-          resolve(password);
-        });
-      });
-    },
-  });
-
-  const handleDelete = async () => {
-    try {
-      await deleteAccount();
-      Alert.alert('Success', 'Account deleted');
-    } catch (error) {
-      Alert.alert('Error', error.message);
-    }
-  };
-
-  return (
-    <View>
-      <Button onPress={handleDelete} disabled={isDeletingAccount}>
-        Delete Account
-      </Button>
-
-      {showReauth && (
-        <ReauthenticationModal
-          onComplete={() => {
-            // Reauthentication successful, deleteAccount continues
-          }}
-        />
-      )}
-    </View>
-  );
-}
-```
-
-### Delete Account Confirmation
-
-```typescript
-function DeleteAccountConfirmation() {
-  const { deleteAccount, isDeletingAccount } = useAccountManagement();
-  const [agreed, setAgreed] = useState(false);
-
-  const handleDelete = async () => {
-    if (!agreed) {
-      Alert.alert('Warning', 'Please accept the terms');
-      return;
-    }
-
-    Alert.alert(
-      'Delete Account',
-      'This action cannot be undone. Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: deleteAccount,
-        },
-      ]
-    );
-  };
-
-  return (
-    <View>
-      <Text style={styles.warning}>
-        By deleting your account:
-      </Text>
-      <Text>• All your data will be permanently deleted</Text>
-      <Text>• This action cannot be undone</Text>
-      <Text>• You won't be able to sign in with the same account</Text>
-
-      <CheckBox
-        value={agreed}
-        onValueChange={setAgreed}
-        label="I accept the account deletion terms"
-      />
-
-      <Button
-        onPress={handleDelete}
-        disabled={!agreed || isDeletingAccount}
-        style={{ backgroundColor: 'red' }}
-      >
-        {isDeletingAccount ? 'Deleting...' : 'Permanently Delete Account'}
-      </Button>
-    </View>
-  );
-}
-```
-
-### Anonymous User Handling
-
-```typescript
-function AccountActionsAnonymous() {
-  const { isAnonymous } = useAuth();
-
-  if (isAnonymous) {
-    return (
-      <Button onPress={() => navigation.navigate('Register')}>
-        Create Account
-      </Button>
-    );
-  }
-
-  const config = {
-    logoutText: 'Sign Out',
-    deleteAccountText: 'Delete Account',
-    logoutConfirmTitle: 'Sign Out',
-    logoutConfirmMessage: 'Are you sure you want to sign out?',
-    deleteConfirmTitle: 'Delete Account',
-    deleteConfirmMessage: 'Are you sure you want to delete your account?',
-    onLogout: logout,
-    onDeleteAccount: deleteAccount,
-  };
-
-  return <AccountActions config={config} />;
-}
-```
-
-## Error Handling
-
-```typescript
-function AccountSettingsWithErrorHandling() {
-  const { logout, deleteAccount } = useAccountManagement();
-  const navigation = useNavigation();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigation.replace('Login');
-    } catch (error) {
-      if (error.code === 'auth/network-request-failed') {
-        Alert.alert('Connection Error', 'Check your internet connection');
-      } else {
-        Alert.alert('Error', 'Failed to sign out');
-      }
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    try {
-      await deleteAccount();
-      Alert.alert('Success', 'Account deleted');
-      navigation.replace('Login');
-    } catch (error) {
-      if (error.code === 'auth/requires-recent-login') {
-        Alert.alert(
-          'Authentication Required',
-          'Please sign in again to delete your account'
-        );
-      } else if (error.code === 'auth/too-many-requests') {
-        Alert.alert(
-          'Too Many Attempts',
-          'Too many failed attempts. Please try again later'
-        );
-      } else {
-        Alert.alert('Error', 'Failed to delete account');
-      }
-    }
-  };
-
-  return (
-    <View>
-      <Button onPress={handleLogout}>Sign Out</Button>
-      <Button onPress={handleDeleteAccount}>Delete Account</Button>
-    </View>
-  );
-}
-```
-
-## Important Notes
-
-1. **Reauthentication Required**: Firebase requires recent sign-in for account deletion
-2. **Anonymous Users**: Anonymous accounts cannot be deleted
-3. **Irreversible**: Account deletion is permanent
-4. **Callbacks**: If `onReauthRequired` and `onPasswordRequired` are not provided, errors will be thrown
+---
 
 ## Reauthentication
 
-Account deletion is a sensitive operation, so Firebase requires the user to have signed in recently. This hook provides reauthentication callbacks:
+### Strategy
 
-### onReauthRequired
+**Purpose**: Handle Firebase requirement for recent authentication before sensitive operations.
 
-For Google or Apple sign-in users:
+**Rules**:
+- MUST provide reauthentication callbacks
+- MUST support both password and social auth reauth
+- MUST show reauthentication UI when required
+- MUST block operation until reauth complete
+- MUST handle reauth failure gracefully
 
-```typescript
-const { deleteAccount } = useAccountManagement({
-  onReauthRequired: async () => {
-    try {
-      // Reauthenticate with Google
-      const result = await signInWithGooglePopup();
-      return result.user ? true : false;
-    } catch (error) {
-      return false;
-    }
-  },
-});
-```
+**MUST NOT**:
+- Skip reauthentication requirement
+- Allow operation without recent auth
+- Hide reauthentication prompt from user
+- Confuse reauth with initial login
 
-### onPasswordRequired
+### Constraints
 
-For email/password users:
+**REAUTHENTICATION TRIGGERS**:
+- Account deletion
+- Password change (if implementing)
+- Sensitive account operations
+- Firebase-determined requirement
 
-```typescript
-const { deleteAccount } = useAccountManagement({
-  onPasswordRequired: async () => {
-    return new Promise((resolve) => {
-      Alert.prompt(
-        'Enter Password',
-        'Please enter your password',
-        [
-          { text: 'Cancel', onPress: () => resolve(null), style: 'cancel' },
-          { text: 'OK', onPress: (password) => resolve(password || null) },
-        ],
-        'secure-text'
-      );
-    });
-  },
-});
-```
+**CALLBACK TYPES**:
+
+**onReauthRequired**
+- Used for: Google/Apple social auth users
+- Purpose: Re-sign in with social provider
+- Must return: `boolean` (success status)
+- Called when: Social auth needs reauth
+
+**onPasswordRequired**
+- Used for: Email/password users
+- Purpose: Get current password
+- Must return: `string | null` (password or cancel)
+- Called when: Email auth needs reauth
+
+**REAUTH FLOW**:
+1. User initiates sensitive operation
+2. Firebase requires recent authentication
+3. Hook calls appropriate callback
+4. App shows reauthentication UI
+5. User reauthenticates
+6. Operation proceeds if successful
+
+---
+
+## Loading States
+
+### Strategy
+
+**Purpose**: Proper UX during account management operations.
+
+**Rules**:
+- MUST show loading indicator during operations
+- MUST disable buttons during operation
+- MUST prevent concurrent operations
+- MUST re-enable after completion
+
+**MUST NOT**:
+- Allow multiple simultaneous operations
+- Leave loading state indefinitely
+- Block UI without indication
+- Allow operation during loading
+
+### Constraints
+
+**LOADING STATES**:
+- `isLoading: boolean` - General loading state
+- `isDeletingAccount: boolean` - Specific to deletion
+
+**OPERATION DURATION**:
+- Sign out: < 2 seconds
+- Account deletion: 5-10 seconds
+- Reauthentication: Variable (user-controlled)
+
+**DISABLED STATES**:
+- Disable all account actions during operation
+- Disable navigation during operation
+- Show progress indication
+- Maintain interactivity for cancel
+
+---
+
+## Anonymous User Handling
+
+### Strategy
+
+**Purpose**: Proper handling for anonymous users vs authenticated users.
+
+**Rules**:
+- MUST hide account deletion for anonymous users
+- MUST show "Create Account" option instead
+- MUST explain anonymous limitations
+- MUST preserve data during upgrade
+
+**MUST NOT**:
+- Show account deletion to anonymous users
+- Allow sign out without warning
+- Treat anonymous users as authenticated
+- Hide anonymous status
+
+### Constraints
+
+**ANONYMOUS LIMITATIONS**:
+- Cannot delete anonymous account
+- Cannot change password (no password)
+- Sign out loses all data
+- Limited account settings
+
+**UPGRADE PATH**:
+- Anonymous → Registered
+- Link credentials to anonymous account
+- Preserve existing user ID
+- Migrate existing data
+- Seamless transition
+
+---
+
+## Error Handling
+
+### Strategy
+
+**Purpose**: Graceful handling of account operation failures.
+
+**Rules**:
+- MUST handle operation errors gracefully
+- MUST show user-friendly error messages
+- MUST allow retry after failures
+- MUST not crash on errors
+- MUST distinguish error types
+
+**MUST NOT**:
+- Show raw error messages to users
+- Block retry indefinitely
+- Crash on operation failures
+- Expose sensitive error details
+
+### Constraints
+
+**ERROR CATEGORIES**:
+- Network errors: Connection issues
+- Reauth errors: Authentication required
+- Permission errors: Insufficient permissions
+- Firebase errors: Service issues
+
+**RECOVERY OPTIONS**:
+- Retry operation automatically
+- Show error with retry button
+- Reauthenticate if required
+- Support contact for persistent issues
+
+**ERROR DISPLAY**:
+- Alert/Modal for critical errors
+- Inline text for non-critical
+- Toast for success/cancellation
+- Console logging for debugging
+
+---
+
+## Security Requirements
+
+### Strategy
+
+**Purpose**: Ensure account operations are secure.
+
+**Rules**:
+- MUST require recent authentication for deletion
+- MUST validate permissions before operations
+- MUST log security events
+- MUST use secure token handling
+- MUST implement proper error handling
+
+**MUST NOT**:
+- Allow deletion without reauthentication
+- Skip permission checks
+- Log sensitive data
+- Expose tokens in errors
+- Bypass Firebase security
+
+### Constraints
+
+**REAUTHENTICATION REQUIREMENTS**:
+- Account deletion: Recent auth required
+- Timeout: Typically 5 minutes
+- Methods: Re-sign in with credentials
+- Failure: Block destructive action
+
+**SECURITY LOGGING**:
+- Log: Account views, settings access
+- Log: Sign out, deletion attempts
+- Never log: Passwords, tokens, credentials
+- Purpose: Security audit, debugging
+
+**DATA HANDLING**:
+- Tokens managed by Firebase SDK
+- Secure storage for credentials
+- No plaintext password storage
+- Proper session cleanup
+
+---
+
+## Navigation Integration
+
+### Strategy
+
+**Purpose**: Proper navigation flow for account operations.
+
+**Rules**:
+- MUST navigate to login after sign out
+- MUST navigate to welcome after deletion
+- MUST handle back navigation properly
+- MUST maintain navigation context
+
+**MUST NOT**:
+- Break navigation stack
+- Leave modals open after operations
+- Lose user context
+- Create navigation loops
+
+### Constraints
+
+**SIGN OUT FLOW**:
+1. User confirms sign out
+2. Clear auth state
+3. Navigate to login screen
+4. Replace entire navigation stack
+5. Clear any deep links
+
+**DELETION FLOW**:
+1. User confirms deletion (twice)
+2. Reauthenticate if required
+3. Delete account
+4. Navigate to welcome/login
+5. Replace entire navigation stack
+
+**STACK MANAGEMENT**:
+- Sign out: Replace stack with login
+- Delete account: Replace stack with welcome
+- No back navigation to authenticated screens
+
+---
 
 ## Related Hooks
 
-- [`useAuth`](./useAuth.md) - Main auth state management
-- [`useSignOut`](./useAuth.md) - Sign out function
-- [`useUserProfile`](./useUserProfile.md) - Profile information
+- **`useAuth`** (`src/presentation/hooks/useAuth.ts`) - Authentication state
+- **`useUserProfile`** (`src/presentation/hooks/useUserProfile.ts`) - Profile data
+- **`useProfileUpdate`** (`src/presentation/hooks/useProfileUpdate.md`) - Profile editing
+
+## Related Components
+
+- **`AccountActions`** (`src/presentation/components/ProfileComponents.md`) - Account management UI

@@ -6,322 +6,294 @@ Hooks for profile update operations and profile editing form management.
 
 ## useProfileUpdate
 
-Hook for profile update operations. Implementation should be provided by the app using Firebase SDK or backend API.
+Hook for updating user profile information (display name, photo URL).
 
-### Usage
+### Strategy
 
+**Purpose**: Provides functionality to update user profile data in Firebase Auth and Firestore. Implementation provided by app using Firebase SDK.
+
+**When to Use**:
+- User profile editing screens
+- Settings screens with profile updates
+- Need to update display name or photo
+- Profile modification operations
+
+**Import Path**:
 ```typescript
 import { useProfileUpdate } from '@umituz/react-native-auth';
-
-function ProfileSettings() {
-  const { updateProfile, isUpdating, error } = useProfileUpdate();
-
-  const handleUpdate = async (data: UpdateProfileParams) => {
-    try {
-      await updateProfile(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  return <ProfileForm onSave={handleUpdate} />;
-}
 ```
 
-### API
+**Hook Location**: `src/presentation/hooks/useProfileUpdate.ts`
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `updateProfile` | `(params: UpdateProfileParams) => Promise<void>` | Profile update function |
-| `isUpdating` | `boolean` | Update in progress |
-| `error` | `string \| null` | Error message |
+### Rules
 
-### Create Your Own Implementation
+**MUST**:
+- Validate user is authenticated before updating
+- Validate input data before calling update
+- Handle loading state during update
+- Display error messages on failure
+- Update both Firebase Auth and Firestore
+- Handle anonymous users appropriately
 
-```typescript
-function useProfileUpdate() {
-  const { user } = useAuth();
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+**MUST NOT**:
+- Allow anonymous users to update profile
+- Update profile without validation
+- Expose sensitive error details
+- Allow partial updates (all-or-nothing)
 
-  const updateProfile = async (params: UpdateProfileParams) => {
-    if (!user) {
-      throw new Error("No user logged in");
-    }
+### Constraints
 
-    if (user.isAnonymous) {
-      throw new Error("Anonymous users cannot update profile");
-    }
+**PARAMETERS**:
+- `displayName?: string` - New display name
+- `photoURL?: string` - New profile photo URL
 
-    setIsUpdating(true);
-    setError(null);
+**OPERATION RULES**:
+- Updates Firebase Auth user profile
+- Updates Firestore user document
+- Transactional (both or none)
+- Auto-updates auth state
+- Triggers profile listeners
 
-    try {
-      // Update profile in Firebase Auth
-      await updateProfile(user, {
-        displayName: params.displayName,
-        photoURL: params.photoURL,
-      });
+**LIMITATIONS**:
+- Cannot update email (use separate method)
+- Cannot update password (use separate method)
+- Anonymous users cannot update
+- Requires authentication
 
-      // Update user document in Firestore
-      await updateDoc(doc(db, 'users', user.uid), {
-        displayName: params.displayName,
-        photoURL: params.photoURL,
-        updatedAt: serverTimestamp(),
-      });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Update failed';
-      setError(message);
-      throw err;
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  return { updateProfile, isUpdating, error };
-}
-```
+**ERROR HANDLING**:
+- Validation errors before API call
+- Network errors during update
+- Permission errors (user not authenticated)
+- Firebase errors
 
 ---
 
 ## useProfileEdit
 
-Hook for simple profile editing with form state management.
+Hook for managing profile editing form state and validation.
 
-### Usage
+### Strategy
 
+**Purpose**: Provides form state management for profile editing with validation and change tracking.
+
+**When to Use**:
+- Profile editing forms
+- Settings screens with profile edits
+- Need form validation for profile data
+- Want to track form modifications
+
+**Import Path**:
 ```typescript
 import { useProfileEdit } from '@umituz/react-native-auth';
-
-function EditProfileScreen({ navigation }) {
-  const {
-    formState,
-    setDisplayName,
-    setEmail,
-    setPhotoURL,
-    resetForm,
-    validateForm,
-  } = useProfileEdit({
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-    photoURL: user?.photoURL || null,
-  });
-
-  const handleSave = () => {
-    const { isValid, errors } = validateForm();
-
-    if (!isValid) {
-      Alert.alert('Error', errors.join('\n'));
-      return;
-    }
-
-    updateProfile({
-      displayName: formState.displayName,
-      photoURL: formState.photoURL,
-    });
-
-    navigation.goBack();
-  };
-
-  return (
-    <ScrollView>
-      <TextInput
-        value={formState.displayName}
-        onChangeText={setDisplayName}
-        placeholder="Full Name"
-      />
-
-      <TextInput
-        value={formState.email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        editable={false}
-      />
-
-      <AvatarUploader
-        photoURL={formState.photoURL}
-        onImageSelected={setPhotoURL}
-      />
-
-      <View style={styles.buttons}>
-        <Button onPress={navigation.goBack}>Cancel</Button>
-        <Button
-          onPress={handleSave}
-          disabled={!formState.isModified}
-        >
-          Save
-        </Button>
-      </View>
-    </ScrollView>
-  );
-}
 ```
 
-### API
+**Hook Location**: `src/presentation/hooks/useProfileUpdate.ts`
 
-#### Return Value
+### Rules
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `formState` | `ProfileEditFormState` | Form state |
-| `setDisplayName` | `(value: string) => void` | Set display name |
-| `setEmail` | `(value: string) => void` | Set email |
-| `setPhotoURL` | `(value: string \| null) => void` | Set photo URL |
-| `resetForm` | `(initial: Partial<ProfileEditFormState>) => void` | Reset form |
-| `validateForm` | `() => { isValid: boolean; errors: string[] }` | Validate form |
+**MUST**:
+- Validate form before submission
+- Show validation errors to user
+- Track form modifications
+- Handle email field as read-only
+- Provide clear error messages
+- Reset form after successful submission
 
-#### ProfileEditFormState
+**MUST NOT**:
+- Allow invalid form submission
+- Allow email modification (read-only)
+- Submit unchanged data
+- Clear form without confirmation if modified
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `displayName` | `string` | Display name |
-| `email` | `string` | Email |
-| `photoURL` | `string \| null` | Photo URL |
-| `isModified` | `boolean` | Form has been modified |
+### Constraints
 
-### Validation
+**FORM FIELDS**:
+- `displayName: string` - Editable
+- `email: string` - Read-only
+- `photoURL: string | null` - Editable
+- `isModified: boolean` - Auto-calculated
 
-`validateForm()` checks:
+**VALIDATION RULES**:
+- Display name: Cannot be empty
+- Email: Valid format (if provided)
+- Photo URL: Valid URL format (if provided)
 
-- **Display name**: Cannot be empty
-- **Email**: Valid email format (if provided)
+**RETURNED FUNCTIONS**:
+- `setDisplayName: (value: string) => void`
+- `setEmail: (value: string) => void`
+- `setPhotoURL: (value: string | null) => void`
+- `resetForm: (initial: Partial<ProfileEditFormState>) => void`
+- `validateForm: () => { isValid: boolean; errors: string[] }`
 
-```typescript
-const { isValid, errors } = validateForm();
+**CHANGE TRACKING**:
+- `isModified` automatically calculated
+- Compares current vs initial values
+- Triggers re-calculation on any change
+- Used to enable/disable save button
 
-if (!isValid) {
-  errors.forEach(error => console.log(error));
-  // ["Display name is required", "Invalid email format"]
-}
-```
+---
 
-## Examples
+## Validation Strategy
 
-### Profile Photo Upload
+### Strategy
 
-```typescript
-function ProfilePhotoSection() {
-  const { formState, setPhotoURL } = useProfileEdit(initialState);
+**Purpose**: Ensure profile data meets requirements before submission.
 
-  const handlePickImage = async () => {
-    const result = await launchImageLibrary({
-      mediaType: 'photo',
-      quality: 0.8,
-    });
+**Rules**:
+- MUST validate all fields before submission
+- MUST show clear error messages
+- MUST prevent invalid submissions
+- MUST provide real-time validation feedback
 
-    if (result.assets?.[0]) {
-      // Upload to storage and get URL
-      const url = await uploadToStorage(result.assets[0].uri);
-      setPhotoURL(url);
-    }
-  };
+**MUST NOT**:
+- Allow empty display names
+- Accept invalid email formats
+- Submit with validation errors
+- Hide validation errors
 
-  return (
-    <TouchableOpacity onPress={handlePickImage}>
-      {formState.photoURL ? (
-        <Image source={{ uri: formState.photoURL }} />
-      ) : (
-        <View style={styles.placeholder}>
-          <Text>Select Photo</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-}
-```
+### Constraints
 
-### Unsaved Changes Warning
+**DISPLAY NAME VALIDATION**:
+- Required field
+- Minimum length: 1 character
+- Maximum length: 100 characters
+- No special character restrictions
 
-```typescript
-function EditProfileScreen({ navigation }) {
-  const {
-    formState,
-    resetForm,
-    validateForm
-  } = useProfileEdit(initialState);
+**EMAIL VALIDATION**:
+- Valid email format required
+- Read-only field (cannot change)
+- Must match Firebase user email
+- Used for display only
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      if (!formState.isModified) {
-        return;
-      }
+**PHOTO URL VALIDATION**:
+- Optional field
+- Must be valid URL if provided
+- Supports HTTP, HTTPS URLs
+- Can be cleared (set to null)
 
-      e.preventDefault();
+**VALIDATION TIMING**:
+- Real-time validation on input
+- Final validation on submit
+- Clear errors on correction
+- Error messages localized
 
-      Alert.alert(
-        'Unsaved Changes',
-        'You have unsaved changes. What would you like to do?',
-        [
-          { text: 'Don\'t Save', style: 'cancel' },
-          {
-            text: 'Save',
-            onPress: () => {
-              saveChanges();
-              navigation.dispatch(e.data.action);
-            }
-          },
-          {
-            text: 'Discard',
-            style: 'destructive',
-            onPress: () => {
-              resetForm(initialState);
-              navigation.dispatch(e.data.action);
-            }
-          },
-        ]
-      );
-    });
+---
 
-    return unsubscribe;
-  }, [navigation, formState.isModified]);
+## Anonymous User Handling
 
-  // ...
-}
-```
+### Strategy
 
-### Custom Validation
+**Purpose**: Prevent profile updates from anonymous users.
 
-```typescript
-function ExtendedProfileEdit() {
-  const {
-    formState,
-    setDisplayName,
-    setEmail,
-    setPhotoURL,
-    validateForm
-  } = useProfileEdit(initialState);
+**Rules**:
+- MUST check user is not anonymous
+- MUST hide profile edit for anonymous users
+- MUST show upgrade prompt instead
+- MUST NOT allow anonymous profile updates
 
-  const handleSave = () => {
-    // Base validation
-    const { isValid, errors } = validateForm();
+**Constraints**:
+- Anonymous users cannot update profile
+- Show "Create account" prompt
+- Guide to registration
+- Preserve anonymous data during upgrade
 
-    // Custom validation
-    const customErrors = [];
+---
 
-    if (formState.displayName.length < 3) {
-      customErrors.push('Display name must be at least 3 characters');
-    }
+## Error Handling
 
-    if (formState.photoURL && !isValidImageUrl(formState.photoURL)) {
-      customErrors.push('Invalid image URL');
-    }
+### Strategy
 
-    const allErrors = [...errors, ...customErrors];
+**Purpose**: Graceful handling of profile update failures.
 
-    if (allErrors.length > 0) {
-      Alert.alert('Error', allErrors.join('\n'));
-      return;
-    }
+**Rules**:
+- MUST catch all errors during update
+- MUST show user-friendly error messages
+- MUST allow retry after failures
+- MUST not lose form data on error
 
-    saveProfile();
-  };
+**MUST NOT**:
+- Show raw error messages
+- Crash on update failures
+- Lose user input on errors
+- Block retry attempts
 
-  // ...
-}
-```
+### Constraints
+
+**ERROR TYPES**:
+- Validation errors: Before API call
+- Network errors: During update
+- Permission errors: Not authenticated
+- Firebase errors: From service
+
+**ERROR RECOVERY**:
+- Keep form data on error
+- Allow user to retry
+- Clear errors on new input
+- Show retry button
+
+---
+
+## Performance Optimization
+
+### Strategy
+
+**Purpose**: Efficient form state management and updates.
+
+**Rules**:
+- MUST minimize unnecessary re-renders
+- MUST debounce validation if expensive
+- MUST optimize form state updates
+- MUST prevent excessive recalculations
+
+**Constraints**:
+- Form state in local component
+- Efficient validation checks
+- Minimal prop drilling
+- Optimized re-render triggers
+
+---
+
+## Security Considerations
+
+### Strategy
+
+**Purpose**: Secure profile data updates.
+
+**Rules**:
+- MUST validate user owns profile
+- MUST sanitize input data
+- MUST use secure upload for photos
+- MUST not expose sensitive data
+
+**MUST NOT**:
+- Allow cross-user profile updates
+- Accept unvalidated photo URLs
+- Expose user IDs in errors
+- Log profile data with sensitive info
+
+### Constraints
+
+**PERMISSION CHECKS**:
+- User can only update own profile
+- Firebase security rules enforce
+- Server-side validation required
+- Token-based authentication
+
+**DATA SANITIZATION**:
+- Trim whitespace from names
+- Validate URL formats
+- Escape special characters
+- Prevent XSS attacks
+
+---
 
 ## Related Hooks
 
-- [`useUserProfile`](./useUserProfile.md) - Display profile data
-- [`useAuth`](./useAuth.md) - Main auth state management
-- [`useAccountManagement`](./useAccountManagement.md) - Account operations
+- **`useAuth`** (`src/presentation/hooks/useAuth.ts`) - Authentication state
+- **`useUserProfile`** (`src/presentation/hooks/useUserProfile.ts`) - Profile display data
+- **`useAccountManagement`** (`src/presentation/hooks/useAccountManagement.md`) - Account operations
+
+## Related Components
+
+- **`ProfileSection`** (`src/presentation/components/ProfileComponents.md`) - Profile display
+- **`EditProfileForm`** (`src/presentation/components/ProfileComponents.md`) - Profile editing UI
