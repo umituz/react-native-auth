@@ -1,471 +1,260 @@
 # Password Indicators
 
-Şifre validasyonu ve kullanıcı feedback'i için component'ler.
-
-## Component'ler
-
-- **[`PasswordStrengthIndicator`](#passwordstrengthindicator)** - Şifre güç göstergesi
-- **[`PasswordMatchIndicator`](#passwordmatchindicator)** - Şifre eşleşme göstergesi
+Visual components for password validation and user feedback during registration.
 
 ---
 
 ## PasswordStrengthIndicator
 
-Şifre gereksinimlerini görsel olarak gösterir. Kullanıcı şifre girdikçe hangi gereksinimleri karşıladığını gösterir.
+Displays password requirements visually and shows which requirements are met as user types.
 
-### Kullanım
+### Strategy
 
+**Purpose**: Provides real-time visual feedback on password strength to guide users toward creating secure passwords.
+
+**When to Use**:
+- Registration screens requiring password input
+- Password change screens
+- Anywhere users create/update passwords
+- Need to show password security requirements
+
+**Import Path**:
 ```typescript
 import { PasswordStrengthIndicator } from '@umituz/react-native-auth';
-
-function RegisterForm() {
-  const [password, setPassword] = useState('');
-  const requirements = validatePasswordRequirements(password);
-
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
-
-      <PasswordStrengthIndicator requirements={requirements} />
-    </View>
-  );
-}
 ```
 
-### Props
+**Component Location**: `src/presentation/components/PasswordIndicators.tsx`
 
-| Prop | Tip | Required | Default | Açıklama |
-|------|-----|----------|---------|----------|
-| `requirements` | `PasswordRequirements` | Yes | - | Şifre gereksinimleri objesi |
-| `showLabels` | `boolean` | No | `true` | Label'lar gösterilsin mi |
+**Validation Utility**: `src/infrastructure/utils/AuthValidation.ts`
 
-#### PasswordRequirements
+### Rules
 
+**MUST**:
+- Pass `requirements` object with boolean values for each requirement
+- Show indicator before user starts typing for guidance
+- Update in real-time as password changes
+- Use clear visual distinction (color/icons) for met vs unmet requirements
+- Support both labeled and compact (dots only) modes
+
+**MUST NOT**:
+- Hide requirements until after user fails validation
+- Use color alone to convey requirement status (add icons/text)
+- Allow password submission when requirements not met
+- Modify validation logic (use provided utilities)
+
+### Constraints
+
+**REQUIREMENT TYPES** (Fixed):
 ```typescript
 interface PasswordRequirements {
-  hasMinLength: boolean;      // Minimum uzunluk (varsayılan: 8)
-  hasUppercase: boolean;      // Büyük harf içeriyor
-  hasLowercase: boolean;      // Küçük harf içeriyor
-  hasNumber: boolean;         // Rakam içeriyor
-  hasSpecialChar: boolean;    // Özel karakter içeriyor
+  hasMinLength: boolean;      // Default: 8 characters
+  hasUppercase: boolean;      // A-Z
+  hasLowercase: boolean;      // a-z
+  hasNumber: boolean;         // 0-9
+  hasSpecialChar: boolean;    // Special characters
 }
 ```
 
-### Örnekler
+**DISPLAY MODES**:
+- Full mode: Labels with each requirement
+- Compact mode: Dots only (5 dots = 5 requirements)
 
-#### Tam Kullanım (Label'larla)
+**VISUAL FEEDBACK**:
+- Met requirement: Green color with checkmark
+- Unmet requirement: Gray color with dot
+- Partially met: Yellow/orange color (optional enhancement)
 
-```typescript
-function PasswordField() {
-  const [password, setPassword] = useState('');
+**CUSTOMIZATION LIMITS**:
+- Cannot add/remove requirements
+- Cannot change requirement order
+- Colors follow design system tokens
 
-  const requirements: PasswordRequirements = {
-    hasMinLength: password.length >= 8,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
+**PLATFORM SUPPORT**:
+- iOS: ✅ Fully supported
+- Android: ✅ Fully supported
+- Web: ✅ Fully supported
 
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
-
-      <PasswordStrengthIndicator
-        requirements={requirements}
-        showLabels={true}
-      />
-    </View>
-  );
-}
-```
-
-#### Sadece Dot'lar (Label'sız)
-
-```typescript
-function CompactPasswordField() {
-  const [password, setPassword] = useState('');
-
-  const requirements: PasswordRequirements = {
-    hasMinLength: password.length >= 8,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
-
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
-
-      <PasswordStrengthIndicator
-        requirements={requirements}
-        showLabels={false}
-      />
-    </View>
-  );
-}
-```
-
-#### Custom Validasyon ile
-
-```typescript
-function CustomPasswordField() {
-  const [password, setPassword] = useState('');
-
-  const requirements: PasswordRequirements = {
-    hasMinLength: password.length >= 12, // Özel: 12 karakter
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
-
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre (en az 12 karakter)"
-        secureTextEntry
-      />
-
-      <PasswordStrengthIndicator
-        requirements={requirements}
-      />
-
-      {password.length > 0 && password.length < 12 && (
-        <Text style={styles.warning}>
-          Şifre en az 12 karakter olmalıdır
-        </Text>
-      )}
-    </View>
-  );
-}
-```
-
-#### Custom Validation Hook ile
-
-```typescript
-function usePasswordValidation(minLength = 8) {
-  const [password, setPassword] = useState('');
-
-  const requirements = useMemo(() => ({
-    hasMinLength: password.length >= minLength,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  }), [password, minLength]);
-
-  const allRequirementsMet = useMemo(() =>
-    Object.values(requirements).every(Boolean),
-    [requirements]
-  );
-
-  return {
-    password,
-    setPassword,
-    requirements,
-    allRequirementsMet,
-  };
-}
-
-function RegisterForm() {
-  const { password, setPassword, requirements, allRequirementsMet } = usePasswordValidation();
-
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
-
-      <PasswordStrengthIndicator requirements={requirements} />
-
-      <Button
-        onPress={handleRegister}
-        disabled={!allRequirementsMet}
-      >
-        Kayıt Ol
-      </Button>
-    </View>
-  );
-}
-```
-
-### Görünüm
-
-Label'lı modda:
-```
-● En az 8 karakter
-● Büyük harf
-● Küçük harf
-● Rakam
-● Özel karakter
-```
-
-Label'sız modda:
-```
-● ● ● ● ●
-```
-
-Yeşil dot ✓ = Gereklilik karşılandı
-Gri dot ○ = Gereklilik karşılanmadı
+**REQUIREMENTS**:
+- Parent component must calculate requirements object
+- Must recalculate on every password change
+- Localization keys for requirement labels
 
 ---
 
 ## PasswordMatchIndicator
 
-İki şifre alanının eşleşip eşleşmediğini gösterir.
+Shows whether two password fields match in real-time.
 
-### Kullanım
+### Strategy
 
+**Purpose**: Provides immediate feedback when confirming password to prevent typos and ensure user entered intended password.
+
+**When to Use**:
+- Registration forms with password confirmation
+- Password change forms
+- Anywhere password needs to be re-entered for confirmation
+
+**Import Path**:
 ```typescript
 import { PasswordMatchIndicator } from '@umituz/react-native-auth';
-
-function RegisterForm() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const passwordsMatch = password === confirmPassword && password.length > 0;
-
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
-
-      <TextInput
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        placeholder="Şifre Tekrar"
-        secureTextEntry
-      />
-
-      <PasswordMatchIndicator isMatch={passwordsMatch} />
-    </View>
-  );
-}
 ```
 
-### Props
+**Component Location**: `src/presentation/components/PasswordIndicators.tsx`
 
-| Prop | Tip | Required | Açıklama |
-|------|-----|----------|----------|
-| `isMatch` | `boolean` | Yes | Şifreler eşleşiyor mu |
+### Rules
 
-### Örnekler
+**MUST**:
+- Only show when confirm password field has input
+- Update in real-time as user types
+- Show clear visual feedback (green = match, red = no match)
+- Display before form submission
+- Check for exact string match (case-sensitive)
 
-#### Basit Kullanım
+**MUST NOT**:
+- Show indicator before user types in confirm field
+- Allow submission if passwords don't match
+- Use ambiguous colors (red/green only, no yellow)
+- Hide indicator after initial display
 
-```typescript
-function ConfirmPasswordField() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+### Constraints
 
-  const passwordsMatch = password === confirmPassword && password.length > 0;
+**DISPLAY TRIGGERS**:
+- Show only when: `confirmPassword.length > 0`
+- Hide when: Confirm field cleared
+- Update on: Every keystroke in confirm field
 
-  return (
-    <View>
-      <TextInput
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        placeholder="Şifre Tekrar"
-        secureTextEntry
-      />
+**MATCH CRITERIA**:
+- Exact string match required
+- Case-sensitive
+- Whitespace-sensitive
+- No fuzzy matching allowed
 
-      {confirmPassword.length > 0 && (
-        <PasswordMatchIndicator isMatch={passwordsMatch} />
-      )}
-    </View>
-  );
-}
-```
+**VISUAL STATES**:
+- Match: Green color, checkmark icon, positive text
+- No Match: Red color, X icon, negative text
+- Empty: Hidden (no indicator)
 
-#### Buton Disabled State ile
+**TIMING CONSTRAINTS**:
+- No debounce (immediate feedback)
+- No animation delay
+- Instant update on keystroke
 
-```typescript
-function RegisterForm() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+**PLATFORM SUPPORT**:
+- iOS: ✅ Fully supported
+- Android: ✅ Fully supported
+- Web: ✅ Fully supported
 
-  const passwordsMatch = password === confirmPassword && password.length > 0;
-  const canSubmit = passwordsMatch && password.length >= 8;
+---
 
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
+## Combined Usage Strategy
 
-      <TextInput
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        placeholder="Şifre Tekrar"
-        secureTextEntry
-      />
+### Strategy
 
-      <PasswordMatchIndicator isMatch={passwordsMatch} />
+**Purpose**: Use both indicators together for complete password validation feedback during registration.
 
-      <Button
-        onPress={handleRegister}
-        disabled={!canSubmit}
-      >
-        Kayıt Ol
-      </Button>
-    </View>
-  );
-}
-```
+**When to Use**:
+- User registration flow
+- Password creation with confirmation
+- Need both strength requirements and match confirmation
 
-#### Custom Validation ile
+### Rules
 
-```typescript
-function SecureRegisterForm() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+**MUST**:
+- Show PasswordStrengthIndicator below password field
+- Show PasswordMatchIndicator below confirm password field
+- Calculate strength requirements on password field changes
+- Calculate match status on confirm field changes
+- Disable submit button until both: all requirements met AND passwords match
 
-  const passwordsMatch = password === confirmPassword && password.length > 0;
+**MUST NOT**:
+- Show match indicator before strength indicator
+- Allow submission with unmet requirements even if passwords match
+- Hide strength indicator after user moves to confirm field
 
-  // Şifre güvenliği kontrolü
-  const isPasswordSecure = useMemo(() => {
-    const hasMinLength = password.length >= 8;
-    const hasUppercase = /[A-Z]/.test(password);
-    const hasLowercase = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
+### Constraints
 
-    return hasMinLength && hasUppercase && hasLowercase && hasNumber;
-  }, [password]);
+**FORM FLOW**:
+1. User types password → Show strength indicator
+2. User types confirm password → Show match indicator
+3. Both valid → Enable submit button
+4. Either invalid → Disable submit button
 
-  const canSubmit = passwordsMatch && isPasswordSecure;
+**VALIDATION DEPENDENCIES**:
+- Strength validation: Password field only
+- Match validation: Both password fields
+- Submit enabled: Both validations pass
 
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
+---
 
-      <TextInput
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        placeholder="Şifre Tekrar"
-        secureTextEntry
-      />
+## Accessibility Requirements
 
-      {confirmPassword.length > 0 && (
-        <PasswordMatchIndicator isMatch={passwordsMatch} />
-      )}
+### Strategy
 
-      <Button
-        onPress={handleRegister}
-        disabled={!canSubmit}
-      >
-        Kayıt Ol
-      </Button>
-    </View>
-  );
-}
-```
+**Purpose**: Ensure password validation is accessible to all users including screen reader users.
 
-### Görünüm
+### Rules
 
-Eşleşiyor ✓:
-```
-● Şifreler eşleşiyor
-```
-(Yeşil renk)
+**MUST**:
+- Announce requirement status changes to screen readers
+- Provide text alternatives to color indicators
+- Use semantic HTML (if web)
+- Maintain high contrast for visibility
+- Support keyboard navigation
 
-Eşleşmiyor ✗:
-```
-● Şifreler eşleşmiyor
-```
-(Kırmızı renk)
+**MUST NOT**:
+- Rely on color alone to convey status
+- Use placeholder text for requirements
+- Hide requirements from screen readers
 
-## Birlikte Kullanım
+### Constraints
 
-```typescript
-function CompleteRegisterForm() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+**SCREEN READER**:
+- Announce "Password requirement met: 3 of 5"
+- Announce match status: "Passwords match" or "Passwords don't match"
+- Use ARIA live regions for dynamic updates
 
-  const requirements: PasswordRequirements = {
-    hasMinLength: password.length >= 8,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
+**VISUAL ACCESSIBILITY**:
+- Minimum contrast ratio: 4.5:1 for text
+- Color + icon for requirement status (not color alone)
+- Touch target size: 44x44px minimum (mobile)
 
-  const allRequirementsMet = Object.values(requirements).every(Boolean);
-  const passwordsMatch = password === confirmPassword && password.length > 0;
-  const canSubmit = allRequirementsMet && passwordsMatch;
+---
 
-  return (
-    <View>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Şifre"
-        secureTextEntry
-      />
+## Design System Integration
 
-      <PasswordStrengthIndicator requirements={requirements} />
+### Strategy
 
-      <TextInput
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        placeholder="Şifre Tekrar"
-        secureTextEntry
-      />
+**Purpose**: Consistent styling with application design system.
 
-      {confirmPassword.length > 0 && (
-        <PasswordMatchIndicator isMatch={passwordsMatch} />
-      )}
+### Rules
 
-      <Button
-        onPress={handleRegister}
-        disabled={!canSubmit}
-      >
-        Kayıt Ol
-      </Button>
-    </View>
-  );
-}
-```
+**MUST**:
+- Use design system color tokens for valid/invalid states
+- Follow design system spacing guidelines
+- Use design system typography
+- Match design system border radius
 
-## İlgili Component'ler
+**MUST NOT**:
+- Hardcode colors or sizes
+- Use custom icons outside design system
+- Override design system animations
 
-- [`RegisterForm`](./LoginForm.md#registerform) - Kayıt formu
-- [`useRegisterForm`](../hooks/useRegisterForm.md) - Register form hook'u
+### Constraints
 
-## İlgili Util'ler
+**TOKEN DEPENDENCIES**:
+- `tokens.colors.success` - Met requirement
+- `tokens.colors.error` - Unmet requirement
+- `tokens.spacing.md` - Indicator spacing
+- `tokens.radius.sm` - Icon border radius
 
-- [`validatePasswordForRegister`](../../infrastructure/utils/AuthValidation.ts) - Şifre validasyonu
-- [`DEFAULT_VAL_CONFIG`](../../infrastructure/utils/AuthValidation.ts) - Varsayılan validasyon konfigürasyonu
+---
+
+## Related Components
+
+- **`RegisterForm`** (`src/presentation/components/RegisterForm.tsx`) - Uses both indicators automatically
+- **`LoginForm`** (`src/presentation/components/LoginForm.tsx`) - May use strength indicator for password changes
+
+## Related Utilities
+
+- **`validatePasswordForRegister`** (`src/infrastructure/utils/AuthValidation.ts`) - Password validation logic
+- **`DEFAULT_VAL_CONFIG`** (`src/infrastructure/utils/AuthValidation.ts`) - Configuration for requirements

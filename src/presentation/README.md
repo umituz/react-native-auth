@@ -42,7 +42,7 @@ presentation/
 │   ├── AuthDivider.tsx            # Divider
 │   ├── AuthLink.tsx               # Navigation link
 │   ├── AuthErrorDisplay.tsx       # Error display
-│   ├── AuthGradientBackground.tsx # Gradient background
+│   ├── AuthBackground.tsx         # Background component
 │   └── icons/
 │       ├── GoogleIconSvg.tsx      # Google icon
 │       └── AppleIconSvg.tsx       # Apple icon
@@ -408,7 +408,7 @@ function AuthBottomSheet() {
 
 ### AuthContainer
 
-Main auth layout container with gradient background.
+Main auth layout container with background component and scroll.
 
 ```typescript
 import { AuthContainer } from '@umituz/react-native-auth';

@@ -1,19 +1,19 @@
 # Profile Components
 
-Kullanıcı profili ve hesap yönetimi için component'ler.
+Components for user profile display and account management.
 
-## Component'ler
+## Components
 
-- **[`ProfileSection`](#profilesection)** - Profil bölümü
-- **[`AccountActions`](#accountactions)** - Hesap işlemleri
+- **[`ProfileSection`](#profilesection)** - Profile display section
+- **[`AccountActions`](#accountactions)** - Account management actions
 
 ---
 
 ## ProfileSection
 
-Kullanıcı profil bilgilerini gösteren component. Avatar, isim ve kullanıcı ID'si içerir.
+Component that displays user profile information including avatar, name, and user ID.
 
-### Kullanım
+### Usage
 
 ```typescript
 import { ProfileSection } from '@umituz/react-native-auth';
@@ -37,8 +37,8 @@ function SettingsScreen() {
         }}
         onPress={() => navigation.navigate('EditProfile')}
         onSignIn={() => navigation.navigate('Login')}
-        signInText="Giriş Yap"
-        anonymousText="Misafir"
+        signInText="Sign In"
+        anonymousText="Guest"
       />
     </View>
   );
@@ -47,30 +47,30 @@ function SettingsScreen() {
 
 ### Props
 
-| Prop | Tip | Required | Açıklama |
-|------|-----|----------|----------|
-| `profile` | `ProfileSectionConfig` | Yes | Profil konfigürasyonu |
-| `onPress` | `() => void` | No | Press handler (authenticated kullanıcılar için) |
-| `onSignIn` | `() => void` | No | Sign-in handler (anonymous kullanıcılar için) |
-| `signInText` | `string` | No | "Giriş Yap" metni |
-| `anonymousText` | `string` | No | Anonymous kullanıcı metni |
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `profile` | `ProfileSectionConfig` | Yes | Profile configuration |
+| `onPress` | `() => void` | No | Press handler (for authenticated users) |
+| `onSignIn` | `() => void` | No | Sign-in handler (for anonymous users) |
+| `signInText` | `string` | No | "Sign In" button text |
+| `anonymousText` | `string` | No | Anonymous user label |
 
 #### ProfileSectionConfig
 
 ```typescript
 interface ProfileSectionConfig {
-  displayName?: string;        // Görünen ad
-  userId?: string;             // Kullanıcı ID'si
-  isAnonymous: boolean;        // Anonymous mu
-  avatarUrl?: string;          // Profil fotoğrafı URL'si
-  accountSettingsRoute?: string; // Hesap ayarları route'u
-  benefits?: string[];         // Faydalar listesi
+  displayName?: string;        // Display name
+  userId?: string;             // User ID
+  isAnonymous: boolean;        // Is anonymous user
+  avatarUrl?: string;          // Profile photo URL
+  accountSettingsRoute?: string; // Account settings route
+  benefits?: string[];         // Benefits list
 }
 ```
 
-### Örnekler
+### Examples
 
-#### Authenticated Kullanıcı
+#### Authenticated User
 
 ```typescript
 function ProfileSection() {
@@ -95,14 +95,14 @@ function ProfileSection() {
 }
 ```
 
-#### Anonymous Kullanıcı
+#### Anonymous User
 
 ```typescript
 function ProfileSection() {
   const { user } = useAuth();
 
   const profile = {
-    displayName: 'Misafir Kullanıcı',
+    displayName: 'Guest User',
     userId: undefined,
     isAnonymous: true,
     avatarUrl: undefined,
@@ -114,13 +114,13 @@ function ProfileSection() {
     <ProfileSection
       profile={profile}
       onSignIn={() => navigation.navigate('Login')}
-      signInText="Giriş Yap"
+      signInText="Sign In"
     />
   );
 }
 ```
 
-#### Benefits ile
+#### With Benefits
 
 ```typescript
 function PremiumProfileSection() {
@@ -132,9 +132,9 @@ function PremiumProfileSection() {
     isAnonymous: false,
     avatarUrl: user?.photoURL,
     benefits: [
-      'Premium içeriklere erişim',
-      'Reklamsız deneyim',
-      'Özel indirimler',
+      'Access to premium content',
+      'Ad-free experience',
+      'Exclusive discounts',
     ],
   };
 
@@ -166,11 +166,65 @@ function DynamicProfileSection() {
         isAnonymous: profile?.isAnonymous || false,
         avatarUrl: profile?.avatarUrl,
         benefits: profile?.isAnonymous
-          ? ['Hesap oluşturarak daha fazla özelliğe erişin']
-          : ['Premium üyelik alın', 'Ayrıcalıklı içeriklere erişin'],
+          ? ['Create an account to access more features']
+          : ['Get premium membership', 'Access exclusive content'],
       }}
       onPress={handlePress}
     />
+  );
+}
+```
+
+#### With Custom Avatar
+
+```typescript
+function ProfileSectionWithCustomAvatar() {
+  const { user } = useAuth();
+  const navigation = useNavigation();
+
+  const profile = {
+    displayName: user?.displayName || 'User',
+    userId: user?.uid,
+    isAnonymous: user?.isAnonymous || false,
+    avatarUrl: user?.photoURL || 'https://example.com/default-avatar.png',
+    accountSettingsRoute: 'AccountSettings',
+  };
+
+  return (
+    <ProfileSection
+      profile={profile}
+      onPress={() => navigation.navigate('EditProfile')}
+    />
+  );
+}
+```
+
+#### With Edit Indicator
+
+```typescript
+function ProfileSectionWithEditIndicator() {
+  const profile = useUserProfile();
+  const navigation = useNavigation();
+
+  return (
+    <View>
+      <ProfileSection
+        profile={{
+          displayName: profile?.displayName,
+          userId: profile?.userId,
+          isAnonymous: profile?.isAnonymous || false,
+          avatarUrl: profile?.avatarUrl,
+          accountSettingsRoute: 'AccountSettings',
+        }}
+        onPress={() => navigation.navigate('EditProfile')}
+      />
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() => navigation.navigate('EditProfile')}
+      >
+        <Text>Edit Profile</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 ```
@@ -179,9 +233,9 @@ function DynamicProfileSection() {
 
 ## AccountActions
 
-Hesap yönetimi işlemlerini içeren component. Çıkış yapma, şifre değiştirme ve hesap silme butonlarını sağlar.
+Component for account management operations including sign out, password change, and account deletion.
 
-### Kullanım
+### Usage
 
 ```typescript
 import { AccountActions } from '@umituz/react-native-auth';
@@ -191,15 +245,15 @@ function AccountSettingsScreen() {
   const navigation = useNavigation();
 
   const config = {
-    logoutText: 'Çıkış Yap',
-    deleteAccountText: 'Hesabı Sil',
-    changePasswordText: 'Şifre Değiştir',
-    logoutConfirmTitle: 'Çıkış Yap',
-    logoutConfirmMessage: 'Çıkış yapmak istediğinizden emin misiniz?',
-    deleteConfirmTitle: 'Hesabı Sil',
-    deleteConfirmMessage: 'Bu işlem geri alınamaz. Devam etmek istiyor musunuz?',
-    deleteErrorTitle: 'Hata',
-    deleteErrorMessage: 'Hesap silinemedi. Lütfen tekrar deneyin.',
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    changePasswordText: 'Change Password',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure you want to sign out?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'This action cannot be undone. Continue?',
+    deleteErrorTitle: 'Error',
+    deleteErrorMessage: 'Account could not be deleted. Please try again.',
     onLogout: async () => {
       await logout();
       navigation.replace('Login');
@@ -224,45 +278,45 @@ function AccountSettingsScreen() {
 
 ### Props
 
-| Prop | Tip | Required | Açıklama |
-|------|-----|----------|----------|
-| `config` | `AccountActionsConfig` | Yes | Hesap işlemleri konfigürasyonu |
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `config` | `AccountActionsConfig` | Yes | Account actions configuration |
 
 #### AccountActionsConfig
 
 ```typescript
 interface AccountActionsConfig {
-  logoutText: string;                  // "Çıkış Yap" butonu metni
-  deleteAccountText: string;           // "Hesabı Sil" butonu metni
-  changePasswordText?: string;         // "Şifre Değiştir" butonu metni
-  logoutConfirmTitle: string;          // Çıkış onay başlığı
-  logoutConfirmMessage: string;        // Çıkış onay mesajı
-  deleteConfirmTitle: string;          // Silme onay başlığı
-  deleteConfirmMessage: string;        // Silme onay mesajı
-  deleteErrorTitle?: string;           // Silme hata başlığı
-  deleteErrorMessage?: string;         // Silme hata mesajı
-  onLogout: () => Promise<void>;       // Çıkış handler
-  onDeleteAccount: () => Promise<void>; // Silme handler
-  onChangePassword?: () => void;       // Şifre değiştirme handler
-  showChangePassword?: boolean;        // Şifre değiştirme butonu göster
+  logoutText: string;                  // "Sign Out" button text
+  deleteAccountText: string;           // "Delete Account" button text
+  changePasswordText?: string;         // "Change Password" button text
+  logoutConfirmTitle: string;          // Sign out confirmation title
+  logoutConfirmMessage: string;        // Sign out confirmation message
+  deleteConfirmTitle: string;          // Delete confirmation title
+  deleteConfirmMessage: string;        // Delete confirmation message
+  deleteErrorTitle?: string;           // Delete error title
+  deleteErrorMessage?: string;         // Delete error message
+  onLogout: () => Promise<void>;       // Sign out handler
+  onDeleteAccount: () => Promise<void>; // Delete handler
+  onChangePassword?: () => void;       // Change password handler
+  showChangePassword?: boolean;        // Show change password button
 }
 ```
 
-### Örnekler
+### Examples
 
-#### Basit Kullanım
+#### Basic Usage
 
 ```typescript
 function SimpleAccountActions() {
   const { logout, deleteAccount } = useAccountManagement();
 
   const config = {
-    logoutText: 'Çıkış Yap',
-    deleteAccountText: 'Hesabı Sil',
-    logoutConfirmTitle: 'Çıkış Yap',
-    logoutConfirmMessage: 'Çıkış yapmak istiyor musunuz?',
-    deleteConfirmTitle: 'Hesabı Sil',
-    deleteConfirmMessage: 'Hesabınızı silmek istediğinizden emin misiniz?',
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure you want to sign out?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'Are you sure you want to delete your account?',
     onLogout: logout,
     onDeleteAccount: deleteAccount,
   };
@@ -271,7 +325,7 @@ function SimpleAccountActions() {
 }
 ```
 
-#### Şifre Değiştirme ile
+#### With Password Change
 
 ```typescript
 function AccountActionsWithPasswordChange() {
@@ -279,13 +333,13 @@ function AccountActionsWithPasswordChange() {
   const navigation = useNavigation();
 
   const config = {
-    logoutText: 'Çıkış Yap',
-    deleteAccountText: 'Hesabı Sil',
-    changePasswordText: 'Şifre Değiştir',
-    logoutConfirmTitle: 'Çıkış Yap',
-    logoutConfirmMessage: 'Çıkış yapmak istiyor musunuz?',
-    deleteConfirmTitle: 'Hesabı Sil',
-    deleteConfirmMessage: 'Hesabınızı silmek istediğinizden emin misiniz?',
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    changePasswordText: 'Change Password',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure you want to sign out?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'Are you sure you want to delete your account?',
     onLogout: async () => {
       await logout();
       navigation.replace('Login');
@@ -304,7 +358,7 @@ function AccountActionsWithPasswordChange() {
 }
 ```
 
-#### Custom Error Handling
+#### With Custom Error Handling
 
 ```typescript
 function AccountActionsWithErrorHandling() {
@@ -312,29 +366,29 @@ function AccountActionsWithErrorHandling() {
   const navigation = useNavigation();
 
   const config = {
-    logoutText: 'Çıkış Yap',
-    deleteAccountText: 'Hesabı Sil',
-    logoutConfirmTitle: 'Çıkış Yap',
-    logoutConfirmMessage: 'Çıkış yapmak istiyor musunuz?',
-    deleteConfirmTitle: 'Hesabı Sil',
-    deleteConfirmMessage: 'Bu işlem geri alınamaz. Emin misiniz?',
-    deleteErrorTitle: 'Hesap Silinemedi',
-    deleteErrorMessage: 'Hesabınız silinirken bir hata oluştu. Lütfen daha sonra tekrar deneyin veya destek ile iletişime geçin.',
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure you want to sign out?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'This action cannot be undone. Continue?',
+    deleteErrorTitle: 'Account Deletion Failed',
+    deleteErrorMessage: 'An error occurred while deleting your account. Please try again later or contact support.',
     onLogout: async () => {
       try {
         await logout();
         navigation.replace('Login');
       } catch (error) {
-        Alert.alert('Hata', 'Çıkış yapılamadı');
+        Alert.alert('Error', 'Failed to sign out');
       }
     },
     onDeleteAccount: async () => {
       try {
         await deleteAccount();
-        Alert.alert('Başarılı', 'Hesabınız silindi');
+        Alert.alert('Success', 'Your account has been deleted');
         navigation.replace('Login');
       } catch (error) {
-        // Hata otomatik olarak gösterilir (deleteErrorMessage)
+        // Error is automatically shown (deleteErrorMessage)
         throw error;
       }
     },
@@ -344,7 +398,7 @@ function AccountActionsWithErrorHandling() {
 }
 ```
 
-#### Anonymous Kullanıcı İçin
+#### For Anonymous Users
 
 ```typescript
 function AccountActionsAnonymous() {
@@ -353,18 +407,18 @@ function AccountActionsAnonymous() {
   if (isAnonymous) {
     return (
       <Button onPress={() => navigation.navigate('Register')}>
-        Hesap Oluştur
+        Create Account
       </Button>
     );
   }
 
   const config = {
-    logoutText: 'Çıkış Yap',
-    deleteAccountText: 'Hesabı Sil',
-    logoutConfirmTitle: 'Çıkış Yap',
-    logoutConfirmMessage: 'Çıkış yapmak istiyor musunuz?',
-    deleteConfirmTitle: 'Hesabı Sil',
-    deleteConfirmMessage: 'Hesabınızı silmek istediğinizden emin misiniz?',
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure you want to sign out?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'Are you sure you want to delete your account?',
     onLogout: logout,
     onDeleteAccount: deleteAccount,
   };
@@ -373,7 +427,70 @@ function AccountActionsAnonymous() {
 }
 ```
 
-## Birlikte Kullanım
+#### With Loading States
+
+```typescript
+function AccountActionsWithLoading() {
+  const { logout, deleteAccount, isLoading, isDeletingAccount } = useAccountManagement();
+  const navigation = useNavigation();
+
+  const config = {
+    logoutText: isLoading ? 'Signing out...' : 'Sign Out',
+    deleteAccountText: isDeletingAccount ? 'Deleting...' : 'Delete Account',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'This cannot be undone. Continue?',
+    onLogout: async () => {
+      await logout();
+      navigation.replace('Login');
+    },
+    onDeleteAccount: async () => {
+      await deleteAccount();
+      navigation.replace('Login');
+    },
+  };
+
+  return (
+    <AccountActions
+      config={config}
+      isLoading={isLoading}
+      isDeletingAccount={isDeletingAccount}
+    />
+  );
+}
+```
+
+#### With Analytics
+
+```typescript
+function AccountActionsWithAnalytics() {
+  const { logout, deleteAccount } = useAccountManagement();
+  const analytics = useAnalytics();
+
+  const config = {
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'This cannot be undone.',
+    onLogout: async () => {
+      analytics.trackEvent('account_logout');
+      await logout();
+    },
+    onDeleteAccount: async () => {
+      analytics.trackEvent('account_delete_initiated');
+      await deleteAccount();
+      analytics.trackEvent('account_delete_completed');
+    },
+  };
+
+  return <AccountActions config={config} />;
+}
+```
+
+## Combined Usage
 
 ```typescript
 function AccountSettingsScreen() {
@@ -383,7 +500,7 @@ function AccountSettingsScreen() {
 
   return (
     <ScrollView>
-      {/* Profil bölümü */}
+      {/* Profile section */}
       <ProfileSection
         profile={{
           displayName: profile?.displayName,
@@ -394,16 +511,16 @@ function AccountSettingsScreen() {
         onPress={() => navigation.navigate('EditProfile')}
       />
 
-      {/* Hesap işlemleri */}
+      {/* Account actions */}
       {!profile?.isAnonymous && (
         <AccountActions
           config={{
-            logoutText: 'Çıkış Yap',
-            deleteAccountText: 'Hesabı Sil',
-            logoutConfirmTitle: 'Çıkış Yap',
-            logoutConfirmMessage: 'Çıkış yapmak istiyor musunuz?',
-            deleteConfirmTitle: 'Hesabı Sil',
-            deleteConfirmMessage: 'Bu işlem geri alınamaz. Emin misiniz?',
+            logoutText: 'Sign Out',
+            deleteAccountText: 'Delete Account',
+            logoutConfirmTitle: 'Sign Out',
+            logoutConfirmMessage: 'Are you sure you want to sign out?',
+            deleteConfirmTitle: 'Delete Account',
+            deleteConfirmMessage: 'This action cannot be undone. Continue?',
             onLogout: async () => {
               await logout();
               navigation.replace('Login');
@@ -420,13 +537,39 @@ function AccountSettingsScreen() {
 }
 ```
 
-## İlgili Component'ler
+## Styling
 
-- [`EditProfileForm`](./EditProfileForm.md) - Profil düzenleme formu
-- [`EditProfileAvatar`](./EditProfileAvatar.md) - Profil fotoğrafı düzenleme
+Components use design system tokens:
 
-## İlgili Hook'lar
+```typescript
+{
+  colors: {
+    primary: tokens.colors.primary,
+    danger: tokens.colors.error,
+    text: tokens.colors.textPrimary,
+    background: tokens.colors.background,
+  },
+  spacing: tokens.spacing,
+}
+```
 
-- [`useUserProfile`](../hooks/useUserProfile.md) - Profil verileri hook'u
-- [`useAccountManagement`](../hooks/useAccountManagement.md) - Hesap yönetimi hook'u
-- [`useAuth`](../hooks/useAuth.md) - Ana auth state yönetimi
+## Accessibility
+
+Components include accessibility features:
+
+- ✅ Screen reader labels
+- ✅ Accessibility hints
+- ✅ Proper touch targets
+- ✅ High contrast support
+- ✅ Semantic button labels
+
+## Related Components
+
+- [`EditProfileForm`](./README.md) - Profile editing form
+- [`EditProfileAvatar`](./README.md) - Profile photo editing
+
+## Related Hooks
+
+- [`useUserProfile`](../hooks/useUserProfile.md) - Profile data hook
+- [`useAccountManagement`](../hooks/useAccountManagement.md) - Account management hook
+- [`useAuth`](../hooks/useAuth.md) - Main auth state management

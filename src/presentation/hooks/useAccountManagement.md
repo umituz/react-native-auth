@@ -1,15 +1,15 @@
 # useAccountManagement
 
-Hesap yönetimi işlemleri için hook. Çıkış yapma ve hesap silme işlevselliği sağlar.
+Hook for account management operations (logout, delete account).
 
-## Özellikler
+## Features
 
-- Güvenli çıkış yapma
-- Hesap silme (reauthentication gerektirir)
-- Reauthentication callback desteği
-- Loading state yönetimi
+- Sign out functionality
+- Account deletion with reauthentication
+- Reauthentication callback support
+- Loading state management
 
-## Kullanım
+## Usage
 
 ```typescript
 import { useAccountManagement } from '@umituz/react-native-auth';
@@ -17,58 +17,21 @@ import { useAccountManagement } from '@umituz/react-native-auth';
 function AccountSettings() {
   const { logout, deleteAccount, isLoading, isDeletingAccount } = useAccountManagement({
     onReauthRequired: async () => {
-      // Google/Apple ile yeniden authentication
+      // Show Google/Apple sign-in UI
       const result = await reauthenticateWithGoogle();
       return result.success;
     },
     onPasswordRequired: async () => {
-      // Şifre prompt göster
+      // Show password prompt
       const password = await showPasswordPrompt();
       return password;
     },
   });
 
-  const handleLogout = async () => {
-    Alert.alert(
-      'Çıkış Yap',
-      'Çıkış yapmak istediğinizden emin misiniz?',
-      [
-        { text: 'İptal', style: 'cancel' },
-        {
-          text: 'Çıkış',
-          onPress: logout,
-        },
-      ]
-    );
-  };
-
-  const handleDeleteAccount = async () => {
-    Alert.alert(
-      'Hesabı Sil',
-      'Bu işlem geri alınamaz. Hesabınızı silmek istediğinizden emin misiniz?',
-      [
-        { text: 'İptal', style: 'cancel' },
-        {
-          text: 'Sil',
-          style: 'destructive',
-          onPress: deleteAccount,
-        },
-      ]
-    );
-  };
-
   return (
     <View>
-      <Button onPress={handleLogout} disabled={isLoading}>
-        Çıkış Yap
-      </Button>
-      <Button
-        onPress={handleDeleteAccount}
-        disabled={isDeletingAccount}
-        style={{ backgroundColor: 'red' }}
-      >
-        {isDeletingAccount ? 'Siliniyor...' : 'Hesabı Sil'}
-      </Button>
+      <Button onPress={logout}>Sign Out</Button>
+      <Button onPress={deleteAccount}>Delete Account</Button>
     </View>
   );
 }
@@ -78,122 +41,43 @@ function AccountSettings() {
 
 ### Parameters
 
-| Param | Tip | Required | Açıklama |
-|-------|------|----------|----------|
-| `onReauthRequired` | `() => Promise<boolean>` | No | Google/Apple ile yeniden authentication callback'i |
-| `onPasswordRequired` | `() => Promise<string \| null>` | No | Şifre ile yeniden authentication callback'i |
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `onReauthRequired` | `() => Promise<boolean>` | No | Callback for Google/Apple reauthentication |
+| `onPasswordRequired` | `() => Promise<string \| null>` | No | Callback for password reauthentication |
 
 ### Return Value
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `logout` | `() => Promise<void>` | Çıkış yapma fonksiyonu |
-| `deleteAccount` | `() => Promise<void>` | Hesap silme fonksiyonu |
-| `isLoading` | `boolean` | Genel loading durumu |
-| `isDeletingAccount` | `boolean` | Hesap silme loading durumu |
+| Prop | Type | Description |
+|------|------|-------------|
+| `logout` | `() => Promise<void>` | Sign out function |
+| `deleteAccount` | `() => Promise<void>` | Delete account function |
+| `isLoading` | `boolean` | General loading state |
+| `isDeletingAccount` | `boolean` | Account deletion loading state |
 
-## Reauthentication
+## Examples
 
-Hesap silme işlemi hassas bir işlem olduğu için Firebase, kullanıcının son zamanlarda giriş yapmasını gerektirir. Bu hook size reauthentication için callback'ler sağlar.
-
-### onReauthRequired
-
-Google veya Apple ile giriş yapmış kullanıcılar için:
-
-```typescript
-const { deleteAccount } = useAccountManagement({
-  onReauthRequired: async () => {
-    try {
-      // Google ile yeniden authentication
-      const result = await signInWithGooglePopup();
-
-      if (result.user) {
-        Alert.alert('Başarılı', 'Lütfen hesap silme işlemine devam edin');
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      Alert.alert('Hata', 'Reauthentication başarısız');
-      return false;
-    }
-  },
-});
-```
-
-### onPasswordRequired
-
-Email/password ile giriş yapmış kullanıcılar için:
-
-```typescript
-const { deleteAccount } = useAccountManagement({
-  onPasswordRequired: async () => {
-    return new Promise((resolve) => {
-      // Şifre prompt göster
-      Alert.prompt(
-        'Şifre Girin',
-        'Hesabınızı silmek için şifrenizi girin',
-        [
-          {
-            text: 'İptal',
-            onPress: () => resolve(null),
-            style: 'cancel',
-          },
-          {
-            text: 'Tamam',
-            onPress: (password) => resolve(password || null),
-          },
-        ],
-        'secure-text'
-      );
-    });
-  },
-});
-```
-
-## Örnekler
-
-### Basit Hesap Ayarları Ekranı
+### Simple Account Settings
 
 ```typescript
 function AccountSettingsScreen() {
   const { logout, deleteAccount, isDeletingAccount } = useAccountManagement();
-  const navigation = useNavigation();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigation.replace('Login');
-    } catch (error) {
-      Alert.alert('Hata', 'Çıkış yapılamadı');
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    try {
-      await deleteAccount();
-      navigation.replace('Login');
-      Alert.alert('Başarılı', 'Hesabınız silindi');
-    } catch (error) {
-      Alert.alert('Hata', 'Hesap silinemedi');
-    }
-  };
 
   return (
     <ScrollView style={styles.container}>
-      <Section title="Oturum">
+      <Section title="Session">
         <MenuItem
-          title="Çıkış Yap"
+          title="Sign Out"
           icon="log-out"
-          onPress={handleLogout}
+          onPress={logout}
         />
       </Section>
 
-      <Section title="Tehlikeli Bölge">
+      <Section title="Danger Zone">
         <MenuItem
-          title="Hesabı Sil"
+          title="Delete Account"
           icon="trash"
-          onPress={handleDeleteAccount}
+          onPress={deleteAccount}
           destructive
           disabled={isDeletingAccount}
         />
@@ -204,12 +88,59 @@ function AccountSettingsScreen() {
 }
 ```
 
+### With Reauthentication
+
+```typescript
+function AccountSettingsScreen() {
+  const { logout, deleteAccount } = useAccountManagement({
+    onReauthRequired: async () => {
+      try {
+        // Reauthenticate with Google
+        const result = await signInWithGooglePopup();
+
+        if (result.user) {
+          Alert.alert('Success', 'Please continue with account deletion');
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        Alert.alert('Error', 'Reauthentication failed');
+        return false;
+      }
+    },
+    onPasswordRequired: async () => {
+      return new Promise((resolve) => {
+        // Show password prompt
+        Alert.prompt(
+          'Enter Password',
+          'Please enter your password to delete your account',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => resolve(null),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: (password) => resolve(password || null),
+            },
+          ],
+          'secure-text'
+        );
+      });
+    },
+  });
+
+  // ...
+}
+```
+
 ### Custom Reauthentication UI
 
 ```typescript
 function DeleteAccountScreen() {
   const [showReauth, setShowReauth] = useState(false);
-  const [reauthMethod, setReauthMethod] = useState<'password' | 'google' | 'apple'>('password');
 
   const { deleteAccount, isDeletingAccount } = useAccountManagement({
     onReauthRequired: async () => {
@@ -221,8 +152,7 @@ function DeleteAccountScreen() {
           resolve(success);
         };
 
-        // UI'ı göster ve sonucu bekle
-        showCustomReauthUI(reauthMethod, handleResult);
+        showCustomReauthUI(handleResult);
       });
     },
     onPasswordRequired: async () => {
@@ -240,23 +170,22 @@ function DeleteAccountScreen() {
   const handleDelete = async () => {
     try {
       await deleteAccount();
-      Alert.alert('Başarılı', 'Hesabınız silindi');
+      Alert.alert('Success', 'Account deleted');
     } catch (error) {
-      Alert.alert('Hata', error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
   return (
     <View>
       <Button onPress={handleDelete} disabled={isDeletingAccount}>
-        Hesabı Sil
+        Delete Account
       </Button>
 
       {showReauth && (
         <ReauthenticationModal
-          method={reauthMethod}
           onComplete={() => {
-            // Reauthentication başarılı, deleteAccount devam eder
+            // Reauthentication successful, deleteAccount continues
           }}
         />
       )}
@@ -265,7 +194,7 @@ function DeleteAccountScreen() {
 }
 ```
 
-### Hesap Silme Onayı
+### Delete Account Confirmation
 
 ```typescript
 function DeleteAccountConfirmation() {
@@ -274,17 +203,17 @@ function DeleteAccountConfirmation() {
 
   const handleDelete = async () => {
     if (!agreed) {
-      Alert.alert('Uyarı', 'Lütfen koşulları kabul edin');
+      Alert.alert('Warning', 'Please accept the terms');
       return;
     }
 
     Alert.alert(
-      'Hesabı Sil',
-      'Bu işlem geri alınamaz. Devam etmek istediğinizden emin misiniz?',
+      'Delete Account',
+      'This action cannot be undone. Are you sure?',
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: deleteAccount,
         },
@@ -295,16 +224,16 @@ function DeleteAccountConfirmation() {
   return (
     <View>
       <Text style={styles.warning}>
-        Hesabınızı silerseniz:
+        By deleting your account:
       </Text>
-      <Text>• Tüm verileriniz kalıcı olarak silinir</Text>
-      <Text>• İşlemler geri alınamaz</Text>
-      <Text>• Aynı hesapla tekrar giriş yapamazsınız</Text>
+      <Text>• All your data will be permanently deleted</Text>
+      <Text>• This action cannot be undone</Text>
+      <Text>• You won't be able to sign in with the same account</Text>
 
       <CheckBox
         value={agreed}
         onValueChange={setAgreed}
-        label="Hesap silme koşullarını kabul ediyorum"
+        label="I accept the account deletion terms"
       />
 
       <Button
@@ -312,27 +241,58 @@ function DeleteAccountConfirmation() {
         disabled={!agreed || isDeletingAccount}
         style={{ backgroundColor: 'red' }}
       >
-        {isDeletingAccount ? 'Siliniyor...' : 'Hesabı Kalıcı Olarak Sil'}
+        {isDeletingAccount ? 'Deleting...' : 'Permanently Delete Account'}
       </Button>
     </View>
   );
 }
 ```
 
-## Hata Yönetimi
+### Anonymous User Handling
 
 ```typescript
-function AccountSettings() {
+function AccountActionsAnonymous() {
+  const { isAnonymous } = useAuth();
+
+  if (isAnonymous) {
+    return (
+      <Button onPress={() => navigation.navigate('Register')}>
+        Create Account
+      </Button>
+    );
+  }
+
+  const config = {
+    logoutText: 'Sign Out',
+    deleteAccountText: 'Delete Account',
+    logoutConfirmTitle: 'Sign Out',
+    logoutConfirmMessage: 'Are you sure you want to sign out?',
+    deleteConfirmTitle: 'Delete Account',
+    deleteConfirmMessage: 'Are you sure you want to delete your account?',
+    onLogout: logout,
+    onDeleteAccount: deleteAccount,
+  };
+
+  return <AccountActions config={config} />;
+}
+```
+
+## Error Handling
+
+```typescript
+function AccountSettingsWithErrorHandling() {
   const { logout, deleteAccount } = useAccountManagement();
+  const navigation = useNavigation();
 
   const handleLogout = async () => {
     try {
       await logout();
+      navigation.replace('Login');
     } catch (error) {
       if (error.code === 'auth/network-request-failed') {
-        Alert.alert('Bağlantı Hatası', 'İnternet bağlantınızı kontrol edin');
+        Alert.alert('Connection Error', 'Check your internet connection');
       } else {
-        Alert.alert('Hata', 'Çıkış yapılamadı');
+        Alert.alert('Error', 'Failed to sign out');
       }
     }
   };
@@ -340,41 +300,87 @@ function AccountSettings() {
   const handleDeleteAccount = async () => {
     try {
       await deleteAccount();
+      Alert.alert('Success', 'Account deleted');
+      navigation.replace('Login');
     } catch (error) {
       if (error.code === 'auth/requires-recent-login') {
         Alert.alert(
-          'Giriş Gerekiyor',
-          'Hesabınızı silmek için lütfen tekrar giriş yapın'
+          'Authentication Required',
+          'Please sign in again to delete your account'
         );
       } else if (error.code === 'auth/too-many-requests') {
         Alert.alert(
-          'Çok Fazla Deneme',
-          'Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin'
+          'Too Many Attempts',
+          'Too many failed attempts. Please try again later'
         );
       } else {
-        Alert.alert('Hata', 'Hesap silinemedi');
+        Alert.alert('Error', 'Failed to delete account');
       }
     }
   };
 
   return (
     <View>
-      <Button onPress={handleLogout}>Çıkış Yap</Button>
-      <Button onPress={handleDeleteAccount}>Hesabı Sil</Button>
+      <Button onPress={handleLogout}>Sign Out</Button>
+      <Button onPress={handleDeleteAccount}>Delete Account</Button>
     </View>
   );
 }
 ```
 
-## Önemli Notlar
+## Important Notes
 
-1. **Reauthentication Gerekli**: Firebase, hesap silme işlemi için son zamanlarda giriş yapmayı gerektirir
-2. **Anonymous Kullanıcılar**: Anonymous hesaplar silinemez
-3. **Geri Alınamaz**: Hesap silme işlemi geri alınamaz
-4. **Callback'ler**: `onReauthRequired` ve `onPasswordRequired` callback'lerini sağlamazsanız, hatalar fırlatılır
+1. **Reauthentication Required**: Firebase requires recent sign-in for account deletion
+2. **Anonymous Users**: Anonymous accounts cannot be deleted
+3. **Irreversible**: Account deletion is permanent
+4. **Callbacks**: If `onReauthRequired` and `onPasswordRequired` are not provided, errors will be thrown
 
-## İlgili Hooks
+## Reauthentication
 
-- [`useAuth`](./useAuth.md) - Ana auth state yönetimi
-- [`useSignOut`](./useAuth.md) - Çıkış yapma fonksiyonu
-- [`useUserProfile`](./useUserProfile.md) - Profil bilgileri
+Account deletion is a sensitive operation, so Firebase requires the user to have signed in recently. This hook provides reauthentication callbacks:
+
+### onReauthRequired
+
+For Google or Apple sign-in users:
+
+```typescript
+const { deleteAccount } = useAccountManagement({
+  onReauthRequired: async () => {
+    try {
+      // Reauthenticate with Google
+      const result = await signInWithGooglePopup();
+      return result.user ? true : false;
+    } catch (error) {
+      return false;
+    }
+  },
+});
+```
+
+### onPasswordRequired
+
+For email/password users:
+
+```typescript
+const { deleteAccount } = useAccountManagement({
+  onPasswordRequired: async () => {
+    return new Promise((resolve) => {
+      Alert.prompt(
+        'Enter Password',
+        'Please enter your password',
+        [
+          { text: 'Cancel', onPress: () => resolve(null), style: 'cancel' },
+          { text: 'OK', onPress: (password) => resolve(password || null) },
+        ],
+        'secure-text'
+      );
+    });
+  },
+});
+```
+
+## Related Hooks
+
+- [`useAuth`](./useAuth.md) - Main auth state management
+- [`useSignOut`](./useAuth.md) - Sign out function
+- [`useUserProfile`](./useUserProfile.md) - Profile information

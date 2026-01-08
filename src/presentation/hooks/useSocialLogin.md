@@ -1,20 +1,14 @@
 # Social Login Hooks
 
-Google ve Apple ile social authentication işlemleri için hooks.
-
-## Hooks
-
-- **[`useSocialLogin`](#usesociallogin)** - Genel social login yönetimi
-- **[`useGoogleAuth`](#usegoogleauth)** - Google ile giriş (OAuth flow)
-- **[`useAppleAuth`](#useappleauth)** - Apple ile giriş
+Hooks for Google and Apple social authentication.
 
 ---
 
 ## useSocialLogin
 
-Genel social login işlevselliği sağlar. `@umituz/react-native-firebase` paketinin `useSocialAuth` hook'unu wrap'ler.
+General social login functionality. Wraps `@umituz/react-native-firebase`'s `useSocialAuth`.
 
-### Kullanım
+### Usage
 
 ```typescript
 import { useSocialLogin } from '@umituz/react-native-auth';
@@ -29,26 +23,20 @@ function LoginScreen() {
     appleAvailable,
   } = useSocialLogin({
     google: {
-      webClientId: 'your-web-client-id.apps.googleusercontent.com',
-      iosClientId: 'your-ios-client-id.apps.googleusercontent.com',
+      webClientId: 'your-web-client-id',
+      iosClientId: 'your-ios-client-id',
     },
     apple: { enabled: true },
   });
 
   return (
     <View>
-      <Button
-        onPress={signInWithGoogle}
-        disabled={googleLoading || !googleConfigured}
-      >
-        {googleLoading ? 'Giriş yapılıyor...' : 'Google ile Giriş'}
+      <Button onPress={signInWithGoogle} disabled={googleLoading || !googleConfigured}>
+        {googleLoading ? 'Signing in...' : 'Sign in with Google'}
       </Button>
 
-      <Button
-        onPress={signInWithApple}
-        disabled={appleLoading || !appleAvailable}
-      >
-        {appleLoading ? 'Giriş yapılıyor...' : 'Apple ile Giriş'}
+      <Button onPress={signInWithApple} disabled={appleLoading || !appleAvailable}>
+        {appleLoading ? 'Signing in...' : 'Sign in with Apple'}
       </Button>
     </View>
   );
@@ -57,47 +45,22 @@ function LoginScreen() {
 
 ### API
 
-#### Parameters
-
-| Param | Tip | Açıklama |
-|-------|------|----------|
-| `config` | `UseSocialLoginConfig` | Social auth konfigürasyonu |
-
-#### UseSocialLoginConfig
-
-```typescript
-interface UseSocialLoginConfig {
-  google?: {
-    iosClientId?: string;
-    webClientId?: string;
-    androidClientId?: string;
-  };
-  apple?: {
-    enabled: boolean;
-  };
-}
-```
-
-#### Return Value
-
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `signInWithGoogle` | `() => Promise<SocialAuthResult>` | Google ile giriş (Not: `useGoogleAuth` kullanın) |
-| `signInWithApple` | `() => Promise<SocialAuthResult>` | Apple ile giriş |
-| `googleLoading` | `boolean` | Google giriş loading durumu |
-| `appleLoading` | `boolean` | Apple giriş loading durumu |
-| `googleConfigured` | `boolean` | Google yapılandırılmış mı |
-| `appleAvailable` | `boolean` | Apple mevcut mu (sadece iOS) |
-
-**Not:** `signInWithGoogle` için tam OAuth flow'u `useGoogleAuth` hook'unu kullanın.
+| Prop | Type | Description |
+|------|------|-------------|
+| `signInWithGoogle` | `() => Promise<SocialAuthResult>` | Google sign-in (use `useGoogleAuth` for OAuth) |
+| `signInWithApple` | `() => Promise<SocialAuthResult>` | Apple sign-in |
+| `googleLoading` | `boolean` | Google loading state |
+| `appleLoading` | `boolean` | Apple loading state |
+| `googleConfigured` | `boolean` | Google is configured |
+| `appleAvailable` | `boolean` | Apple is available (iOS only) |
 
 ---
 
 ## useGoogleAuth
 
-Google OAuth flow'unu `expo-auth-session` kullanarak yönetir ve Firebase authentication ile entegre eder.
+Handles complete Google OAuth flow with `expo-auth-session`.
 
-### Kullanım
+### Usage
 
 ```typescript
 import { useGoogleAuth } from '@umituz/react-native-auth';
@@ -106,25 +69,21 @@ function LoginScreen() {
   const { signInWithGoogle, googleLoading, googleConfigured } = useGoogleAuth({
     iosClientId: 'your-ios-client-id.apps.googleusercontent.com',
     webClientId: 'your-web-client-id.apps.googleusercontent.com',
-    androidClientId: 'your-android-client-id.apps.googleusercontent.com',
   });
 
   const handleGoogleSignIn = async () => {
     const result = await signInWithGoogle();
 
     if (result.success) {
-      console.log('Google ile giriş başarılı');
+      console.log('Google sign-in successful');
     } else {
-      Alert.alert('Hata', result.error || 'Giriş başarısız');
+      Alert.alert('Error', result.error || 'Sign-in failed');
     }
   };
 
   return (
-    <Button
-      onPress={handleGoogleSignIn}
-      disabled={googleLoading || !googleConfigured}
-    >
-      {googleLoading ? 'Giriş yapılıyor...' : 'Google ile Giriş'}
+    <Button onPress={handleGoogleSignIn} disabled={googleLoading || !googleConfigured}>
+      Sign in with Google
     </Button>
   );
 }
@@ -134,25 +93,25 @@ function LoginScreen() {
 
 #### Parameters
 
-| Param | Tip | Required | Açıklama |
-|-------|------|----------|----------|
-| `iosClientId` | `string` | No* | iOS için Google Client ID |
-| `webClientId` | `string` | No* | Web için Google Client ID |
-| `androidClientId` | `string` | No* | Android için Google Client ID |
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `iosClientId` | `string` | No* | iOS Google Client ID |
+| `webClientId` | `string` | No* | Web Google Client ID |
+| `androidClientId` | `string` | No* | Android Google Client ID |
 
-*En az biri sağlanmalıdır.
+*At least one must be provided
 
 #### Return Value
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `signInWithGoogle` | `() => Promise<SocialAuthResult>` | Google ile giriş fonksiyonu |
-| `googleLoading` | `boolean` | Loading durumu |
-| `googleConfigured` | `boolean` | Yapılandırılmış mı |
+| Prop | Type | Description |
+|------|------|-------------|
+| `signInWithGoogle` | `() => Promise<SocialAuthResult>` | Google sign-in function |
+| `googleLoading` | `boolean` | Loading state |
+| `googleConfigured` | `boolean` | Is configured |
 
-### Örnekler
+### Examples
 
-#### Google ile Giriş Ekranı
+#### Google Sign-In Screen
 
 ```typescript
 function SocialLoginScreen() {
@@ -165,7 +124,7 @@ function SocialLoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Giriş Yap</Text>
+      <Text style={styles.title}>Sign In</Text>
 
       <TouchableOpacity
         style={styles.googleButton}
@@ -177,7 +136,7 @@ function SocialLoginScreen() {
         ) : (
           <>
             <GoogleIcon />
-            <Text>Google ile devam et</Text>
+            <Text>Continue with Google</Text>
           </>
         )}
       </TouchableOpacity>
@@ -193,7 +152,7 @@ function SocialLoginScreen() {
           ) : (
             <>
               <AppleIcon />
-              <Text>Apple ile devam et</Text>
+              <Text>Continue with Apple</Text>
             </>
           )}
         </TouchableOpacity>
@@ -203,7 +162,7 @@ function SocialLoginScreen() {
 }
 ```
 
-#### Hata Yönetimi
+#### Error Handling
 
 ```typescript
 function LoginWithErrorHandling() {
@@ -216,25 +175,16 @@ function LoginWithErrorHandling() {
       const result = await signInWithGoogle();
 
       if (result.success) {
-        // Başarılı giriş
         navigation.navigate('Home');
       } else {
-        // Hata durumunda
+        // User cancelled or error
         if (result.error?.includes('cancelled')) {
-          // Kullanıcı iptal etti
-          return;
+          return; // Silent cancel
         }
-
-        Alert.alert(
-          'Giriş Hatası',
-          result.error || 'Google ile giriş yapılamadı'
-        );
+        Alert.alert('Error', result.error || 'Google sign-in failed');
       }
     } catch (error) {
-      Alert.alert(
-        'Beklenmeyen Hata',
-        'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
-      );
+      Alert.alert('Error', 'An unexpected error occurred');
     }
   };
 
@@ -246,9 +196,9 @@ function LoginWithErrorHandling() {
 
 ## useAppleAuth
 
-Apple Sign-In işlevselliği sağlar. Sadece iOS'ta mevcuttur.
+Convenience wrapper for Apple Sign-In.
 
-### Kullanım
+### Usage
 
 ```typescript
 import { useAppleAuth } from '@umituz/react-native-auth';
@@ -258,7 +208,7 @@ function LoginScreen() {
   const { signInWithApple, appleLoading, appleAvailable } = useAppleAuth();
 
   if (Platform.OS !== 'ios' || !appleAvailable) {
-    return null; // Apple sadece iOS'ta çalışır
+    return null;
   }
 
   return (
@@ -272,7 +222,7 @@ function LoginScreen() {
       ) : (
         <>
           <AppleIcon />
-          <Text>Apple ile Giriş</Text>
+          <Text>Sign in with Apple</Text>
         </>
       )}
     </TouchableOpacity>
@@ -282,17 +232,13 @@ function LoginScreen() {
 
 ### API
 
-#### Return Value
+| Prop | Type | Description |
+|------|------|-------------|
+| `signInWithApple` | `() => Promise<SocialAuthResult>` | Apple sign-in function |
+| `appleLoading` | `boolean` | Loading state |
+| `appleAvailable` | `boolean` | Apple Sign-In is available (iOS only) |
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `signInWithApple` | `() => Promise<SocialAuthResult>` | Apple ile giriş fonksiyonu |
-| `appleLoading` | `boolean` | Loading durumu |
-| `appleAvailable` | `boolean` | Apple Sign-In mevcut mu (iOS only) |
-
-### Örnekler
-
-#### Platform-Specific Apple Button
+### Platform-Specific Button
 
 ```typescript
 function SocialLoginButtons() {
@@ -303,14 +249,14 @@ function SocialLoginButtons() {
 
   return (
     <View>
-      {/* Google - tüm platformlar */}
+      {/* Google - all platforms */}
       <SocialButton
         provider="google"
         onPress={signInWithGoogle}
         loading={googleLoading}
       />
 
-      {/* Apple - sadece iOS */}
+      {/* Apple - iOS only */}
       {Platform.OS === 'ios' && appleAvailable && (
         <SocialButton
           provider="apple"
@@ -323,7 +269,7 @@ function SocialLoginButtons() {
 }
 ```
 
-#### Apple ile Giriş ve Hata Yönetimi
+### Apple Sign-In with Error Handling
 
 ```typescript
 function AppleLoginButton() {
@@ -333,14 +279,13 @@ function AppleLoginButton() {
     const result = await signInWithApple();
 
     if (result.success) {
-      console.log('Apple ile giriş başarılı');
-      // Kullanıcıyı ana ekrana yönlendir
+      console.log('Apple sign-in successful');
     } else {
-      // Hata yönetimi
+      // Handle error
       if (result.error?.includes('cancelled')) {
-        console.log('Kullanıcı iptal etti');
+        console.log('User cancelled');
       } else {
-        Alert.alert('Hata', result.error || 'Apple ile giriş yapılamadı');
+        Alert.alert('Error', result.error || 'Apple sign-in failed');
       }
     }
   };
@@ -351,7 +296,7 @@ function AppleLoginButton() {
 
   return (
     <TouchableOpacity onPress={handleAppleSignIn} disabled={appleLoading}>
-      <Text>Apple ile Giriş</Text>
+      <Text>Sign in with Apple</Text>
     </TouchableOpacity>
   );
 }
@@ -359,7 +304,7 @@ function AppleLoginButton() {
 
 ## SocialAuthResult
 
-Tüm social login fonksiyonları aynı result tipini döner:
+All social login functions return the same type:
 
 ```typescript
 interface SocialAuthResult {
@@ -369,43 +314,43 @@ interface SocialAuthResult {
 }
 ```
 
-## Konfigürasyon
+## Configuration
 
-### Google Client ID Almak
+### Get Google Client ID
 
-1. [Google Cloud Console](https://console.cloud.google.com/)'a gidin
-2. Yeni bir proje oluşturun veya mevcut projeyi seçin
-3. "APIs & Services" > "Credentials" sayfasına gidin
-4. "OAuth 2.0 Client IDs" oluşturun:
-   - **iOS**: iOS uygulamanız için
-   - **Android**: Android uygulamanız için
-   - **Web**: Expo/web için
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Navigate to "APIs & Services" > "Credentials"
+4. Create "OAuth 2.0 Client IDs":
+   - **iOS**: For your iOS app
+   - **Android**: For your Android app
+   - **Web**: For Expo/web
 
-### Apple Sign-In Konfigürasyonu
+### Configure Apple Sign-In
 
-1. [Apple Developer](https://developer.apple.com/)'da gidin
-2. "Certificates, Identifiers & Profiles" > "Identifiers"
-3. App ID'nizi seçin ve "Sign In with Apple"ı enable edin
-4. Firebase Console'da Apple Sign-In'i enable edin
+1. Go to [Apple Developer](https://developer.apple.com/)
+2. Navigate to "Certificates, Identifiers & Profiles" > "Identifiers"
+3. Select your App ID and enable "Sign In with Apple"
+4. Enable Apple Sign-In in Firebase Console
 
-## Önemli Notlar
+## Important Notes
 
 ### Google
-- `expo-web-browser` kurulumu gerekir
-- `WebBrowser.maybeCompleteAuthSession()` app root'ta çağrılmalı
-- En az bir client ID sağlanmalıdır
+- Requires `expo-web-browser` setup
+- `WebBrowser.maybeCompleteAuthSession()` must be called in app root
+- At least one client ID must be provided
 
 ### Apple
-- Sadece iOS'ta mevcuttur
-- `expo-apple-authentication` kurulumu gerekir
-- Apple Developer hesabı gerekir
-- Test için cihaz gereklidir (simulator'de çalışmayabilir)
+- Only available on iOS
+- Requires `expo-apple-authentication` setup
+- Requires Apple Developer account
+- Testing requires a physical device (may not work in simulator)
 
-## İlgili Hook'lar
+## Related Hooks
 
-- [`useAuth`](./useAuth.md) - Ana auth state yönetimi
-- [`useSocialLogin`](#usesociallogin) - Genel social login yönetimi
+- [`useAuth`](./useAuth.md) - Main auth state management
+- [`useSocialLogin`](#usesociallogin) - General social login
 
-## İlgili Component'ler
+## Related Components
 
-- [`SocialLoginButtons`](../components/SocialLoginButtons.md) - Social login button component'i
+- [`SocialLoginButtons`](../components/SocialLoginButtons.md) - Social login button component

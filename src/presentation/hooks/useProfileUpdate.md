@@ -1,14 +1,14 @@
 # useProfileUpdate & useProfileEdit
 
-Profil güncelleme ve düzenleme işlemleri için hooks.
+Hooks for profile update operations and profile editing form management.
+
+---
 
 ## useProfileUpdate
 
-Profil güncelleme işlemleri için hook. Bu hook implementasyon provides app tarafından sağlanmalıdır.
+Hook for profile update operations. Implementation should be provided by the app using Firebase SDK or backend API.
 
-**Not:** Bu hook placeholder olarak sağlanmıştır. Gerçek implementasyon için Firebase SDK veya backend API kullanın.
-
-### Kullanım
+### Usage
 
 ```typescript
 import { useProfileUpdate } from '@umituz/react-native-auth';
@@ -19,30 +19,24 @@ function ProfileSettings() {
   const handleUpdate = async (data: UpdateProfileParams) => {
     try {
       await updateProfile(data);
-      // Başarılı
     } catch (err) {
-      // Hata yönetimi
+      console.error(err);
     }
   };
 
-  return (
-    <View>
-      {/* Profile form */}
-      {error && <Text>{error}</Text>}
-    </View>
-  );
+  return <ProfileForm onSave={handleUpdate} />;
 }
 ```
 
 ### API
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `updateProfile` | `(params: UpdateProfileParams) => Promise<void>` | Profil güncelleme fonksiyonu |
-| `isUpdating` | `boolean` | Güncelleme durumunda |
-| `error` | `string \| null` | Hata mesajı |
+| Prop | Type | Description |
+|------|------|-------------|
+| `updateProfile` | `(params: UpdateProfileParams) => Promise<void>` | Profile update function |
+| `isUpdating` | `boolean` | Update in progress |
+| `error` | `string \| null` | Error message |
 
-### Kendi Implementasyonunuzu Oluşturma
+### Create Your Own Implementation
 
 ```typescript
 function useProfileUpdate() {
@@ -50,7 +44,7 @@ function useProfileUpdate() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateProfile = useCallback(async (params: UpdateProfileParams) => {
+  const updateProfile = async (params: UpdateProfileParams) => {
     if (!user) {
       throw new Error("No user logged in");
     }
@@ -63,13 +57,13 @@ function useProfileUpdate() {
     setError(null);
 
     try {
-      // Firebase SDK kullanarak profil güncelleme
+      // Update profile in Firebase Auth
       await updateProfile(user, {
         displayName: params.displayName,
         photoURL: params.photoURL,
       });
 
-      // Firestore'da kullanıcı dokümanını güncelleme
+      // Update user document in Firestore
       await updateDoc(doc(db, 'users', user.uid), {
         displayName: params.displayName,
         photoURL: params.photoURL,
@@ -82,7 +76,7 @@ function useProfileUpdate() {
     } finally {
       setIsUpdating(false);
     }
-  }, [user]);
+  };
 
   return { updateProfile, isUpdating, error };
 }
@@ -92,23 +86,21 @@ function useProfileUpdate() {
 
 ## useProfileEdit
 
-Profil düzenleme form state yönetimi için hook. Form validasyonu ve değişiklik takibi sağlar.
+Hook for simple profile editing with form state management.
 
-### Kullanım
+### Usage
 
 ```typescript
 import { useProfileEdit } from '@umituz/react-native-auth';
 
 function EditProfileScreen({ navigation }) {
-  const { user } = useAuth();
-
   const {
     formState,
     setDisplayName,
     setEmail,
     setPhotoURL,
     resetForm,
-    validateForm
+    validateForm,
   } = useProfileEdit({
     displayName: user?.displayName || '',
     email: user?.email || '',
@@ -119,11 +111,10 @@ function EditProfileScreen({ navigation }) {
     const { isValid, errors } = validateForm();
 
     if (!isValid) {
-      Alert.alert('Hata', errors.join('\n'));
+      Alert.alert('Error', errors.join('\n'));
       return;
     }
 
-    // Profil güncelleme işlemi
     updateProfile({
       displayName: formState.displayName,
       photoURL: formState.photoURL,
@@ -132,45 +123,19 @@ function EditProfileScreen({ navigation }) {
     navigation.goBack();
   };
 
-  const handleCancel = () => {
-    if (formState.isModified) {
-      Alert.alert(
-        'Değişiklikler kaydedilmedi',
-        'Yapılan değişiklikler iptal edilsin mi?',
-        [
-          { text: 'İptal', style: 'cancel' },
-          {
-            text: 'Tamam',
-            onPress: () => {
-              resetForm({
-                displayName: user?.displayName || '',
-                email: user?.email || '',
-                photoURL: user?.photoURL || null,
-              });
-              navigation.goBack();
-            }
-          },
-        ]
-      );
-    } else {
-      navigation.goBack();
-    }
-  };
-
   return (
     <ScrollView>
       <TextInput
         value={formState.displayName}
         onChangeText={setDisplayName}
-        placeholder="Ad Soyad"
+        placeholder="Full Name"
       />
 
       <TextInput
         value={formState.email}
         onChangeText={setEmail}
         placeholder="Email"
-        keyboardType="email-address"
-        editable={false} // Email genellikle değiştirilemez
+        editable={false}
       />
 
       <AvatarUploader
@@ -179,12 +144,12 @@ function EditProfileScreen({ navigation }) {
       />
 
       <View style={styles.buttons}>
-        <Button onPress={handleCancel}>İptal</Button>
+        <Button onPress={navigation.goBack}>Cancel</Button>
         <Button
           onPress={handleSave}
           disabled={!formState.isModified}
         >
-          Kaydet
+          Save
         </Button>
       </View>
     </ScrollView>
@@ -196,30 +161,30 @@ function EditProfileScreen({ navigation }) {
 
 #### Return Value
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `formState` | `ProfileEditFormState` | Form state'i |
-| `setDisplayName` | `(value: string) => void` | Display name set etme |
-| `setEmail` | `(value: string) => void` | Email set etme |
-| `setPhotoURL` | `(value: string \| null) => void` | Photo URL set etme |
-| `resetForm` | `(initial: Partial<ProfileEditFormState>) => void` | Formu sıfırlama |
-| `validateForm` | `() => { isValid: boolean; errors: string[] }` | Form validasyonu |
+| Prop | Type | Description |
+|------|------|-------------|
+| `formState` | `ProfileEditFormState` | Form state |
+| `setDisplayName` | `(value: string) => void` | Set display name |
+| `setEmail` | `(value: string) => void` | Set email |
+| `setPhotoURL` | `(value: string \| null) => void` | Set photo URL |
+| `resetForm` | `(initial: Partial<ProfileEditFormState>) => void` | Reset form |
+| `validateForm` | `() => { isValid: boolean; errors: string[] }` | Validate form |
 
 #### ProfileEditFormState
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `displayName` | `string` | Görünen ad |
-| `email` | `string` | Email adresi |
-| `photoURL` | `string \| null` | Profil fotoğrafı URL'si |
-| `isModified` | `boolean` | Form değiştirildi mi |
+| Prop | Type | Description |
+|------|------|-------------|
+| `displayName` | `string` | Display name |
+| `email` | `string` | Email |
+| `photoURL` | `string \| null` | Photo URL |
+| `isModified` | `boolean` | Form has been modified |
 
-### Validasyon
+### Validation
 
-`validateForm()` fonksiyonu şu kontrolleri yapar:
+`validateForm()` checks:
 
-- **Display name**: Boş olamaz
-- **Email**: Geçerli email formatı kontrolü
+- **Display name**: Cannot be empty
+- **Email**: Valid email format (if provided)
 
 ```typescript
 const { isValid, errors } = validateForm();
@@ -230,15 +195,13 @@ if (!isValid) {
 }
 ```
 
-### Örnekler
+## Examples
 
-#### Profil Fotoğrafı Yükleme
+### Profile Photo Upload
 
 ```typescript
 function ProfilePhotoSection() {
-  const { formState, setPhotoURL } = useProfileEdit({
-    photoURL: user?.photoURL,
-  });
+  const { formState, setPhotoURL } = useProfileEdit(initialState);
 
   const handlePickImage = async () => {
     const result = await launchImageLibrary({
@@ -259,7 +222,7 @@ function ProfilePhotoSection() {
         <Image source={{ uri: formState.photoURL }} />
       ) : (
         <View style={styles.placeholder}>
-          <Text>Fotoğraf Seç</Text>
+          <Text>Select Photo</Text>
         </View>
       )}
     </TouchableOpacity>
@@ -267,7 +230,7 @@ function ProfilePhotoSection() {
 }
 ```
 
-#### Değişiklik Uyarısı
+### Unsaved Changes Warning
 
 ```typescript
 function EditProfileScreen({ navigation }) {
@@ -286,12 +249,12 @@ function EditProfileScreen({ navigation }) {
       e.preventDefault();
 
       Alert.alert(
-        'Değişiklikler kaydedilmedi',
-        'Yapılan değişiklikler kaydedilsin mi?',
+        'Unsaved Changes',
+        'You have unsaved changes. What would you like to do?',
         [
-          { text: 'İptal', style: 'cancel' },
+          { text: 'Don\'t Save', style: 'cancel' },
           {
-            text: 'Kaydet',
+            text: 'Save',
             onPress: () => {
               saveChanges();
               navigation.dispatch(e.data.action);
@@ -316,7 +279,7 @@ function EditProfileScreen({ navigation }) {
 }
 ```
 
-#### Custom Validasyon
+### Custom Validation
 
 ```typescript
 function ExtendedProfileEdit() {
@@ -329,28 +292,27 @@ function ExtendedProfileEdit() {
   } = useProfileEdit(initialState);
 
   const handleSave = () => {
-    // Base validasyon
+    // Base validation
     const { isValid, errors } = validateForm();
 
-    // Custom validasyon
+    // Custom validation
     const customErrors = [];
 
     if (formState.displayName.length < 3) {
-      customErrors.push('Display name en az 3 karakter olmalı');
+      customErrors.push('Display name must be at least 3 characters');
     }
 
     if (formState.photoURL && !isValidImageUrl(formState.photoURL)) {
-      customErrors.push('Geçersiz resim URL');
+      customErrors.push('Invalid image URL');
     }
 
     const allErrors = [...errors, ...customErrors];
 
     if (allErrors.length > 0) {
-      Alert.alert('Hata', allErrors.join('\n'));
+      Alert.alert('Error', allErrors.join('\n'));
       return;
     }
 
-    // Kaydet
     saveProfile();
   };
 
@@ -358,8 +320,8 @@ function ExtendedProfileEdit() {
 }
 ```
 
-## İlgili Hooks
+## Related Hooks
 
-- [`useUserProfile`](./useUserProfile.md) - Profil verilerini görüntüleme
-- [`useAuth`](./useAuth.md) - Ana auth state yönetimi
-- [`useAccountManagement`](./useAccountManagement.md) - Hesap yönetimi işlemleri
+- [`useUserProfile`](./useUserProfile.md) - Display profile data
+- [`useAuth`](./useAuth.md) - Main auth state management
+- [`useAccountManagement`](./useAccountManagement.md) - Account operations

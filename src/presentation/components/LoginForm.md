@@ -1,331 +1,222 @@
 # LoginForm & RegisterForm
 
-Authentication formları için hazır component'ler.
+Pre-built authentication form components for email/password login and registration.
 
 ---
 
 ## LoginForm
 
-Email ve şifre ile giriş formu.
+Email and password login form component with built-in validation.
 
-### Kullanım
+### Strategy
 
+**Purpose**: Provides a complete login form with email/password validation, error handling, and loading states without needing to build from scratch.
+
+**When to Use**:
+- Standard email/password authentication flow
+- Need quick login screen implementation
+- Want built-in validation and error handling
+
+**Import Path**:
 ```typescript
 import { LoginForm } from '@umituz/react-native-auth';
-
-function LoginScreen() {
-  const navigation = useNavigation();
-
-  return (
-    <View>
-      <LoginForm
-        onNavigateToRegister={() => navigation.navigate('Register')}
-      />
-    </View>
-  );
-}
 ```
 
-### Props
+**Component Location**: `src/presentation/components/LoginForm.tsx`
 
-| Prop | Tip | Required | Açıklama |
-|------|-----|----------|----------|
-| `onNavigateToRegister` | `() => void` | Yes | Kayıt ekranına navigasyon |
+### Rules
 
-### Özellikler
+**MUST**:
+- Provide `onNavigateToRegister` callback for navigation to registration screen
+- Use within an auth container or proper layout wrapper
+- Handle loading states during authentication
+- Display error messages from validation
 
-- ✅ Email validasyonu
-- ✅ Şifre validasyonu
-- ✅ Loading state
-- ✅ Hata gösterimi
-- ✅ Keyboard navigation (Enter ile sonraki alana geçiş)
-- ✅ Localisation desteği
-- ✅ Disabled state (boş alanlar)
+**MUST NOT**:
+- Modify internal form validation logic
+- Override keyboard navigation behavior
+- Bypass built-in error handling
 
-### Örnekler
+### Constraints
 
-#### Basit Kullanım
+**LIMITATIONS**:
+- Only supports email/password authentication (use social login components separately)
+- Validation rules are fixed (email format, password required)
+- Error messages follow localization keys
+- Form layout is predefined
 
-```typescript
-function LoginScreen() {
-  const navigation = useNavigation();
+**PLATFORM SUPPORT**:
+- iOS: ✅ Fully supported
+- Android: ✅ Fully supported
+- Web: ✅ Fully supported
 
-  return (
-    <AuthContainer>
-      <AuthHeader title="Giriş Yap" />
-      <LoginForm
-        onNavigateToRegister={() => navigation.navigate('Register')}
-      />
-    </AuthContainer>
-  );
-}
-```
-
-#### Social Login ile
-
-```typescript
-function LoginScreen() {
-  const navigation = useNavigation();
-  const { signInWithGoogle, signInWithApple } = useSocialLogin();
-
-  return (
-    <AuthContainer>
-      <AuthHeader title="Giriş Yap" />
-
-      <LoginForm
-        onNavigateToRegister={() => navigation.navigate('Register')}
-      />
-
-      <AuthDivider text="veya" />
-
-      <SocialLoginButtons
-        onGoogleSignIn={signInWithGoogle}
-        onAppleSignIn={signInWithApple}
-      />
-    </AuthContainer>
-  );
-}
-```
-
-#### Custom AuthContainer ile
-
-```typescript
-function CustomLoginScreen() {
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Logo />
-        <Text style={styles.title}>Hoşgeldiniz</Text>
-        <Text style={styles.subtitle}>Devam etmek için giriş yapın</Text>
-      </View>
-
-      <View style={styles.formContainer}>
-        <LoginForm
-          onNavigateToRegister={() => navigation.navigate('Register')}
-        />
-      </View>
-
-      <View style={styles.footer}>
-        <AuthLegalLinks />
-      </View>
-    </ScrollView>
-  );
-}
-```
+**REQUIREMENTS**:
+- Parent component must handle navigation
+- Authentication context/provider must be configured
+- Localization keys must be defined
 
 ---
 
 ## RegisterForm
 
-Kullanıcı kayıt formu. DisplayName, email, şifre ve şifre tekrar alanlarını içerir.
+User registration form with display name, email, password, and confirm password fields.
 
-### Kullanım
+### Strategy
 
+**Purpose**: Provides complete registration flow with password strength indicator, validation, and terms acceptance.
+
+**When to Use**:
+- Standard user registration flow
+- Need password strength requirements
+- Require terms/privacy acceptance
+
+**Import Path**:
 ```typescript
 import { RegisterForm } from '@umituz/react-native-auth';
-
-function RegisterScreen() {
-  const navigation = useNavigation();
-
-  return (
-    <View>
-      <RegisterForm
-        onNavigateToLogin={() => navigation.navigate('Login')}
-        onTermsPress={() => navigation.navigate('Terms')}
-        onPrivacyPress={() => navigation.navigate('Privacy')}
-      />
-    </View>
-  );
-}
 ```
 
-### Props
+**Component Location**: `src/presentation/components/RegisterForm.tsx`
 
-| Prop | Tip | Required | Açıklama |
-|------|-----|----------|----------|
-| `onNavigateToLogin` | `() => void` | Yes | Giriş ekranına navigasyon |
-| `termsUrl` | `string` | No | Kullanım şartları URL |
-| `privacyUrl` | `string` | No | Gizlilik politikası URL |
-| `onTermsPress` | `() => void` | No | Kullanım şartları butonu handler |
-| `onPrivacyPress` | `() => void` | No | Gizlilik politikası butonu handler |
+### Rules
 
-### Özellikler
+**MUST**:
+- Provide `onNavigateToLogin` callback for navigation back to login
+- Provide terms/privacy URLs or handlers
+- Display password strength indicator to users
+- Handle terms acceptance before submission
 
-- ✅ DisplayName validasyonu
-- ✅ Email validasyonu
-- ✅ Şifre validasyonu
-- ✅ Şifre eşleşme kontrolü
-- ✅ Şifre güç göstergesi
-- ✅ Loading state
-- ✅ Hata gösterimi
-- ✅ KVKK/Kullanım şartları kabulü
-- ✅ Keyboard navigation
+**MUST NOT**:
+- Allow registration without terms acceptance
+- Disable password validation
+- Bypass email verification flow (if enabled)
 
-### Örnekler
+### Constraints
 
-#### Basit Kullanım
+**LIMITATIONS**:
+- Password requirements are fixed (8+ chars, uppercase, lowercase, number, special char)
+- Terms/privacy links must be provided
+- Form fields are predefined (display name, email, password, confirm password)
+- Cannot add custom validation rules
 
-```typescript
-function RegisterScreen() {
-  const navigation = useNavigation();
+**VALIDATION REQUIREMENTS**:
+- Display name: Required, cannot be empty
+- Email: Required, must be valid format
+- Password: Required, must meet complexity requirements
+- Confirm Password: Required, must match password
 
-  return (
-    <AuthContainer>
-      <AuthHeader title="Kayıt Ol" />
-      <RegisterForm
-        onNavigateToLogin={() => navigation.navigate('Login')}
-      />
-    </AuthContainer>
-  );
-}
-```
+**PLATFORM SUPPORT**:
+- iOS: ✅ Fully supported
+- Android: ✅ Fully supported
+- Web: ✅ Fully supported
 
-#### Legal Links ile
+---
 
-```typescript
-function RegisterScreen() {
-  const navigation = useNavigation();
+## Form Validation
 
-  return (
-    <AuthContainer>
-      <AuthHeader title="Kayıt Ol" />
-      <RegisterForm
-        onNavigateToLogin={() => navigation.navigate('Login')}
-        termsUrl="https://example.com/terms"
-        privacyUrl="https://example.com/privacy"
-      />
-    </AuthContainer>
-  );
-}
-```
+### Strategy
 
-#### Custom Handlers ile
+**Purpose**: Built-in validation ensures user input meets security requirements before submission.
 
-```typescript
-function RegisterScreen() {
-  const navigation = useNavigation();
+**Validation Utility Location**: `src/infrastructure/utils/AuthValidation.ts`
 
-  const handleTermsPress = () => {
-    navigation.navigate('WebView', {
-      url: 'https://example.com/terms',
-      title: 'Kullanım Şartları',
-    });
-  };
+### Rules
 
-  const handlePrivacyPress = () => {
-    navigation.navigate('WebView', {
-      url: 'https://example.com/privacy',
-      title: 'Gizlilik Politikası',
-    });
-  };
+**MUST**:
+- Use `validateEmail` for email format validation
+- Use `validatePasswordForRegister` for password requirements
+- Display validation errors to users
+- Prevent submission with invalid data
 
-  return (
-    <AuthContainer>
-      <AuthHeader title="Kayıt Ol" />
-      <RegisterForm
-        onNavigateToLogin={() => navigation.navigate('Login')}
-        onTermsPress={handleTermsPress}
-        onPrivacyPress={handlePrivacyPress}
-      />
-    </AuthContainer>
-  );
-}
-```
+**MUST NOT**:
+- Allow empty required fields
+- Bypass password complexity requirements
+- Submit with mismatched passwords
 
-#### Social Login ile
+### Constraints
 
-```typescript
-function RegisterScreen() {
-  const navigation = useNavigation();
-  const { signInWithGoogle, signInWithApple } = useSocialLogin();
+**PASSWORD REQUIREMENTS** (Default):
+- Minimum length: 8 characters
+- Must contain: Uppercase letter
+- Must contain: Lowercase letter
+- Must contain: Number
+- Must contain: Special character
 
-  return (
-    <AuthContainer>
-      <AuthHeader title="Kayıt Ol" />
+**EMAIL REQUIREMENTS**:
+- Valid email format (user@domain.com)
+- Cannot be empty
 
-      <RegisterForm
-        onNavigateToLogin={() => navigation.navigate('Login')}
-      />
+**CONFIGURABLE SETTINGS**:
+See `DEFAULT_VAL_CONFIG` in `AuthValidation.ts`
 
-      <AuthDivider text="veya şununla devam et" />
+---
 
-      <SocialLoginButtons
-        onGoogleSignIn={signInWithGoogle}
-        onAppleSignIn={signInWithApple}
-      />
-    </AuthContainer>
-  );
-}
-```
+## Error Handling
 
-## Form Validasyonu
+### Strategy
 
-### LoginForm Validasyonları
+**Purpose**: Clear user feedback for validation and authentication errors.
 
-| Alan | Validasyon |
-|------|------------|
-| Email | Boş olamaz, geçerli email formatı |
-| Password | Boş olamaz |
+### Rules
 
-### RegisterForm Validasyonları
+**MUST**:
+- Display field-level validation errors
+- Show authentication errors (wrong password, user not found, etc.)
+- Provide clear error messages in user's language
+- Allow retry after error
 
-| Alan | Validasyon |
-|------|------------|
-| DisplayName | Boş olamaz |
-| Email | Boş olamaz, geçerli email formatı |
-| Password | Boş olamaz, minimum uzunluk, karmaşıklık |
-| Confirm Password | Boş olamaz, password ile eşleşmeli |
+**MUST NOT**:
+- Show raw error codes to users
+- Expose sensitive information in errors
+- Block user indefinitely after errors
 
-## Password Requirements
+### Constraints
 
-RegisterForm otomatik olarak şifre gereksinimlerini kontrol eder:
+**ERROR TYPES**:
+- Validation errors: Red text below input field
+- Network errors: Alert or banner message
+- Authentication errors: Clear message with retry option
 
-```typescript
-{
-  minLength: 8,
-  requireUppercase: true,
-  requireLowercase: true,
-  requireNumbers: true,
-  requireSpecialChars: true,
-}
-```
+**LOCALIZATION**:
+All error messages must use localization keys from i18n configuration.
 
-## Şifre Güç Göstergesi
+---
 
-RegisterForm otomatik olarak [`PasswordStrengthIndicator`](./PasswordStrengthIndicator.md) ve [`PasswordMatchIndicator`](./PasswordMatchIndicator.md) component'lerini kullanır:
+## Accessibility
 
-```typescript
-// Kullanıcı şifre girdikçe
-// 1. Şifre gücü gösterilir (Zayıf/Orta/Güçlü)
-// 2. Şifreler eşleşiyor mu gösterilir
-```
+### Strategy
 
-## Hata Yönetimi
+**Purpose**: Ensure forms are accessible to all users including screen reader users.
 
-Form component'leri otomatik olarak hataları gösterir:
+### Rules
 
-```typescript
-// Email hatalı
-<input state="error" helperText="Geçersiz email formatı" />
+**MUST**:
+- Provide labels for all input fields
+- Announce errors to screen readers
+- Support keyboard navigation
+- Maintain proper focus order
 
-// Şifre çok kısa
-<input state="error" helperText="Şifre en az 8 karakter olmalı" />
+**MUST NOT**:
+- Rely on color alone for error indication
+- Use placeholder text as labels
+- Disrupt screen reader navigation
 
-// Genel hata (Firebase, network vb.)
-<AuthErrorDisplay error="Şifre hatalı" />
-```
+### Constraints
 
-## İlgili Component'ler
+**WCAG COMPLIANCE**:
+- Minimum contrast ratios for text
+- Touch target size: 44x44px minimum
+- Focus indicators on all interactive elements
+- Screen reader announcements for state changes
 
-- [`AuthContainer`](./AuthContainer.md) - Layout container
-- [`AuthHeader`](./AuthHeader.md) - Header component'i
-- [`PasswordStrengthIndicator`](./PasswordStrengthIndicator.md) - Şifre güç göstergesi
-- [`PasswordMatchIndicator`](./PasswordMatchIndicator.md) - Şifre eşleşme göstergesi
-- [`SocialLoginButtons`](./SocialLoginButtons.md) - Social login butonları
-- [`AuthLegalLinks`](./AuthLegalLinks.md) - Legal links
+---
 
-## İlgili Hook'lar
+## Related Components
 
-- [`useLoginForm`](../hooks/useLoginForm.md) - Login form state yönetimi
-- [`useRegisterForm`](../hooks/useRegisterForm.md) - Register form state yönetimi
-- [`useAuth`](../hooks/useAuth.md) - Ana auth state yönetimi
+- **`PasswordStrengthIndicator`** (`src/presentation/components/PasswordIndicators.tsx`) - Visual password requirements display
+- **`PasswordMatchIndicator`** (`src/presentation/components/PasswordIndicators.tsx`) - Password confirmation feedback
+- **`SocialLoginButtons`** (`src/presentation/components/SocialLoginButtons.tsx`) - Social authentication integration
+
+## Related Hooks
+
+- **`useAuth`** (`src/presentation/hooks/useAuth.ts`) - Main authentication state management
+- **`useSocialLogin`** (`src/presentation/hooks/useSocialLogin.ts`) - Social authentication handlers

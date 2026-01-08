@@ -1,16 +1,16 @@
 # useAuthBottomSheet
 
-Authentication bottom sheet yönetimi için hook. Login/Register modal'ını göstermek, yönetmek ve social authentication işlemlerini gerçekleştirmek için kullanılır.
+Hook for authentication bottom sheet management. Handles login/register modal display and social authentication.
 
-## Özellikler
+## Features
 
-- Bottom sheet modal yönetimi
-- Login/Register mod değiştirme
-- Social authentication entegrasyonu
-- Otomatik kapanma (başarılı authentication sonrası)
-- Pending callback yönetimi
+- Bottom sheet modal management
+- Login/Register mode switching
+- Social authentication integration
+- Auto-close on successful auth
+- Pending callback management
 
-## Kullanım
+## Usage
 
 ```typescript
 import { useAuthBottomSheet } from '@umituz/react-native-auth';
@@ -67,13 +67,13 @@ function AuthBottomSheet() {
 
 ### Parameters
 
-| Param | Tip | Required | Açıklama |
-|-------|------|----------|----------|
-| `socialConfig` | `SocialAuthConfiguration` | No | Social auth konfigürasyonu |
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `socialConfig` | `SocialAuthConfiguration` | No | Social auth configuration |
 | `onGoogleSignIn` | `() => Promise<void>` | No | Custom Google sign-in handler |
 | `onAppleSignIn` | `() => Promise<void>` | No | Custom Apple sign-in handler |
 
-#### SocialAuthConfiguration
+### SocialAuthConfiguration
 
 ```typescript
 interface SocialAuthConfiguration {
@@ -84,23 +84,23 @@ interface SocialAuthConfiguration {
 
 ### Return Value
 
-| Prop | Tip | Açıklama |
-|------|-----|----------|
-| `modalRef` | `RefObject<BottomSheetModalRef>` | Bottom sheet modal referansı |
-| `mode` | `'login' \| 'register'` | Mevcut mod |
-| `providers` | `SocialAuthProvider[]` | Mevcut social provider'lar |
-| `googleLoading` | `boolean` | Google loading durumu |
-| `appleLoading` | `boolean` | Apple loading durumu |
-| `handleDismiss` | `() => void` | Modal'ı kapatma (dismiss) |
-| `handleClose` | `() => void` | Modal'ı kapatma ve temizleme |
-| `handleNavigateToRegister` | `() => void` | Register moduna geçiş |
-| `handleNavigateToLogin` | `() => void` | Login moduna geçiş |
-| `handleGoogleSignIn` | `() => Promise<void>` | Google ile giriş |
-| `handleAppleSignIn` | `() => Promise<void>` | Apple ile giriş |
+| Prop | Type | Description |
+|------|------|-------------|
+| `modalRef` | `RefObject<BottomSheetModalRef>` | Bottom sheet modal reference |
+| `mode` | `'login' \| 'register'` | Current mode |
+| `providers` | `SocialAuthProvider[]` | Available social providers |
+| `googleLoading` | `boolean` | Google loading state |
+| `appleLoading` | `boolean` | Apple loading state |
+| `handleDismiss` | `() => void` | Dismiss modal |
+| `handleClose` | `() => void` | Close modal and cleanup |
+| `handleNavigateToRegister` | `() => void` | Switch to register mode |
+| `handleNavigateToLogin` | `() => void` | Switch to login mode |
+| `handleGoogleSignIn` | `() => Promise<void>` | Google sign-in handler |
+| `handleAppleSignIn` | `() => Promise<void>` | Apple sign-in handler |
 
-## Örnekler
+## Examples
 
-### Basit Auth Bottom Sheet
+### Basic Auth Bottom Sheet
 
 ```typescript
 function AuthModal() {
@@ -117,18 +117,18 @@ function AuthModal() {
       <View>
         {mode === 'login' ? (
           <>
-            <Text>Giriş Yap</Text>
+            <Text>Sign In</Text>
             <LoginForm />
             <Button onPress={handleNavigateToRegister}>
-              Hesabınız yok mu? Kayıt Olun
+              Don't have an account? Sign Up
             </Button>
           </>
         ) : (
           <>
-            <Text>Kayıt Ol</Text>
+            <Text>Sign Up</Text>
             <RegisterForm />
             <Button onPress={handleNavigateToLogin}>
-              Zaten hesabınız var mı? Giriş Yapın
+              Already have an account? Sign In
             </Button>
           </>
         )}
@@ -138,7 +138,7 @@ function AuthModal() {
 }
 ```
 
-### Social Login ile
+### With Social Login
 
 ```typescript
 function AuthBottomSheetWithSocial() {
@@ -188,7 +188,7 @@ function AuthBottomSheetWithSocial() {
             )}
 
             <Button onPress={handleNavigateToRegister}>
-              Kayıt Ol
+              Sign Up
             </Button>
           </>
         ) : (
@@ -213,7 +213,7 @@ function AuthBottomSheetWithSocial() {
             )}
 
             <Button onPress={handleNavigateToLogin}>
-              Giriş Yap
+              Sign In
             </Button>
           </>
         )}
@@ -231,28 +231,26 @@ function AuthBottomSheetWithCustomHandlers() {
 
   const handleCustomGoogleSignIn = async () => {
     try {
-      // Custom Google sign-in logic
       const result = await customGoogleSignInFlow();
 
       if (result.success) {
-        // Başarılı authentication sonrası modal otomatik kapanır
-        console.log('Google ile giriş başarılı');
+        // Modal auto-closes on successful auth
+        console.log('Google sign-in successful');
       }
     } catch (error) {
-      Alert.alert('Hata', 'Google ile giriş başarısız');
+      Alert.alert('Error', 'Google sign-in failed');
     }
   };
 
   const handleCustomAppleSignIn = async () => {
     try {
-      // Custom Apple sign-in logic
       const result = await customAppleSignInFlow();
 
       if (result.success) {
-        console.log('Apple ile giriş başarılı');
+        console.log('Apple sign-in successful');
       }
     } catch (error) {
-      Alert.alert('Hata', 'Apple ile giriş başarısız');
+      Alert.alert('Error', 'Apple sign-in failed');
     }
   };
 
@@ -279,7 +277,7 @@ function AuthBottomSheetWithCustomHandlers() {
 }
 ```
 
-### Auth Modal Tetikleme
+### Triggering Auth Modal
 
 ```typescript
 function RequireAuthButton() {
@@ -288,24 +286,24 @@ function RequireAuthButton() {
 
   const handlePress = () => {
     if (!isAuthenticated) {
-      // Login modal'ını göster
+      // Show login modal
       showAuthModal(undefined, 'login');
       return;
     }
 
-    // Auth gerektiren işlemi yap
-    console.log('İşlem başarılı');
+    // Perform auth-required action
+    console.log('Action successful');
   };
 
   return (
     <Button onPress={handlePress}>
-      Auth Gerektiren İşlem
+      Auth Required Action
     </Button>
   );
 }
 ```
 
-### Pending Callback ile
+### With Pending Callback
 
 ```typescript
 function AddToFavoritesButton() {
@@ -314,45 +312,45 @@ function AddToFavoritesButton() {
 
   const handleAddToFavorites = async () => {
     if (!isAuthenticated) {
-      // Authentication sonrası çalışacak callback'i kaydet
+      // Save callback to run after successful auth
       showAuthModal(async () => {
         await addToFavorites(postId);
-        Alert.alert('Başarılı', 'Favorilere eklendi');
+        Alert.alert('Success', 'Added to favorites');
       }, 'login');
       return;
     }
 
-    // Kullanıcı authenticated, doğrudan işlemi yap
+    // User authenticated, perform action directly
     await addToFavorites(postId);
-    Alert.alert('Başarılı', 'Favorilere eklendi');
+    Alert.alert('Success', 'Added to favorites');
   };
 
   return (
     <Button onPress={handleAddToFavorites}>
-      Favorilere Ekle
+      Add to Favorites
     </Button>
   );
 }
 ```
 
-## Otomatik Kapanma
+## Auto-Close Behavior
 
-Hook, başarılı authentication sonrası otomatik olarak modal'ı kapatır:
+The hook automatically closes the modal after successful authentication:
 
-- **Authenticated olmadan authenticated olmaya**: Kullanıcı giriş yaptığında
-- **Anonymous'den authenticated olmaya**: Anonymous kullanıcı kayıt olduğunda
+- **Not authenticated → Authenticated**: User signs in/logs in
+- **Anonymous → Authenticated**: Anonymous user registers
 
 ```typescript
-// Kullanıcı giriş yapar
-// → useAuth store güncellenir
-// → useAuthBottomSheet bunu tespit eder
-// → Modal otomatik kapanır
-// → Pending callback çalıştırılır
+// User signs in
+// → useAuth store updates
+// → useAuthBottomSheet detects this
+// → Modal auto-closes
+// → Pending callback executes
 ```
 
-## Provider Kontrolü
+## Provider Detection
 
-Hook hangi provider'ların mevcut olduğunu otomatik belirler:
+The hook automatically determines which providers are available:
 
 ```typescript
 const { providers } = useAuthBottomSheet({
@@ -362,12 +360,12 @@ const { providers } = useAuthBottomSheet({
   },
 });
 
-// iOS: ['apple', 'google'] veya ['google']
+// iOS: ['apple', 'google'] or ['google']
 // Android: ['google']
 // Web: ['google']
 ```
 
-## Hata Yönetimi
+## Error Handling
 
 ```typescript
 function AuthBottomSheetWithErrorHandling() {
@@ -386,32 +384,31 @@ function AuthBottomSheetWithErrorHandling() {
   const handleGoogleSignInWithErrorHandling = async () => {
     try {
       await handleGoogleSignIn();
-      // Hook hata yönetimini içeride yapar
     } catch (error) {
       // Additional error handling if needed
-      Alert.alert('Hata', 'Bir sorun oluştu');
+      Alert.alert('Error', 'Something went wrong');
     }
   };
 
   return (
     <BottomSheetModal ref={modalRef}>
       <Button onPress={handleGoogleSignInWithErrorHandling}>
-        Google ile Giriş
+        Sign in with Google
       </Button>
     </BottomSheetModal>
   );
 }
 ```
 
-## İlgili Component'ler
+## Related Components
 
-- [`AuthBottomSheet`](../components/AuthBottomSheet.md) - Bottom sheet component'i
-- [`useAuthModalStore`](../stores/authModalStore.md) - Auth modal state store'u
-- [`LoginForm`](../components/LoginForm.md) - Login form component'i
-- [`RegisterForm`](../components/RegisterForm.md) - Register form component'i
+- [`AuthBottomSheet`](../components/AuthBottomSheet.md) - Bottom sheet component
+- [`useAuthModalStore`](../stores/authModalStore.md) - Auth modal state store
+- [`LoginForm`](../components/LoginForm.md) - Login form component
+- [`RegisterForm`](../components/RegisterForm.md) - Register form component
 
-## İlgili Hook'lar
+## Related Hooks
 
-- [`useGoogleAuth`](./useSocialLogin.md#usegoogleauth) - Google auth hook'u
-- [`useAppleAuth`](./useSocialLogin.md#useappleauth) - Apple auth hook'u
-- [`useAuth`](./useAuth.md) - Ana auth state yönetimi
+- [`useGoogleAuth`](./useSocialLogin.md#usegoogleauth) - Google auth hook
+- [`useAppleAuth`](./useSocialLogin.md#useappleauth) - Apple auth hook
+- [`useAuth`](./useAuth.md) - Main auth state management

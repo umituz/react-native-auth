@@ -88,9 +88,7 @@ jest.mock('react-native-safe-area-context', () => ({
   })),
 }));
 
-jest.mock('expo-linear-gradient', () => ({
-  LinearGradient: 'LinearGradient',
-}));
+
 
 jest.mock('@react-navigation/stack', () => ({
   createStackNavigator: jest.fn(() => ({
