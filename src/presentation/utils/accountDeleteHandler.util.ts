@@ -58,7 +58,7 @@ async function handleReauthentication(
   const { onReauthRequired, onPasswordRequired } = callbacks;
 
   // Handle password reauth
-  if (initialResult.error?.code === "auth/password-reauth-required" && onPasswordRequired) {
+  if (initialResult.error?.code === "auth/password-reauth" && onPasswordRequired) {
     await retryWithPassword(onPasswordRequired);
     return;
   }

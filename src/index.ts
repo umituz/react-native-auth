@@ -151,8 +151,6 @@ export type { SocialAuthConfiguration } from './presentation/hooks/useAuthBottom
 
 // DOMAIN ENTITIES & UTILS
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
-export { generateAnonymousName, getAnonymousDisplayName } from './domain/utils/anonymousNameGenerator';
-export type { AnonymousNameConfig } from './domain/utils/anonymousNameGenerator';
 export { migrateUserData, configureMigration } from './domain/utils/migration';
 export type { MigrationConfig } from './domain/utils/migration';
 

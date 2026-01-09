@@ -17,7 +17,7 @@ export const ProfileBenefitsList: React.FC<ProfileBenefitsListProps> = ({ benefi
         <View style={styles.benefitsContainer}>
             {benefits.map((benefit, index) => (
                 <View key={index} style={styles.benefitItem}>
-                    <AtomicIcon name="Check" size="sm" color="primary" />
+                    <AtomicIcon name="checkmark-circle" size="sm" color="primary" />
                     <AtomicText
                         type="bodyMedium"
                         color="secondary"

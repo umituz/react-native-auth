@@ -1,25 +1,30 @@
 /**
  * useAccountManagement Hook
  * Provides account management functionality (logout, delete)
- * Generic hook - reauthentication is handled via callback from calling app
  */
 
 import { useCallback, useState } from "react";
+import { Alert } from "react-native";
 import { useAuth } from "./useAuth";
 import { handleAccountDeletion } from "../utils/accountDeleteHandler.util";
 
 export interface UseAccountManagementOptions {
   /**
    * Callback invoked when reauthentication is required (for Google/Apple)
-   * App should show appropriate UI (Google/Apple sign-in) and return success status
-   * If not provided, reauthentication errors will be thrown
    */
   onReauthRequired?: () => Promise<boolean>;
   /**
-   * Callback invoked when password reauthentication is required (for email/password accounts)
-   * App should show password prompt and return the entered password, or null if cancelled
+   * Callback invoked when password reauthentication is required
+   * If not provided, built-in Alert.prompt will be used
    */
   onPasswordRequired?: () => Promise<string | null>;
+  /**
+   * Translations for built-in password prompt
+   */
+  passwordPromptTitle?: string;
+  passwordPromptMessage?: string;
+  passwordPromptCancel?: string;
+  passwordPromptConfirm?: string;
 }
 
 export interface UseAccountManagementReturn {
@@ -34,7 +39,31 @@ export const useAccountManagement = (
 ): UseAccountManagementReturn => {
   const { user, loading, signOut } = useAuth();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const { onReauthRequired, onPasswordRequired } = options;
+
+  const {
+    onReauthRequired,
+    onPasswordRequired,
+    passwordPromptTitle = "Password Required",
+    passwordPromptMessage = "Enter your password to delete account",
+    passwordPromptCancel = "Cancel",
+    passwordPromptConfirm = "Confirm",
+  } = options;
+
+  const defaultPasswordPrompt = useCallback((): Promise<string | null> => {
+    return new Promise((resolve) => {
+      Alert.prompt(
+        passwordPromptTitle,
+        passwordPromptMessage,
+        [
+          { text: passwordPromptCancel, style: "cancel", onPress: () => resolve(null) },
+          { text: passwordPromptConfirm, onPress: (pwd?: string) => resolve(pwd || null) },
+        ],
+        "secure-text"
+      );
+    });
+  }, [passwordPromptTitle, passwordPromptMessage, passwordPromptCancel, passwordPromptConfirm]);
+
+  const passwordHandler = onPasswordRequired || defaultPasswordPrompt;
 
   const logout = useCallback(async () => {
     await signOut();
@@ -59,11 +88,14 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
-      await handleAccountDeletion({ onReauthRequired, onPasswordRequired });
+      await handleAccountDeletion({
+        onReauthRequired,
+        onPasswordRequired: passwordHandler,
+      });
     } finally {
       setIsDeletingAccount(false);
     }
-  }, [user, onReauthRequired, onPasswordRequired]);
+  }, [user, onReauthRequired, passwordHandler]);
 
   return {
     logout,
