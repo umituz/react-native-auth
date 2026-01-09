@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useAppNavigation } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { AuthStackParamList } from "../navigation/AuthNavigator";
 import { AuthContainer } from "../components/AuthContainer";
@@ -14,7 +14,7 @@ import { LoginForm } from "../components/LoginForm";
 
 export const LoginScreen: React.FC = () => {
   const { t } = useLocalization();
-  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
+  const navigation = useAppNavigation<AuthStackParamList>();
 
   const handleNavigateToRegister = () => {
     navigation.navigate("Register");

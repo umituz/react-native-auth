@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useAppNavigation } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { AuthStackParamList } from "../navigation/AuthNavigator";
 import { AuthContainer } from "../components/AuthContainer";
@@ -26,7 +26,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onPrivacyPress,
 }) => {
   const { t } = useLocalization();
-  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
+  const navigation = useAppNavigation<AuthStackParamList>();
 
   const handleNavigateToLogin = () => {
     navigation.navigate("Login");
