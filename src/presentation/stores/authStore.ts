@@ -6,7 +6,7 @@
  * Firebase auth changes are synced via initializeAuthListener().
  */
 
-import { createStore } from "@umituz/react-native-storage";
+import { createStore } from "@umituz/react-native-design-system";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthState, AuthActions, UserType } from "../../types/auth-store.types";

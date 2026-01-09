@@ -3,7 +3,7 @@
  * TanStack Query mutations for auth operations
  */
 
-import { useMutation } from "@umituz/react-native-tanstack";
+import { useMutation } from "@umituz/react-native-design-system";
 import { getAuthService } from "../../../infrastructure/services/AuthService";
 import type { SignUpParams, SignInParams } from "../../../application/ports/IAuthService";
 import type { AuthUser } from "../../../domain/entities/AuthUser";
