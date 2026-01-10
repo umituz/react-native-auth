@@ -5,10 +5,11 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  createStackNavigator,
+  StackNavigator,
   useAppDesignTokens,
   storageRepository,
   unwrap,
+  type StackNavigatorConfig,
   type StackScreenProps,
 } from "@umituz/react-native-design-system";
 import { LoginScreen } from "../screens/LoginScreen";
@@ -18,8 +19,6 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
 };
-
-const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const SHOW_REGISTER_KEY = "auth_show_register";
 
@@ -72,28 +71,31 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     return null;
   }
 
-  return (
-    <AuthStack.Navigator
-      initialRouteName={initialRouteName}
-      screenOptions={{
-        headerShown: false,
-        cardStyle: { backgroundColor: tokens.colors.backgroundPrimary },
-      }}
-    >
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Register">
-        {(props: StackScreenProps<AuthStackParamList, "Register">) => (
-          <RegisterScreen
-            {...props}
-            termsUrl={termsUrl}
-            privacyUrl={privacyUrl}
-            onTermsPress={onTermsPress}
-            onPrivacyPress={onPrivacyPress}
-          />
-        )}
-      </AuthStack.Screen>
-    </AuthStack.Navigator>
+  const RegisterScreenWrapper = (
+    props: StackScreenProps<AuthStackParamList, "Register">
+  ) => (
+    <RegisterScreen
+      {...props}
+      termsUrl={termsUrl}
+      privacyUrl={privacyUrl}
+      onTermsPress={onTermsPress}
+      onPrivacyPress={onPrivacyPress}
+    />
   );
+
+  const stackConfig: StackNavigatorConfig<AuthStackParamList> = {
+    initialRouteName,
+    screenOptions: {
+      headerShown: false,
+      cardStyle: { backgroundColor: tokens.colors.backgroundPrimary },
+    },
+    screens: [
+      { name: "Login", component: LoginScreen },
+      { name: "Register", component: RegisterScreenWrapper },
+    ],
+  };
+
+  return <StackNavigator config={stackConfig} />;
 };
 
 
