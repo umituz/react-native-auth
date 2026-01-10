@@ -85,14 +85,17 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
           justConvertedFromAnonymous,
         });
       }
-      handleClose();
+      // Execute callback BEFORE closing to prevent clearPendingCallback from clearing it
       executePendingCallback();
+      // Close modal and hide (without clearing callback again)
+      modalRef.current?.dismiss();
+      hideAuthModal();
     }
-    
+
     prevIsAuthenticatedRef.current = isAuthenticated;
     prevIsVisibleRef.current = isVisible;
     prevIsAnonymousRef.current = isAnonymous;
-  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, handleClose]);
+  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, hideAuthModal]);
 
   const handleNavigateToRegister = useCallback(() => {
     setMode("register");
