@@ -69,7 +69,7 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
       {prefixText && (
         <AtomicText
           type="bodySmall"
-          color="secondary"
+          color="textSecondary"
           style={styles.prefixText}
         >
           {prefixText}
@@ -86,7 +86,7 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
           />
         )}
         {hasTerms && hasPrivacy && (
-          <AtomicText type="bodySmall" color="secondary" style={styles.separator}>
+          <AtomicText type="bodySmall" color="textSecondary" style={styles.separator}>
             {" • "}
           </AtomicText>
         )}

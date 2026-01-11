@@ -43,15 +43,21 @@ export function validatePasswordForRegister(
   config: PasswordConfig,
   validationConfig: ValidationConfig = DEFAULT_VAL_CONFIG
 ): PasswordStrengthResult {
+  /*
+   * Check for strict presence of characters regardless of configuration
+   * This ensures the UI reflects actual password content
+   */
   const req: PasswordRequirements = {
     hasMinLength: password.length >= config.minLength,
-    hasUppercase: !config.requireUppercase || validationConfig.uppercaseRegex.test(password),
-    hasLowercase: !config.requireLowercase || validationConfig.lowercaseRegex.test(password),
-    hasNumber: !config.requireNumber || validationConfig.numberRegex.test(password),
-    hasSpecialChar: !config.requireSpecialChar || validationConfig.specialCharRegex.test(password),
+    hasUppercase: validationConfig.uppercaseRegex.test(password),
+    hasLowercase: validationConfig.lowercaseRegex.test(password),
+    hasNumber: validationConfig.numberRegex.test(password),
+    hasSpecialChar: validationConfig.specialCharRegex.test(password),
   };
 
   if (!password) return { isValid: false, error: "auth.validation.passwordRequired", requirements: req };
+  
+  // Validation checks based on configuration
   if (!req.hasMinLength) return { isValid: false, error: "auth.validation.passwordTooShort", requirements: req };
   if (config.requireUppercase && !req.hasUppercase) return { isValid: false, error: "auth.validation.passwordRequireUppercase", requirements: req };
   if (config.requireLowercase && !req.hasLowercase) return { isValid: false, error: "auth.validation.passwordRequireLowercase", requirements: req };

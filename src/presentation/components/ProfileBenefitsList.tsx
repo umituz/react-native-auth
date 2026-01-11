@@ -20,7 +20,7 @@ export const ProfileBenefitsList: React.FC<ProfileBenefitsListProps> = ({ benefi
                     <AtomicIcon name="checkmark-circle" size="sm" color="primary" />
                     <AtomicText
                         type="bodyMedium"
-                        color="secondary"
+                        color="textSecondary"
                         style={styles.benefitText}
                     >
                         {benefit}

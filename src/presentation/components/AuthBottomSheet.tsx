@@ -93,7 +93,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           accessibilityLabel={t("common.close")}
           accessibilityRole="button"
         >
-          <AtomicIcon name="close" size="md" color="secondary" />
+          <AtomicIcon name="close" size="md" color="textSecondary" />
         </TouchableOpacity>
 
         <ScrollView
@@ -103,10 +103,10 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         >
 
         <View style={styles.header}>
-          <AtomicText type="headlineLarge" color="primary" style={styles.title}>
+          <AtomicText type="headlineLarge" color="textPrimary" style={styles.title}>
             {mode === "login" ? t("auth.signIn") : t("auth.createAccount")}
           </AtomicText>
-          <AtomicText type="bodyLarge" color="secondary" style={styles.subtitle}>
+          <AtomicText type="bodyLarge" color="textSecondary" style={styles.subtitle}>
             {mode === "login" ? t("auth.signInSubtitle") : t("auth.createAccountSubtitle")}
           </AtomicText>
         </View>

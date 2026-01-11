@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { useAppDesignTokens, AtomicText, AtomicIcon, Avatar } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, AtomicText, AtomicIcon, AtomicAvatar } from "@umituz/react-native-design-system";
 import { ProfileBenefitsList } from "./ProfileBenefitsList";
 
 export interface ProfileSectionConfig {
@@ -51,11 +51,10 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
         >
             <View style={styles.content}>
                 <View style={styles.avatarContainer}>
-                    <Avatar
-                        uri={profile.avatarUrl}
+                    <AtomicAvatar
+                        source={profile.avatarUrl ? { uri: profile.avatarUrl } : undefined}
                         name={profile.displayName || (profile.isAnonymous ? anonymousText : signInText)}
                         size="md"
-                        shape="circle"
                     />
                 </View>
 
@@ -71,7 +70,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                     {profile.userId && (
                         <AtomicText
                             type="bodySmall"
-                            color="secondary"
+                            color="textSecondary"
                             numberOfLines={1}
                         >
                             {profile.userId}
@@ -80,7 +79,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 </View>
 
                 {onPress && !profile.isAnonymous && (
-                    <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                    <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
                 )}
             </View>
 

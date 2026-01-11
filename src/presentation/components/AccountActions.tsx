@@ -93,11 +93,11 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                     onPress={onChangePassword}
                     activeOpacity={0.7}
                 >
-                    <AtomicIcon name="key-outline" size="md" customColor={tokens.colors.textPrimary} />
-                    <AtomicText style={[styles.actionText, { color: tokens.colors.textPrimary }]}>
+                    <AtomicIcon name="key-outline" size="md" color="textPrimary" />
+                    <AtomicText style={styles.actionText} color="textPrimary">
                         {changePasswordText}
                     </AtomicText>
-                    <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                    <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
                 </TouchableOpacity>
             )}
 
@@ -108,10 +108,10 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                 activeOpacity={0.7}
             >
                 <AtomicIcon name="log-out-outline" size="md" color="error" />
-                <AtomicText style={[styles.actionText, { color: tokens.colors.error }]}>
+                <AtomicText style={styles.actionText} color="error">
                     {logoutText}
                 </AtomicText>
-                <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
             </TouchableOpacity>
 
             {/* Delete Account */}
@@ -121,10 +121,10 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
                 activeOpacity={0.7}
             >
                 <AtomicIcon name="trash-outline" size="md" color="error" />
-                <AtomicText style={[styles.actionText, { color: tokens.colors.error }]}>
+                <AtomicText style={styles.actionText} color="error">
                     {deleteAccountText}
                 </AtomicText>
-                <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
             </TouchableOpacity>
         </View>
     );

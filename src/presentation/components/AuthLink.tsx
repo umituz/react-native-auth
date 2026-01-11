@@ -26,7 +26,7 @@ export const AuthLink: React.FC<AuthLinkProps> = ({
     <View style={[styles.container, { marginTop: tokens.spacing.xs, paddingTop: tokens.spacing.xs }]}>
       <AtomicText
         type="bodyMedium"
-        style={{ color: tokens.colors.textSecondary }}
+        color="textSecondary"
       >
         {text}{" "}
       </AtomicText>
