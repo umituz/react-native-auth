@@ -51,10 +51,6 @@ export const PasswordStrengthIndicator: React.FC<
 
   const items = [
     { key: "minLength", label: t("auth.passwordReq.minLength"), isValid: requirements.hasMinLength },
-    { key: "uppercase", label: t("auth.passwordReq.uppercase"), isValid: requirements.hasUppercase },
-    { key: "lowercase", label: t("auth.passwordReq.lowercase"), isValid: requirements.hasLowercase },
-    { key: "number", label: t("auth.passwordReq.number"), isValid: requirements.hasNumber },
-    { key: "special", label: t("auth.passwordReq.special"), isValid: requirements.hasSpecialChar },
   ];
 
   if (!showLabels) {

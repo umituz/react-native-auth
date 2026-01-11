@@ -3,24 +3,16 @@ import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
 export interface ValidationResult { isValid: boolean; error?: string; }
 export interface PasswordStrengthResult extends ValidationResult { requirements: PasswordRequirements; }
 export interface PasswordRequirements {
-  hasMinLength: boolean; hasUppercase: boolean; hasLowercase: boolean; hasNumber: boolean; hasSpecialChar: boolean;
+  hasMinLength: boolean;
 }
 
 export interface ValidationConfig {
   emailRegex: RegExp;
-  uppercaseRegex: RegExp;
-  lowercaseRegex: RegExp;
-  numberRegex: RegExp;
-  specialCharRegex: RegExp;
   displayNameMinLength: number;
 }
 
 export const DEFAULT_VAL_CONFIG: ValidationConfig = {
   emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  uppercaseRegex: /[A-Z]/,
-  lowercaseRegex: /[a-z]/,
-  numberRegex: /[0-9]/,
-  specialCharRegex: /[!@#$%^&*(),.?":{}|<>]/,
   displayNameMinLength: 2,
 };
 
@@ -41,28 +33,15 @@ export function validatePasswordForLogin(password: string): ValidationResult {
 export function validatePasswordForRegister(
   password: string,
   config: PasswordConfig,
-  validationConfig: ValidationConfig = DEFAULT_VAL_CONFIG
+  _validationConfig: ValidationConfig = DEFAULT_VAL_CONFIG
 ): PasswordStrengthResult {
-  /*
-   * Check for strict presence of characters regardless of configuration
-   * This ensures the UI reflects actual password content
-   */
   const req: PasswordRequirements = {
     hasMinLength: password.length >= config.minLength,
-    hasUppercase: validationConfig.uppercaseRegex.test(password),
-    hasLowercase: validationConfig.lowercaseRegex.test(password),
-    hasNumber: validationConfig.numberRegex.test(password),
-    hasSpecialChar: validationConfig.specialCharRegex.test(password),
   };
 
   if (!password) return { isValid: false, error: "auth.validation.passwordRequired", requirements: req };
   
-  // Validation checks based on configuration
   if (!req.hasMinLength) return { isValid: false, error: "auth.validation.passwordTooShort", requirements: req };
-  if (config.requireUppercase && !req.hasUppercase) return { isValid: false, error: "auth.validation.passwordRequireUppercase", requirements: req };
-  if (config.requireLowercase && !req.hasLowercase) return { isValid: false, error: "auth.validation.passwordRequireLowercase", requirements: req };
-  if (config.requireNumber && !req.hasNumber) return { isValid: false, error: "auth.validation.passwordRequireNumber", requirements: req };
-  if (config.requireSpecialChar && !req.hasSpecialChar) return { isValid: false, error: "auth.validation.passwordRequireSpecialChar", requirements: req };
 
   return { isValid: true, requirements: req };
 }

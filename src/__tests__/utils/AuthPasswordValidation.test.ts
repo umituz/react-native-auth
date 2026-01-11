@@ -34,39 +34,8 @@ describe('AuthPasswordValidation', () => {
       expect(result.requirements.hasMinLength).toBe(false);
     });
 
-    it('should validate uppercase requirement', () => {
-      const configReq = { ...config, requireUppercase: true };
-      expect(validatePasswordForRegister('password', configReq).isValid).toBe(false);
-      expect(validatePasswordForRegister('Password', configReq).requirements.hasUppercase).toBe(true);
-    });
-
-    it('should validate lowercase requirement', () => {
-      const configReq = { ...config, requireLowercase: true };
-      expect(validatePasswordForRegister('PASSWORD', configReq).isValid).toBe(false);
-      expect(validatePasswordForRegister('Password', configReq).requirements.hasLowercase).toBe(true);
-    });
-
-    it('should validate number requirement', () => {
-      const configReq = { ...config, requireNumber: true };
-      expect(validatePasswordForRegister('Password', configReq).isValid).toBe(false);
-      expect(validatePasswordForRegister('Password1', configReq).requirements.hasNumber).toBe(true);
-    });
-
-    it('should validate special character requirement', () => {
-      const configReq = { ...config, requireSpecialChar: true };
-      expect(validatePasswordForRegister('Password1', configReq).isValid).toBe(false);
-      expect(validatePasswordForRegister('Password1!', configReq).requirements.hasSpecialChar).toBe(true);
-    });
-
-    it('should accept password that meets all requirements', () => {
-      const strictConfig = {
-        ...config,
-        requireUppercase: true,
-        requireLowercase: true,
-        requireNumber: true,
-        requireSpecialChar: true,
-      };
-      const result = validatePasswordForRegister('Password1!', strictConfig);
+    it('should accept password that meets length requirement', () => {
+      const result = validatePasswordForRegister('Password1!', config);
       expect(result.isValid).toBe(true);
     });
   });

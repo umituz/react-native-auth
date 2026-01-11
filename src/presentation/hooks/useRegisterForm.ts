@@ -62,10 +62,6 @@ export function useRegisterForm(): UseRegisterFormResult {
     if (!password) {
       return {
         hasMinLength: false,
-        hasUppercase: false,
-        hasLowercase: false,
-        hasNumber: false,
-        hasSpecialChar: false,
       };
     }
     const result = validatePasswordForRegister(password, DEFAULT_PASSWORD_CONFIG);
