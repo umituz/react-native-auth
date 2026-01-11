@@ -9,8 +9,12 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   updateProfile,
+  EmailAuthProvider,
+  linkWithCredential,
   type Auth,
 } from "firebase/auth";
+
+declare const __DEV__: boolean;
 import type {
   IAuthProvider,
   AuthCredentials,
@@ -72,11 +76,44 @@ export class FirebaseAuthProvider implements IAuthProvider {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        this.auth,
-        credentials.email.trim(),
-        credentials.password
-      );
+      const currentUser = this.auth.currentUser;
+      const isAnonymous = currentUser?.isAnonymous ?? false;
+
+      let userCredential;
+
+      // Convert anonymous user to permanent account
+      if (currentUser && isAnonymous) {
+        if (__DEV__) {
+          console.log("[FirebaseAuthProvider] Converting anonymous user to authenticated:", {
+            anonymousId: currentUser.uid.slice(0, 8),
+          });
+        }
+
+        const credential = EmailAuthProvider.credential(
+          credentials.email.trim(),
+          credentials.password
+        );
+
+        userCredential = await linkWithCredential(currentUser, credential);
+
+        if (__DEV__) {
+          console.log("[FirebaseAuthProvider] Anonymous user converted successfully:", {
+            userId: userCredential.user.uid.slice(0, 8),
+            sameUser: currentUser.uid === userCredential.user.uid,
+          });
+        }
+      } else {
+        // Create new user
+        if (__DEV__) {
+          console.log("[FirebaseAuthProvider] Creating new user account");
+        }
+
+        userCredential = await createUserWithEmailAndPassword(
+          this.auth,
+          credentials.email.trim(),
+          credentials.password
+        );
+      }
 
       if (credentials.displayName && userCredential.user) {
         try {
