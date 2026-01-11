@@ -3,13 +3,15 @@
  * Single Responsibility: Render login form UI
  */
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
+
+declare const __DEV__: boolean;
 
 interface LoginFormProps {
   onNavigateToRegister: () => void;
@@ -29,6 +31,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
     handleSignIn,
     displayError,
   } = useLoginForm();
+
+  useEffect(() => {
+    if (__DEV__) {
+      console.log("[LoginForm] Mounted/Updated:", {
+        hasEmail: !!email,
+        hasPassword: !!password,
+        loading,
+        hasError: !!displayError,
+      });
+    }
+  }, [email, password, loading, displayError]);
+
+  if (__DEV__) {
+    console.log("[LoginForm] Rendering...");
+  }
 
   return (
     <>

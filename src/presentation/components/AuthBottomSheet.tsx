@@ -3,7 +3,7 @@
  * Bottom sheet modal for authentication (Login/Register)
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import {
   useAppDesignTokens,
@@ -18,6 +18,8 @@ import { LoginForm } from "./LoginForm";
 import { RegisterForm } from "./RegisterForm";
 import { SocialLoginButtons } from "./SocialLoginButtons";
 import { styles } from "./AuthBottomSheet.styles";
+
+declare const __DEV__: boolean;
 
 export interface AuthBottomSheetProps {
   termsUrl?: string;
@@ -57,6 +59,22 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     handleGoogleSignIn,
     handleAppleSignIn,
   } = useAuthBottomSheet({ socialConfig, onGoogleSignIn, onAppleSignIn });
+
+  useEffect(() => {
+    if (__DEV__) {
+      console.log("[AuthBottomSheet] Rendered with:", {
+        mode,
+        providersCount: providers.length,
+        hasModalRef: !!modalRef.current,
+        hasTermsUrl: !!termsUrl,
+        hasPrivacyUrl: !!privacyUrl,
+      });
+    }
+  }, [mode, providers.length, termsUrl, privacyUrl, modalRef]);
+
+  if (__DEV__) {
+    console.log("[AuthBottomSheet] Rendering...");
+  }
 
   return (
     <BottomSheetModal
