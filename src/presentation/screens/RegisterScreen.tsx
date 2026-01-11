@@ -6,7 +6,6 @@
 import React from "react";
 import { useAppNavigation, AtomicCard, ScreenLayout, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
-import type { AuthStackParamList } from "../navigation/AuthNavigator";
 import { AuthHeader } from "../components/AuthHeader";
 import { RegisterForm } from "../components/RegisterForm";
 
@@ -24,7 +23,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onPrivacyPress,
 }) => {
   const { t } = useLocalization();
-  const navigation = useAppNavigation<AuthStackParamList>();
+  const navigation = useAppNavigation();
   const tokens = useAppDesignTokens();
 
   const handleNavigateToLogin = () => {
