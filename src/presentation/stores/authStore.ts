@@ -4,10 +4,12 @@
  *
  * Single source of truth for auth state across the app.
  * Firebase auth changes are synced via initializeAuthListener().
+ *
+ * IMPORTANT: user is ALWAYS set when firebaseUser exists (anonymous or not).
+ * The isAnonymous flag indicates the user type, not whether user is null.
  */
 
 import { createStore } from "@umituz/react-native-design-system";
-import type { AuthUser } from "../../domain/entities/AuthUser";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthState, AuthActions, UserType } from "../../types/auth-store.types";
 import { initialAuthState } from "../../types/auth-store.types";
@@ -80,48 +82,62 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
   },
   actions: (set, get) => ({
     setFirebaseUser: (firebaseUser) => {
-      const { isAnonymous } = get();
+      const prevState = get();
+      const user = firebaseUser ? mapToAuthUser(firebaseUser) : null;
+      const isAnonymous = firebaseUser?.isAnonymous ?? false;
 
-      let user: AuthUser | null = null;
-
-      if (firebaseUser) {
-        if (!firebaseUser.isAnonymous) {
-          user = mapToAuthUser(firebaseUser);
-        } else if (!isAnonymous) {
-          user = mapToAuthUser(firebaseUser);
-        }
+      if (__DEV__) {
+        console.log("[AuthStore] setFirebaseUser:", {
+          uid: firebaseUser?.uid ?? null,
+          isAnonymous,
+          prevIsAnonymous: prevState.isAnonymous,
+          hasUser: !!user,
+        });
       }
 
-      set({
-        firebaseUser,
-        user,
-        loading: false,
-        isAnonymous: firebaseUser?.isAnonymous ?? false,
-      });
+      set({ firebaseUser, user, loading: false, isAnonymous });
     },
 
-    setLoading: (loading) => set({ loading }),
+    setLoading: (loading) => {
+      if (__DEV__) {
+        console.log("[AuthStore] setLoading:", loading);
+      }
+      set({ loading });
+    },
 
     setIsAnonymous: (isAnonymous) => {
-      const { firebaseUser } = get();
-
-      let user: AuthUser | null = null;
-      if (firebaseUser) {
-        if (!firebaseUser.isAnonymous) {
-          user = mapToAuthUser(firebaseUser);
-        } else if (!isAnonymous) {
-          user = mapToAuthUser(firebaseUser);
-        }
+      const { user } = get();
+      if (__DEV__) {
+        console.log("[AuthStore] setIsAnonymous:", { isAnonymous, hadUser: !!user });
       }
-
-      set({ isAnonymous, user });
+      // Also update user.isAnonymous when converting from anonymous
+      if (user && !isAnonymous && user.isAnonymous) {
+        set({ isAnonymous, user: { ...user, isAnonymous: false } });
+      } else {
+        set({ isAnonymous });
+      }
     },
 
-    setError: (error) => set({ error }),
+    setError: (error) => {
+      if (__DEV__ && error) {
+        console.log("[AuthStore] setError:", error);
+      }
+      set({ error });
+    },
 
-    setInitialized: (initialized) => set({ initialized }),
+    setInitialized: (initialized) => {
+      if (__DEV__) {
+        console.log("[AuthStore] setInitialized:", initialized);
+      }
+      set({ initialized });
+    },
 
-    reset: () => set(initialAuthState),
+    reset: () => {
+      if (__DEV__) {
+        console.log("[AuthStore] reset");
+      }
+      set(initialAuthState);
+    },
   }),
 });
 

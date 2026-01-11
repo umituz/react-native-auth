@@ -14,6 +14,7 @@ import { DEFAULT_PASSWORD_CONFIG } from "../../domain/value-objects/AuthConfig";
 import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
+import { AlertService, alertService } from "@umituz/react-native-design-system";
 
 export interface UseRegisterFormResult {
   displayName: string;
@@ -153,6 +154,11 @@ export function useRegisterForm(): UseRegisterFormResult {
         email.trim(),
         password,
         displayName.trim() || undefined,
+      );
+      
+      alertService.success(
+        t("auth.successTitle"),
+        t("auth.signUpSuccess")
       );
     } catch (err: unknown) {
       const localizationKey = getAuthErrorLocalizationKey(err);

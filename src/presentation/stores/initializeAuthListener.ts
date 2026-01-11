@@ -1,9 +1,10 @@
 /**
  * Auth Listener Initialization
- * Sets up Firebase auth state listener with optional auto anonymous sign-in
+ * Sets up Firebase auth token listener with optional auto anonymous sign-in
+ * Uses onIdTokenChanged for profile updates (displayName, email)
  */
 
-import { onAuthStateChanged } from "firebase/auth";
+import { onIdTokenChanged } from "firebase/auth";
 import {
   getFirebaseAuth,
   anonymousAuthService,
@@ -19,17 +20,23 @@ let listenerInitialized = false;
 /**
  * Initialize Firebase auth listener
  * Call once in app root, returns unsubscribe function
- *
- * @param options - Configuration options
- * @param options.autoAnonymousSignIn - Enable auto anonymous sign-in (default: true)
- * @param options.onAuthStateChange - Callback when auth state changes
  */
 export function initializeAuthListener(
   options: AuthListenerOptions = {}
 ): () => void {
   const { autoAnonymousSignIn = true, onAuthStateChange } = options;
 
+  if (__DEV__) {
+    console.log("[AuthListener] initializeAuthListener called:", {
+      autoAnonymousSignIn,
+      alreadyInitialized: listenerInitialized,
+    });
+  }
+
   if (listenerInitialized) {
+    if (__DEV__) {
+      console.log("[AuthListener] Already initialized, skipping");
+    }
     return () => {};
   }
 
@@ -37,6 +44,9 @@ export function initializeAuthListener(
   const store = useAuthStore.getState();
 
   if (!auth) {
+    if (__DEV__) {
+      console.log("[AuthListener] No Firebase auth, marking initialized");
+    }
     store.setLoading(false);
     store.setInitialized(true);
     return () => {};
@@ -45,6 +55,9 @@ export function initializeAuthListener(
   const service = getAuthService();
   if (service) {
     const isAnonymous = service.getIsAnonymousMode();
+    if (__DEV__) {
+      console.log("[AuthListener] Service isAnonymousMode:", isAnonymous);
+    }
     if (isAnonymous) {
       store.setIsAnonymous(true);
     }
@@ -52,28 +65,30 @@ export function initializeAuthListener(
 
   listenerInitialized = true;
 
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      // eslint-disable-next-line no-console
-      console.log("[authStore] Auth state changed:", user?.uid ?? "null");
+  const unsubscribe = onIdTokenChanged(auth, (user) => {
+    if (__DEV__) {
+      console.log("[AuthListener] onIdTokenChanged:", {
+        uid: user?.uid ?? null,
+        isAnonymous: user?.isAnonymous ?? null,
+        email: user?.email ?? null,
+        displayName: user?.displayName ?? null,
+      });
     }
 
-    // Auto sign-in anonymously if no user and autoAnonymousSignIn is enabled
     if (!user && autoAnonymousSignIn) {
+      if (__DEV__) {
+        console.log("[AuthListener] No user, auto signing in anonymously...");
+      }
       void (async () => {
         try {
-          if (typeof __DEV__ !== "undefined" && __DEV__) {
-            // eslint-disable-next-line no-console
-            console.log("[authStore] Auto signing in anonymously...");
-          }
           await anonymousAuthService.signInAnonymously(auth);
-          // The listener will be called again with the new anonymous user
-        } catch (error) {
-          if (typeof __DEV__ !== "undefined" && __DEV__) {
-            // eslint-disable-next-line no-console
-            console.warn("[authStore] Auto anonymous sign-in failed:", error);
+          if (__DEV__) {
+            console.log("[AuthListener] Anonymous sign-in successful");
           }
-          // Continue with null user if anonymous sign-in fails
+        } catch (error) {
+          if (__DEV__) {
+            console.warn("[AuthListener] Anonymous sign-in failed:", error);
+          }
           store.setFirebaseUser(null);
           store.setInitialized(true);
         }
@@ -85,14 +100,19 @@ export function initializeAuthListener(
     store.setInitialized(true);
 
     if (user && !user.isAnonymous && store.isAnonymous) {
+      if (__DEV__) {
+        console.log("[AuthListener] User converted from anonymous, updating");
+      }
       store.setIsAnonymous(false);
     }
 
-    // Call optional callback
     onAuthStateChange?.(user);
   });
 
   return () => {
+    if (__DEV__) {
+      console.log("[AuthListener] Unsubscribing");
+    }
     unsubscribe();
     listenerInitialized = false;
   };

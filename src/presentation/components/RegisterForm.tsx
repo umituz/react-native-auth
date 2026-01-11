@@ -86,6 +86,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
           blurOnSubmit={false}
+          textContentType="emailAddress"
         />
       </View>
 
@@ -105,6 +106,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           returnKeyType="next"
           onSubmitEditing={() => confirmPasswordRef.current?.focus()}
           blurOnSubmit={false}
+          textContentType="newPassword"
         />
         {password.length > 0 && (
           <PasswordStrengthIndicator requirements={passwordRequirements} />
@@ -128,6 +130,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           helperText={fieldErrors.confirmPassword || undefined}
           returnKeyType="done"
           onSubmitEditing={() => { void handleSignUp(); }}
+          textContentType="newPassword"
         />
         {confirmPassword.length > 0 && (
           <PasswordMatchIndicator isMatch={passwordsMatch} />

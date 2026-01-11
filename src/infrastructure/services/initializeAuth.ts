@@ -1,95 +1,43 @@
 /**
  * Unified Auth Initialization
- * Single function to initialize all auth services
- *
- * Combines:
- * - AuthService (email/password auth)
- * - Auth Listener (state management)
- * - User Document Service (Firestore)
- * - Anonymous-to-authenticated conversion detection
+ * Initializes Firebase auth with user document sync and conversion tracking
  */
 
 import type { Auth, User } from "firebase/auth";
 import { getFirebaseAuth } from "@umituz/react-native-firebase";
 import { initializeAuthService } from "./AuthService";
-import { configureUserDocumentService, ensureUserDocument } from "./UserDocumentService";
-import type { UserDocumentConfig } from "./UserDocumentService";
+import { configureUserDocumentService } from "./UserDocumentService";
 import { collectDeviceExtras } from "@umituz/react-native-design-system";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
+import { createAuthStateHandler } from "../utils/authStateHandler";
+import type { ConversionState } from "../utils/authConversionDetector";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
-
 import type { IStorageProvider } from "../types/Storage.types";
 
-/**
- * Unified auth initialization options
- */
 export interface InitializeAuthOptions {
-  /** User document collection name (default: "users") */
   userCollection?: string;
-
-  /** Additional fields to store with user documents */
   extraFields?: Record<string, unknown>;
-
-  /** Callback to collect device/app info for user documents */
   collectExtras?: () => Promise<Record<string, unknown>>;
-
-  /** Storage provider for persisting auth state (e.g. anonymous mode) */
   storageProvider?: IStorageProvider;
-
-  /** Enable auto anonymous sign-in (default: true) */
   autoAnonymousSignIn?: boolean;
-
-  /**
-   * Callback when user converts from anonymous to authenticated
-   * Use this to migrate user data (e.g., call Cloud Function)
-   *
-   * @param anonymousUserId - The previous anonymous user ID
-   * @param authenticatedUserId - The new authenticated user ID
-   */
-  onUserConverted?: (
-    anonymousUserId: string,
-    authenticatedUserId: string
-  ) => void | Promise<void>;
-
-  /**
-   * Callback when auth state changes (after user document is ensured)
-   * Called for every auth state change including initial load
-   */
+  onUserConverted?: (anonymousId: string, authenticatedId: string) => void | Promise<void>;
   onAuthStateChange?: (user: User | null) => void | Promise<void>;
-
-  /** Auth configuration (password rules, etc.) */
   authConfig?: Partial<AuthConfig>;
 }
 
 let isInitialized = false;
-
-// Track previous user for conversion detection
-let previousUserId: string | null = null;
-let wasAnonymous = false;
+const conversionState: { current: ConversionState } = {
+  current: { previousUserId: null, wasAnonymous: false },
+};
 
 /**
- * Initialize all auth services with a single call
- *
- * @example
- * ```typescript
- * import { initializeAuth } from '@umituz/react-native-auth';
- * import { migrateUserData } from '@domains/migration';
- *
- * await initializeAuth({
- *   userCollection: 'users',
- *   autoAnonymousSignIn: true,
- *   onUserConverted: async (anonymousId, authId) => {
- *     await migrateUserData(anonymousId, authId);
- *   },
- * });
- * ```
+ * Initialize auth services
  */
 export async function initializeAuth(
   options: InitializeAuthOptions = {}
 ): Promise<{ success: boolean; auth: Auth | null }> {
   if (isInitialized) {
-    const auth = getFirebaseAuth();
-    return { success: true, auth };
+    return { success: true, auth: getFirebaseAuth() };
   }
 
   const {
@@ -103,90 +51,40 @@ export async function initializeAuth(
     authConfig,
   } = options;
 
-  // 1. Configure user document service
-  const userDocConfig: UserDocumentConfig = {
-    collectionName: userCollection,
-  };
-  if (extraFields) userDocConfig.extraFields = extraFields;
-  // Use provided collectExtras or default to design system's implementation
-  userDocConfig.collectExtras = collectExtras || collectDeviceExtras;
-
-  configureUserDocumentService(userDocConfig);
-
-  // 2. Get Firebase Auth
   const auth = getFirebaseAuth();
-  if (!auth) {
-    return { success: false, auth: null };
-  }
+  if (!auth) return { success: false, auth: null };
 
-  // 3. Initialize AuthService (for email/password auth)
+  configureUserDocumentService({
+    collectionName: userCollection,
+    extraFields,
+    collectExtras: collectExtras || collectDeviceExtras,
+  });
+
   try {
     await initializeAuthService(auth, authConfig, storageProvider);
   } catch {
-    // AuthService initialization failed, but we can continue
-    // Email/password auth won't work, but social/anonymous will
+    // Continue without email/password auth
   }
 
-  // 4. Initialize Auth Listener (for state management)
+  const handleAuthStateChange = createAuthStateHandler(conversionState, {
+    onUserConverted,
+    onAuthStateChange,
+  });
+
   initializeAuthListener({
     autoAnonymousSignIn,
-    onAuthStateChange: (user) => {
-      void (async () => {
-        if (!user) {
-          // User signed out
-          previousUserId = null;
-          wasAnonymous = false;
-          await onAuthStateChange?.(null);
-          return;
-        }
-
-        const currentUserId = user.uid;
-        const isCurrentlyAnonymous = user.isAnonymous ?? false;
-
-        // Detect anonymous-to-authenticated conversion
-        if (
-          previousUserId &&
-          previousUserId !== currentUserId &&
-          wasAnonymous &&
-          !isCurrentlyAnonymous &&
-          onUserConverted
-        ) {
-          try {
-            await onUserConverted(previousUserId, currentUserId);
-          } catch {
-            // Migration failed but don't block user flow
-          }
-        }
-
-        // Create/update user document in Firestore
-        await ensureUserDocument(user);
-
-        // Update tracking state
-        previousUserId = currentUserId;
-        wasAnonymous = isCurrentlyAnonymous;
-
-        // Call app's custom callback
-        await onAuthStateChange?.(user);
-      })();
-    },
+    onAuthStateChange: (user) => void handleAuthStateChange(user),
   });
 
   isInitialized = true;
   return { success: true, auth };
 }
 
-/**
- * Check if auth is initialized
- */
 export function isAuthInitialized(): boolean {
   return isInitialized;
 }
 
-/**
- * Reset auth initialization state (for testing)
- */
 export function resetAuthInitialization(): void {
   isInitialized = false;
-  previousUserId = null;
-  wasAnonymous = false;
+  conversionState.current = { previousUserId: null, wasAnonymous: false };
 }

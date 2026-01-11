@@ -63,6 +63,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
           blurOnSubmit={false}
+          textContentType="emailAddress"
         />
       </View>
 
@@ -81,6 +82,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
           helperText={passwordError || undefined}
           returnKeyType="done"
           onSubmitEditing={() => { void handleSignIn(); }}
+          textContentType="password"
         />
       </View>
 
