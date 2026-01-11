@@ -52,9 +52,22 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
 
   // Handle visibility sync with modalRef
   useEffect(() => {
+    if (__DEV__) {
+      console.log('[useAuthBottomSheet] Visibility changed:', {
+        isVisible,
+        hasModalRef: !!modalRef.current,
+        modalRefMethods: modalRef.current ? Object.keys(modalRef.current) : [],
+      });
+    }
     if (isVisible) {
+      if (__DEV__) {
+        console.log('[useAuthBottomSheet] Calling present()');
+      }
       modalRef.current?.present();
     } else {
+      if (__DEV__) {
+        console.log('[useAuthBottomSheet] Calling dismiss()');
+      }
       modalRef.current?.dismiss();
     }
   }, [isVisible]);
@@ -77,9 +90,21 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     const justAuthenticated = !prevIsAuthenticatedRef.current && isAuthenticated;
     const justConvertedFromAnonymous = prevIsAnonymousRef.current && !isAnonymous && isAuthenticated;
 
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
+      console.log("[useAuthBottomSheet] Auth state effect:", {
+        isAuthenticated,
+        isAnonymous,
+        isVisible,
+        prevIsAuthenticated: prevIsAuthenticatedRef.current,
+        prevIsAnonymous: prevIsAnonymousRef.current,
+        justAuthenticated,
+        justConvertedFromAnonymous,
+        willClose: (justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous,
+      });
+    }
+
     if ((justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous) {
       if (typeof __DEV__ !== "undefined" && __DEV__) {
-        // eslint-disable-next-line no-console
         console.log("[useAuthBottomSheet] Auto-closing due to successful authentication transition", {
           justAuthenticated,
           justConvertedFromAnonymous,
