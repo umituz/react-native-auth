@@ -21,15 +21,16 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
     <View style={[styles.header, { marginBottom: tokens.spacing.xl, paddingHorizontal: tokens.spacing.md }]}>
       <AtomicText
         type="headlineLarge"
-        style={{ color: tokens.colors.onPrimary, textAlign: "center" }}
+        color="onPrimary"
+        style={{ textAlign: "center" }}
       >
         {title}
       </AtomicText>
       {(subtitle || t("auth.subtitle")) && (
         <AtomicText
           type="bodyMedium"
+          color="textInverse"
           style={{
-            color: tokens.colors.textInverse,
             textAlign: "center",
             marginTop: tokens.spacing.xs,
           }}

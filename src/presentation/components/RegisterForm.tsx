@@ -53,108 +53,102 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <>
-      <View style={styles.inputContainer}>
-        <AtomicInput
-          label={t("auth.displayName")}
-          value={displayName}
-          onChangeText={handleDisplayNameChange}
-          placeholder={
-            t("auth.displayNamePlaceholder")
-          }
-          autoCapitalize="words"
-          disabled={loading}
-          state={fieldErrors.displayName ? "error" : "default"}
-          helperText={fieldErrors.displayName || undefined}
-          returnKeyType="next"
-          onSubmitEditing={() => emailRef.current?.focus()}
-          blurOnSubmit={false}
-        />
-      </View>
+      <AtomicInput
+        label={t("auth.displayName")}
+        value={displayName}
+        onChangeText={handleDisplayNameChange}
+        placeholder={
+          t("auth.displayNamePlaceholder")
+        }
+        autoCapitalize="words"
+        disabled={loading}
+        state={fieldErrors.displayName ? "error" : "default"}
+        helperText={fieldErrors.displayName || undefined}
+        returnKeyType="next"
+        onSubmitEditing={() => emailRef.current?.focus()}
+        blurOnSubmit={false}
+        style={styles.input}
+      />
 
-      <View style={styles.inputContainer}>
-        <AtomicInput
-          ref={emailRef}
-          label={t("auth.email")}
-          value={email}
-          onChangeText={handleEmailChange}
-          placeholder={t("auth.emailPlaceholder")}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          disabled={loading}
-          state={fieldErrors.email ? "error" : "default"}
-          helperText={fieldErrors.email || undefined}
-          returnKeyType="next"
-          onSubmitEditing={() => passwordRef.current?.focus()}
-          blurOnSubmit={false}
-          textContentType="emailAddress"
-        />
-      </View>
+      <AtomicInput
+        ref={emailRef}
+        label={t("auth.email")}
+        value={email}
+        onChangeText={handleEmailChange}
+        placeholder={t("auth.emailPlaceholder")}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        disabled={loading}
+        state={fieldErrors.email ? "error" : "default"}
+        helperText={fieldErrors.email || undefined}
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
+        blurOnSubmit={false}
+        textContentType="emailAddress"
+        style={styles.input}
+      />
 
-      <View style={styles.inputContainer}>
-        <AtomicInput
-          ref={passwordRef}
-          label={t("auth.password")}
-          value={password}
-          onChangeText={handlePasswordChange}
-          placeholder={t("auth.passwordPlaceholder")}
-          secureTextEntry
-          showPasswordToggle
-          autoCapitalize="none"
-          disabled={loading}
-          state={fieldErrors.password ? "error" : "default"}
-          helperText={fieldErrors.password || undefined}
-          returnKeyType="next"
-          onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-          blurOnSubmit={false}
-          textContentType="newPassword"
-        />
-        {password.length > 0 && (
-          <PasswordStrengthIndicator requirements={passwordRequirements} />
-        )}
-      </View>
+      <AtomicInput
+        ref={passwordRef}
+        label={t("auth.password")}
+        value={password}
+        onChangeText={handlePasswordChange}
+        placeholder={t("auth.passwordPlaceholder")}
+        secureTextEntry
+        showPasswordToggle
+        autoCapitalize="none"
+        disabled={loading}
+        state={fieldErrors.password ? "error" : "default"}
+        helperText={fieldErrors.password || undefined}
+        returnKeyType="next"
+        onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+        blurOnSubmit={false}
+        textContentType="newPassword"
+        style={styles.input}
+      />
+      {password.length > 0 && (
+        <PasswordStrengthIndicator requirements={passwordRequirements} />
+      )}
 
-      <View style={styles.inputContainer}>
-        <AtomicInput
-          ref={confirmPasswordRef}
-          label={t("auth.confirmPassword")}
-          value={confirmPassword}
-          onChangeText={handleConfirmPasswordChange}
-          placeholder={
-            t("auth.confirmPasswordPlaceholder")
-          }
-          secureTextEntry
-          showPasswordToggle
-          autoCapitalize="none"
-          disabled={loading}
-          state={fieldErrors.confirmPassword ? "error" : "default"}
-          helperText={fieldErrors.confirmPassword || undefined}
-          returnKeyType="done"
-          onSubmitEditing={() => { void handleSignUp(); }}
-          textContentType="newPassword"
-        />
-        {confirmPassword.length > 0 && (
-          <PasswordMatchIndicator isMatch={passwordsMatch} />
-        )}
-      </View>
+      <AtomicInput
+        ref={confirmPasswordRef}
+        label={t("auth.confirmPassword")}
+        value={confirmPassword}
+        onChangeText={handleConfirmPasswordChange}
+        placeholder={
+          t("auth.confirmPasswordPlaceholder")
+        }
+        secureTextEntry
+        showPasswordToggle
+        autoCapitalize="none"
+        disabled={loading}
+        state={fieldErrors.confirmPassword ? "error" : "default"}
+        helperText={fieldErrors.confirmPassword || undefined}
+        returnKeyType="done"
+        onSubmitEditing={() => { void handleSignUp(); }}
+        textContentType="newPassword"
+        style={styles.input}
+      />
+      {confirmPassword.length > 0 && (
+        <PasswordMatchIndicator isMatch={passwordsMatch} />
+      )}
 
       <AuthErrorDisplay error={displayError} />
 
-      <View style={styles.buttonContainer}>
-        <AtomicButton
-          variant="primary"
-          onPress={() => { void handleSignUp(); }}
-          disabled={
-            loading ||
-            !email.trim() ||
-            !password.trim() ||
-            !confirmPassword.trim()
-          }
-          fullWidth
-          style={styles.signUpButton}
-        >
-          {t("auth.signUp")}
-        </AtomicButton>
-      </View>
+      <AtomicButton
+        variant="primary"
+        onPress={() => { void handleSignUp(); }}
+        disabled={
+          loading ||
+          !email.trim() ||
+          !password.trim() ||
+          !confirmPassword.trim()
+        }
+        fullWidth
+        style={styles.signUpButton}
+      >
+        {t("auth.signUp")}
+      </AtomicButton>
 
       <AuthLink
         text={t("auth.alreadyHaveAccount")}
@@ -175,15 +169,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
+  input: {
     marginBottom: 20,
-  },
-  buttonContainer: {
-    marginBottom: 16,
-    marginTop: 8,
   },
   signUpButton: {
     minHeight: 52,
+    marginBottom: 16,
+    marginTop: 8,
   },
 });
 

@@ -1,11 +1,10 @@
 import React from "react";
 import {
   View,
-  TouchableOpacity,
   StyleSheet,
   Platform,
 } from "react-native";
-import { useAppDesignTokens, AtomicText, AtomicIcon, AtomicSpinner } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, Divider, AtomicButton } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
@@ -45,61 +44,35 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.dividerContainer}>
-        <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
-        <AtomicText type="bodySmall" color="secondary" style={styles.dividerText}>
-          {t("auth.orContinueWith")}
-        </AtomicText>
-        <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
-      </View>
+      <Divider text={t("auth.orContinueWith")} spacing="large" />
 
       <View style={styles.buttonsContainer}>
         {showGoogle && (
-          <TouchableOpacity
-            style={[
-              styles.socialButton,
-              { borderColor: tokens.colors.border },
-              disabled && styles.disabledButton,
-            ]}
-            onPress={onGooglePress}
-            disabled={disabled || googleLoading}
-            activeOpacity={0.7}
+          <AtomicButton
+            variant="outline"
+            onPress={onGooglePress || (() => {})}
+            loading={googleLoading}
+            disabled={disabled}
+            icon="logo-google"
+            fullWidth
+            style={styles.socialButton}
           >
-            {googleLoading ? (
-              <AtomicSpinner size="sm" color={tokens.colors.textPrimary} />
-            ) : (
-              <>
-                <AtomicIcon name="logo-google" size="sm" />
-                <AtomicText style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
-                  {t("auth.google")}
-                </AtomicText>
-              </>
-            )}
-          </TouchableOpacity>
+            {t("auth.google")}
+          </AtomicButton>
         )}
 
         {showApple && (
-          <TouchableOpacity
-            style={[
-              styles.socialButton,
-              { borderColor: tokens.colors.border },
-              disabled && styles.disabledButton,
-            ]}
-            onPress={onApplePress}
-            disabled={disabled || appleLoading}
-            activeOpacity={0.7}
+          <AtomicButton
+            variant="outline"
+            onPress={onApplePress || (() => {})}
+            loading={appleLoading}
+            disabled={disabled}
+            icon="logo-apple"
+            fullWidth
+            style={styles.socialButton}
           >
-            {appleLoading ? (
-              <AtomicSpinner size="sm" color={tokens.colors.textPrimary} />
-            ) : (
-              <>
-                <AtomicIcon name="logo-apple" size="sm" color="onSurface" />
-                <AtomicText style={[styles.buttonText, { color: tokens.colors.textPrimary }]}>
-                  {t("auth.apple")}
-                </AtomicText>
-              </>
-            )}
-          </TouchableOpacity>
+            {t("auth.apple")}
+          </AtomicButton>
         )}
       </View>
     </View>
@@ -110,38 +83,13 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 24,
   },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-  },
   buttonsContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
+    marginTop: 8,
     gap: 12,
   },
   socialButton: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 8,
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
   },
 });
 

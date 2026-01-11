@@ -49,56 +49,52 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
 
   return (
     <>
-      <View style={styles.inputContainer}>
-        <AtomicInput
-          label={t("auth.email")}
-          value={email}
-          onChangeText={handleEmailChange}
-          placeholder={t("auth.emailPlaceholder")}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          disabled={loading}
-          state={emailError ? "error" : "default"}
-          helperText={emailError || undefined}
-          returnKeyType="next"
-          onSubmitEditing={() => passwordRef.current?.focus()}
-          blurOnSubmit={false}
-          textContentType="emailAddress"
-        />
-      </View>
+      <AtomicInput
+        label={t("auth.email")}
+        value={email}
+        onChangeText={handleEmailChange}
+        placeholder={t("auth.emailPlaceholder")}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        disabled={loading}
+        state={emailError ? "error" : "default"}
+        helperText={emailError || undefined}
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
+        blurOnSubmit={false}
+        textContentType="emailAddress"
+        style={styles.input}
+      />
 
-      <View style={styles.inputContainer}>
-        <AtomicInput
-          ref={passwordRef}
-          label={t("auth.password")}
-          value={password}
-          onChangeText={handlePasswordChange}
-          placeholder={t("auth.passwordPlaceholder")}
-          secureTextEntry
-          showPasswordToggle
-          autoCapitalize="none"
-          disabled={loading}
-          state={passwordError ? "error" : "default"}
-          helperText={passwordError || undefined}
-          returnKeyType="done"
-          onSubmitEditing={() => { void handleSignIn(); }}
-          textContentType="password"
-        />
-      </View>
+      <AtomicInput
+        ref={passwordRef}
+        label={t("auth.password")}
+        value={password}
+        onChangeText={handlePasswordChange}
+        placeholder={t("auth.passwordPlaceholder")}
+        secureTextEntry
+        showPasswordToggle
+        autoCapitalize="none"
+        disabled={loading}
+        state={passwordError ? "error" : "default"}
+        helperText={passwordError || undefined}
+        returnKeyType="done"
+        onSubmitEditing={() => { void handleSignIn(); }}
+        textContentType="password"
+        style={styles.input}
+      />
 
       <AuthErrorDisplay error={displayError} />
 
-      <View style={styles.buttonContainer}>
-        <AtomicButton
-          variant="primary"
-          onPress={() => { void handleSignIn(); }}
-          disabled={loading || !email.trim() || !password.trim()}
-          fullWidth
-          style={styles.signInButton}
-        >
-          {t("auth.signIn")}
-        </AtomicButton>
-      </View>
+      <AtomicButton
+        variant="primary"
+        onPress={() => { void handleSignIn(); }}
+        disabled={loading || !email.trim() || !password.trim()}
+        fullWidth
+        style={styles.signInButton}
+      >
+        {t("auth.signIn")}
+      </AtomicButton>
 
       <AuthLink
         text={t("auth.dontHaveAccount")}
@@ -111,13 +107,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
+  input: {
     marginBottom: 20,
-  },
-  buttonContainer: {
-    marginBottom: 16,
   },
   signInButton: {
     minHeight: 52,
+    marginBottom: 16,
   },
 });

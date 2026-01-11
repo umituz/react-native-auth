@@ -32,7 +32,8 @@ export const AuthErrorDisplay: React.FC<AuthErrorDisplayProps> = ({
     >
       <AtomicText
         type="bodyMedium"
-        style={[styles.errorText, { color: tokens.colors.error }]}
+        color="error"
+        style={styles.errorText}
       >
         {error}
       </AtomicText>
@@ -48,7 +49,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   errorText: {
-    fontSize: 14,
     textAlign: "center",
     fontWeight: "500",
   },

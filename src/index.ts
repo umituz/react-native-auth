@@ -170,7 +170,6 @@ export type {
 // COMPONENTS
 export { AuthContainer } from './presentation/components/AuthContainer';
 export { AuthHeader } from './presentation/components/AuthHeader';
-export { AuthFormCard } from './presentation/components/AuthFormCard';
 export { LoginForm } from './presentation/components/LoginForm';
 export { RegisterForm } from './presentation/components/RegisterForm';
 export { AuthLegalLinks } from './presentation/components/AuthLegalLinks';

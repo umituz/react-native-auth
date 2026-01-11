@@ -8,11 +8,8 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  KeyboardAvoidingView,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useResponsive } from "@umituz/react-native-design-system";
-import { AuthBackground } from "./AuthBackground";
+import { useResponsive, useSafeAreaInsets, AtomicKeyboardAvoidingView, useAppDesignTokens } from "@umituz/react-native-design-system";
 
 /** Layout constants for auth screens */
 const AUTH_LAYOUT = {
@@ -29,17 +26,18 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
   const insets = useSafeAreaInsets();
   const { spacingMultiplier } = useResponsive();
 
+  const tokens = useAppDesignTokens();
+
   const dynamicStyles = useMemo(() => ({
     paddingTop: insets.top + (AUTH_LAYOUT.VERTICAL_PADDING * spacingMultiplier),
     paddingBottom: insets.bottom + (AUTH_LAYOUT.VERTICAL_PADDING * spacingMultiplier),
   }), [insets.top, insets.bottom, spacingMultiplier]);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
+    <AtomicKeyboardAvoidingView
+      style={[styles.container, { backgroundColor: tokens.colors.backgroundPrimary }]}
       behavior="padding"
     >
-      <AuthBackground />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, dynamicStyles]}
         keyboardShouldPersistTaps="handled"
@@ -47,7 +45,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
       >
         <View style={styles.content}>{children}</View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </AtomicKeyboardAvoidingView>
   );
 };
 

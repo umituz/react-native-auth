@@ -79,13 +79,11 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
         {hasTerms && (
           <AtomicButton
             variant="text"
+            size="sm"
             onPress={handleTermsPress}
             style={styles.linkButton}
-          >
-            <AtomicText type="bodySmall" color="primary">
-              {t("auth.termsOfService")}
-            </AtomicText>
-          </AtomicButton>
+            title={t("auth.termsOfService")}
+          />
         )}
         {hasTerms && hasPrivacy && (
           <AtomicText type="bodySmall" color="secondary" style={styles.separator}>
@@ -95,13 +93,11 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
         {hasPrivacy && (
           <AtomicButton
             variant="text"
+            size="sm"
             onPress={handlePrivacyPress}
             style={styles.linkButton}
-          >
-            <AtomicText type="bodySmall" color="primary">
-              {t("auth.privacyPolicy")}
-            </AtomicText>
-          </AtomicButton>
+            title={t("auth.privacyPolicy")}
+          />
         )}
       </View>
     </View>

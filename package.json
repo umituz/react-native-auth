@@ -61,7 +61,7 @@
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@umituz/react-native-design-system": "^2.8.36",
+    "@umituz/react-native-design-system": "^2.8.39",
     "@umituz/react-native-design-system-theme": "*",
     "eslint": "^8.57.0",
     "expo-apple-authentication": "^6.0.0",
