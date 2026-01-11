@@ -14,7 +14,7 @@ import { DEFAULT_PASSWORD_CONFIG } from "../../domain/value-objects/AuthConfig";
 import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
-import { AlertService, alertService } from "@umituz/react-native-design-system";
+import { alertService } from "@umituz/react-native-design-system";
 
 export interface UseRegisterFormResult {
   displayName: string;

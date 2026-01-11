@@ -4,7 +4,7 @@
  */
 
 import React, { useRef } from "react";
-import { View, StyleSheet, TextInput } from "react-native";
+import { StyleSheet, TextInput } from "react-native";
 import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import { useRegisterForm } from "../hooks/useRegisterForm";

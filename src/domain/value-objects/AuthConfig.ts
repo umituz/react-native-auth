@@ -5,10 +5,6 @@
 
 export interface PasswordConfig {
   minLength: number;
-  requireUppercase: boolean;
-  requireLowercase: boolean;
-  requireNumber: boolean;
-  requireSpecialChar: boolean;
 }
 
 /**
@@ -48,10 +44,6 @@ export interface AuthConfig {
 
 export const DEFAULT_PASSWORD_CONFIG: PasswordConfig = {
   minLength: 6,
-  requireUppercase: false,
-  requireLowercase: false,
-  requireNumber: false,
-  requireSpecialChar: false,
 };
 
 export const DEFAULT_SOCIAL_CONFIG: SocialAuthConfig = {

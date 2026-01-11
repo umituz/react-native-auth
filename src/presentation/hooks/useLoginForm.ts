@@ -8,7 +8,7 @@ import { useLocalization } from "@umituz/react-native-localization";
 import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 import { validateEmail, validatePasswordForLogin } from "../../infrastructure/utils/AuthValidation";
-import { AlertService, alertService } from "@umituz/react-native-design-system";
+import { alertService } from "@umituz/react-native-design-system";
 
 export interface UseLoginFormResult {
   email: string;

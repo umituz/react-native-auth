@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import { useAppDesignTokens, Divider, AtomicButton } from "@umituz/react-native-design-system";
+import { Divider, AtomicButton } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
@@ -31,7 +31,6 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   appleLoading = false,
   disabled = false,
 }) => {
-  const tokens = useAppDesignTokens();
   const { t } = useLocalization();
 
   const safeEnabledProviders = enabledProviders ?? [];
