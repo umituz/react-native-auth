@@ -168,7 +168,6 @@ export type {
 } from './presentation/navigation/AuthNavigator';
 
 // COMPONENTS
-export { AuthContainer } from './presentation/components/AuthContainer';
 export { AuthHeader } from './presentation/components/AuthHeader';
 export { LoginForm } from './presentation/components/LoginForm';
 export { RegisterForm } from './presentation/components/RegisterForm';

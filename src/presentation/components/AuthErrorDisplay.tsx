@@ -4,8 +4,11 @@
  */
 
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
+import {
+  AlertInline,
+  AlertService,
+  AlertMode,
+} from "@umituz/react-native-design-system";
 
 interface AuthErrorDisplayProps {
   error: string | null;
@@ -14,45 +17,19 @@ interface AuthErrorDisplayProps {
 export const AuthErrorDisplay: React.FC<AuthErrorDisplayProps> = ({
   error,
 }) => {
-  const tokens = useAppDesignTokens();
+  const alert = React.useMemo(() => {
+    if (!error) return null;
+    return AlertService.createErrorAlert(error, undefined, {
+      mode: AlertMode.INLINE,
+    });
+  }, [error]);
 
-  if (!error) {
+  if (!alert) {
     return null;
   }
 
-  return (
-    <View
-      style={[
-        styles.errorContainer,
-        {
-          backgroundColor: tokens.colors.errorLight,
-          borderColor: tokens.colors.error,
-        },
-      ]}
-    >
-      <AtomicText
-        type="bodyMedium"
-        color="error"
-        style={styles.errorText}
-      >
-        {error}
-      </AtomicText>
-    </View>
-  );
+  return <AlertInline alert={alert} />;
 };
-
-const styles = StyleSheet.create({
-  errorContainer: {
-    marginBottom: 16,
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  errorText: {
-    textAlign: "center",
-    fontWeight: "500",
-  },
-});
 
 
 

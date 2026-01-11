@@ -4,10 +4,9 @@
  */
 
 import React from "react";
-import { useAppNavigation, AtomicCard } from "@umituz/react-native-design-system";
+import { useAppNavigation, AtomicCard, ScreenLayout, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { AuthStackParamList } from "../navigation/AuthNavigator";
-import { AuthContainer } from "../components/AuthContainer";
 import { AuthHeader } from "../components/AuthHeader";
 import { RegisterForm } from "../components/RegisterForm";
 
@@ -26,15 +25,22 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
 }) => {
   const { t } = useLocalization();
   const navigation = useAppNavigation<AuthStackParamList>();
+  const tokens = useAppDesignTokens();
 
   const handleNavigateToLogin = () => {
     navigation.navigate("Login");
   };
 
   return (
-    <AuthContainer>
+    <ScreenLayout
+        scrollable
+        keyboardAvoiding
+        maxWidth={440}
+        contentContainerStyle={{ justifyContent: "center" }}
+        backgroundColor={tokens.colors.backgroundPrimary}
+    >
       <AuthHeader title={t("auth.createAccount")} />
-      <AtomicCard variant="elevated" padding="large">
+      <AtomicCard variant="elevated" padding="lg">
         <RegisterForm
           onNavigateToLogin={handleNavigateToLogin}
           termsUrl={termsUrl}
@@ -43,7 +49,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
           onPrivacyPress={onPrivacyPress}
         />
       </AtomicCard>
-    </AuthContainer>
+    </ScreenLayout>
   );
 };
 

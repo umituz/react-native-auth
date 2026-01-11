@@ -4,28 +4,34 @@
  */
 
 import React from "react";
-import { useAppNavigation, AtomicCard } from "@umituz/react-native-design-system";
+import { useAppNavigation, AtomicCard, ScreenLayout, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import type { AuthStackParamList } from "../navigation/AuthNavigator";
-import { AuthContainer } from "../components/AuthContainer";
 import { AuthHeader } from "../components/AuthHeader";
 import { LoginForm } from "../components/LoginForm";
 
 export const LoginScreen: React.FC = () => {
   const { t } = useLocalization();
   const navigation = useAppNavigation<AuthStackParamList>();
+  const tokens = useAppDesignTokens();
 
   const handleNavigateToRegister = () => {
     navigation.navigate("Register");
   };
 
   return (
-    <AuthContainer>
+    <ScreenLayout
+      scrollable
+      keyboardAvoiding
+      maxWidth={440}
+      contentContainerStyle={{ justifyContent: "center" }}
+      backgroundColor={tokens.colors.backgroundPrimary}
+    >
       <AuthHeader title={t("auth.title")} />
-      <AtomicCard variant="elevated" padding="large">
+      <AtomicCard variant="elevated" padding="lg">
         <LoginForm onNavigateToRegister={handleNavigateToRegister} />
       </AtomicCard>
-    </AuthContainer>
+    </ScreenLayout>
   );
 };
 
