@@ -43,15 +43,17 @@ export function buildBaseData(
     isAnonymous: user.isAnonymous,
   };
 
-  const fields: (keyof UserDocumentExtras)[] = [
-    'deviceId', 'platform', 'deviceModel', 'deviceBrand',
-    'osVersion', 'appVersion', 'buildNumber', 'locale', 'timezone'
-  ];
-
-  fields.forEach(field => {
-    const val = extras?.[field];
-    if (val) data[field] = val;
-  });
+  if (extras) {
+    const internalFields = ["signUpMethod", "previousAnonymousUserId"];
+    Object.keys(extras).forEach((key) => {
+      if (!internalFields.includes(key)) {
+        const val = extras[key];
+        if (val !== undefined) {
+          data[key] = val;
+        }
+      }
+    });
+  }
 
   return data;
 }

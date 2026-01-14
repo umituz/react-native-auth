@@ -7,6 +7,7 @@ import type { Auth, User } from "firebase/auth";
 import { getFirebaseAuth } from "@umituz/react-native-firebase";
 import { initializeAuthService } from "./AuthService";
 import { configureUserDocumentService } from "./UserDocumentService";
+import type { UserDocumentExtras } from "./UserDocumentService";
 import { collectDeviceExtras } from "@umituz/react-native-design-system";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
 import { createAuthStateHandler } from "../utils/authStateHandler";
@@ -17,7 +18,7 @@ import type { IStorageProvider } from "../types/Storage.types";
 export interface InitializeAuthOptions {
   userCollection?: string;
   extraFields?: Record<string, unknown>;
-  collectExtras?: () => Promise<Record<string, unknown>>;
+  collectExtras?: () => Promise<UserDocumentExtras>;
   storageProvider?: IStorageProvider;
   autoAnonymousSignIn?: boolean;
   onUserConverted?: (anonymousId: string, authenticatedId: string) => void | Promise<void>;
