@@ -19,7 +19,7 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) => {
   const { t } = useLocalization();
-  const passwordRef = useRef<TextInput>(null);
+  const passwordRef = useRef<React.ElementRef<typeof TextInput>>(null);
   const {
     email,
     password,
@@ -75,12 +75,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
         secureTextEntry
         showPasswordToggle
         autoCapitalize="none"
+        autoCorrect={false}
         disabled={loading}
         state={passwordError ? "error" : "default"}
         helperText={passwordError || undefined}
         returnKeyType="done"
         onSubmitEditing={() => { void handleSignIn(); }}
-        textContentType="password"
+        textContentType="oneTimeCode"
         style={styles.input}
       />
 

@@ -30,9 +30,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onPrivacyPress,
 }) => {
   const { t } = useLocalization();
-  const emailRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
-  const confirmPasswordRef = useRef<TextInput>(null);
+  const emailRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const passwordRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const confirmPasswordRef = useRef<React.ElementRef<typeof TextInput>>(null);
 
   const {
     displayName,
@@ -97,13 +97,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         secureTextEntry
         showPasswordToggle
         autoCapitalize="none"
+        autoCorrect={false}
         disabled={loading}
         state={fieldErrors.password ? "error" : "default"}
         helperText={fieldErrors.password || undefined}
         returnKeyType="next"
         onSubmitEditing={() => confirmPasswordRef.current?.focus()}
         blurOnSubmit={false}
-        textContentType="newPassword"
+        textContentType="oneTimeCode"
         style={styles.input}
       />
       {password.length > 0 && (
@@ -115,18 +116,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         label={t("auth.confirmPassword")}
         value={confirmPassword}
         onChangeText={handleConfirmPasswordChange}
-        placeholder={
-          t("auth.confirmPasswordPlaceholder")
-        }
+        placeholder={t("auth.confirmPasswordPlaceholder")}
         secureTextEntry
         showPasswordToggle
         autoCapitalize="none"
+        autoCorrect={false}
         disabled={loading}
         state={fieldErrors.confirmPassword ? "error" : "default"}
         helperText={fieldErrors.confirmPassword || undefined}
         returnKeyType="done"
         onSubmitEditing={() => { void handleSignUp(); }}
-        textContentType="newPassword"
+        textContentType="oneTimeCode"
         style={styles.input}
       />
       {confirmPassword.length > 0 && (
