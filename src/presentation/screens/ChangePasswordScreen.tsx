@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import {
   ScreenLayout,
+  ScreenHeader,
   AtomicInput,
   AtomicButton,
   AtomicText,
@@ -110,7 +111,7 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
 
   const RequirementsList = () => (
     <View style={styles.requirementsContainer}>
-      <AtomicText variant="labelMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 8 }}>
+      <AtomicText type="labelMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 8 }}>
         {t("auth.passwordChange.requirements")}
       </AtomicText>
       <RequirementItem label={t("auth.passwordChange.minLength")} met={isLengthValid} />
@@ -131,7 +132,7 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
         ]}
       />
       <AtomicText
-        variant="bodySmall"
+        type="bodySmall"
         style={{ color: met ? tokens.colors.textPrimary : tokens.colors.textSecondary }}
       >
         {label}
@@ -142,12 +143,12 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
   return (
     <ScreenLayout
       scrollable
-      title={t("auth.passwordChange.title")}
+      header={<ScreenHeader title={t("auth.passwordChange.title")} />}
       backgroundColor={tokens.colors.backgroundPrimary}
       edges={["bottom"]}
     >
       <View style={styles.content}>
-        <AtomicText variant="bodyMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 24 }}>
+        <AtomicText type="bodyMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 24 }}>
           {t("auth.passwordChange.description")}
         </AtomicText>
 
