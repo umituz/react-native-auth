@@ -161,6 +161,8 @@ export { AccountScreen } from './presentation/screens/AccountScreen';
 export type { AccountScreenConfig, AccountScreenProps } from './presentation/screens/AccountScreen';
 export { EditProfileScreen } from './presentation/screens/EditProfileScreen';
 export type { EditProfileConfig, EditProfileScreenProps } from './presentation/screens/EditProfileScreen';
+export { ChangePasswordScreen } from './presentation/screens/ChangePasswordScreen';
+export type { ChangePasswordScreenProps } from './presentation/screens/ChangePasswordScreen';
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type {
   AuthStackParamList,
