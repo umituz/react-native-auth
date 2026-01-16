@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-auth",
-  "version": "3.6.13",
+  "version": "3.6.15",
   "description": "Authentication service for React Native apps - Secure, type-safe, and production-ready. Provider-agnostic design with dependency injection, configurable validation, and comprehensive error handling.",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -32,7 +32,6 @@
     "url": "git+https://github.com/umituz/react-native-auth.git"
   },
   "dependencies": {
-    "@umituz/react-native-firebase": "*",
     "@umituz/react-native-localization": "*"
   },
   "peerDependencies": {
@@ -64,7 +63,8 @@
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@umituz/react-native-design-system": "*",
+    "@umituz/react-native-design-system": "^2.9.33",
+    "@umituz/react-native-firebase": "^1.13.82",
     "eslint": "^8.57.0",
     "expo-apple-authentication": "^6.0.0",
     "expo-application": "^7.0.8",
@@ -82,8 +82,8 @@
     "expo-media-library": "^18.2.1",
     "expo-modules-core": "^3.0.29",
     "expo-network": "^8.0.8",
-    "expo-sharing": "^14.0.8",
     "expo-secure-store": "^15.0.8",
+    "expo-sharing": "^14.0.8",
     "expo-video": "^3.0.15",
     "expo-web-browser": "^12.0.0",
     "firebase": "^11.0.0",

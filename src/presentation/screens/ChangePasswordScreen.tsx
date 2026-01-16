@@ -17,14 +17,12 @@ import {
   AtomicButton,
   AtomicText,
   useAppDesignTokens,
-  type AtomicInputProps,
 } from "@umituz/react-native-design-system";
 import { useLocalization } from "@umituz/react-native-localization";
 import {
   updateUserPassword,
   reauthenticateWithPassword,
   getCurrentUserFromGlobal,
-  getFirebaseAuth,
 } from "@umituz/react-native-firebase";
 
 export interface ChangePasswordScreenProps {
@@ -38,7 +36,6 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
 }) => {
   const { t } = useLocalization();
   const tokens = useAppDesignTokens();
-  const auth = getFirebaseAuth();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
