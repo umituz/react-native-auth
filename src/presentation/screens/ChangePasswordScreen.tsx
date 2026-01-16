@@ -95,19 +95,19 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
         Alert.alert(t("common.success"), t("auth.passwordChange.success"), [
             { text: "OK", onPress: onSuccess }
         ]);
-        if (onSuccess) onSuccess(); 
       } else {
         setError(updateResult.error?.message || t("auth.passwordChange.error"));
       }
-    } catch (e: any) {
-      setError(e.message || t("auth.passwordChange.error"));
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : t("auth.passwordChange.error");
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const RequirementsList = () => (
-    <View style={styles.requirementsContainer}>
+    <View style={[styles.requirementsContainer, { backgroundColor: tokens.colors.surfaceSecondary }]}>
       <AtomicText type="labelMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 8 }}>
         {t("auth.passwordChange.requirements")}
       </AtomicText>
@@ -200,7 +200,7 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
             />
             <AtomicButton
               title={loading ? t("auth.passwordChange.changing") : t("auth.passwordChange.changePassword")}
-              onPress={handleChangePassword}
+              onPress={() => { void handleChangePassword(); }}
               loading={loading}
               disabled={!isValid || loading}
               style={{ flex: 1 }}
@@ -223,7 +223,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 12,
     borderRadius: 8,
-    backgroundColor: "rgba(0,0,0,0.05)",
   },
   requirementItem: {
     flexDirection: "row",
