@@ -201,10 +201,12 @@ export {
   selectIsAnonymous,
   selectUserType,
   selectIsAuthReady,
+  selectIsRegisteredUser,
   getUserId,
   getUserType,
   getIsAuthenticated,
   getIsAnonymous,
+  getIsRegisteredUser,
 } from './presentation/stores/authStore';
 export type { UserType, AuthState, AuthActions } from './presentation/stores/authStore';
 export type { AuthListenerOptions } from './types/auth-store.types';

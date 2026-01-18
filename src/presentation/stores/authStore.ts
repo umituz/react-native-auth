@@ -27,6 +27,7 @@ import {
   selectIsAnonymous,
   selectUserType,
   selectIsAuthReady,
+  selectIsRegisteredUser,
 } from "./auth.selectors";
 
 // Re-export types for convenience
@@ -47,6 +48,7 @@ export {
   selectIsAnonymous,
   selectUserType,
   selectIsAuthReady,
+  selectIsRegisteredUser,
 };
 
 // Re-export listener functions
@@ -171,4 +173,12 @@ export function getIsAuthenticated(): boolean {
  */
 export function getIsAnonymous(): boolean {
   return selectIsAnonymous(useAuthStore.getState());
+}
+
+/**
+ * Check if registered user without hook
+ * Returns true only if user is authenticated AND not anonymous
+ */
+export function getIsRegisteredUser(): boolean {
+  return selectIsRegisteredUser(useAuthStore.getState());
 }

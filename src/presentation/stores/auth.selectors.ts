@@ -110,3 +110,12 @@ export const selectUserType = (state: AuthStore): UserType => {
 export const selectIsAuthReady = (state: AuthStore): boolean => {
   return state.initialized && !state.loading;
 };
+
+/**
+ * Check if user is a registered user (authenticated AND not anonymous)
+ * Use this for feature gating - only registered users can access premium features
+ */
+export const selectIsRegisteredUser = (state: AuthStore): boolean => {
+  if (!state.initialized) return false;
+  return !!state.user && !state.isAnonymous && !state.user.isAnonymous;
+};

@@ -20,6 +20,7 @@ import {
   selectUserType,
   selectIsAnonymous,
   selectIsAuthReady,
+  selectIsRegisteredUser,
   type UserType,
 } from "../stores/authStore";
 import {
@@ -45,6 +46,8 @@ export interface UseAuthResult {
   isAnonymous: boolean;
   /** Whether user is authenticated (not anonymous) */
   isAuthenticated: boolean;
+  /** Whether user is a registered user (authenticated AND not anonymous) */
+  isRegisteredUser: boolean;
   /** Current error message */
   error: string | null;
   /** Sign up function */
@@ -75,6 +78,7 @@ export function useAuth(): UseAuthResult {
   const userType = useAuthStore(selectUserType);
   const isAnonymous = useAuthStore(selectIsAnonymous);
   const isAuthReady = useAuthStore(selectIsAuthReady);
+  const isRegisteredUser = useAuthStore(selectIsRegisteredUser);
 
   // Actions from store - using typed selectors
   const setLoading = useAuthStore(selectSetLoading);
@@ -152,6 +156,7 @@ export function useAuth(): UseAuthResult {
     isAuthReady,
     isAnonymous,
     isAuthenticated,
+    isRegisteredUser,
     error,
     signUp,
     signIn,
