@@ -32,6 +32,8 @@ export interface AuthBottomSheetProps {
   onGoogleSignIn?: () => Promise<void>;
   /** Called when Apple sign-in is requested (overrides internal behavior) */
   onAppleSignIn?: () => Promise<void>;
+  /** Called when auth completes successfully (login or register) */
+  onAuthSuccess?: () => void;
 }
 
 export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
@@ -42,6 +44,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
   socialConfig,
   onGoogleSignIn,
   onAppleSignIn,
+  onAuthSuccess,
 }) => {
   const tokens = useAppDesignTokens();
   const { t } = useLocalization();
@@ -58,7 +61,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     handleNavigateToLogin,
     handleGoogleSignIn,
     handleAppleSignIn,
-  } = useAuthBottomSheet({ socialConfig, onGoogleSignIn, onAppleSignIn });
+  } = useAuthBottomSheet({ socialConfig, onGoogleSignIn, onAppleSignIn, onAuthSuccess });
 
   useEffect(() => {
     if (__DEV__) {

@@ -89,6 +89,18 @@ export class FirebaseAuthProvider implements IAuthProvider {
           });
         }
 
+        // Reload user to refresh token before linking (prevents token-expired errors)
+        try {
+          await currentUser.reload();
+          if (__DEV__) {
+            console.log("[FirebaseAuthProvider] User reloaded successfully");
+          }
+        } catch (reloadError) {
+          if (__DEV__) {
+            console.log("[FirebaseAuthProvider] Reload failed, proceeding with link:", reloadError);
+          }
+        }
+
         const credential = EmailAuthProvider.credential(
           credentials.email.trim(),
           credentials.password

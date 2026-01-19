@@ -18,10 +18,12 @@ interface UseAuthBottomSheetParams {
   socialConfig?: SocialAuthConfiguration;
   onGoogleSignIn?: () => Promise<void>;
   onAppleSignIn?: () => Promise<void>;
+  /** Called when auth completes successfully (login or register) */
+  onAuthSuccess?: () => void;
 }
 
 export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
-  const { socialConfig, onGoogleSignIn, onAppleSignIn } = params;
+  const { socialConfig, onGoogleSignIn, onAppleSignIn, onAuthSuccess } = params;
   
   const modalRef = useRef<BottomSheetModalRef>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -110,17 +112,24 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
           justConvertedFromAnonymous,
         });
       }
-      // Execute callback BEFORE closing to prevent clearPendingCallback from clearing it
-      executePendingCallback();
-      // Close modal and hide (without clearing callback again)
+      // Close modal and hide first
       modalRef.current?.dismiss();
       hideAuthModal();
+      // Notify auth success
+      onAuthSuccess?.();
+      // Execute callback with delay to ensure auth state has propagated
+      setTimeout(() => {
+        if (typeof __DEV__ !== "undefined" && __DEV__) {
+          console.log("[useAuthBottomSheet] Executing pending callback after auth");
+        }
+        executePendingCallback();
+      }, 100);
     }
 
     prevIsAuthenticatedRef.current = isAuthenticated;
     prevIsVisibleRef.current = isVisible;
     prevIsAnonymousRef.current = isAnonymous;
-  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, hideAuthModal]);
+  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, hideAuthModal, onAuthSuccess]);
 
   const handleNavigateToRegister = useCallback(() => {
     setMode("register");
