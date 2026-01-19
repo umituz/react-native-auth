@@ -213,3 +213,15 @@ export type { AuthListenerOptions } from './types/auth-store.types';
 
 // UTILITIES
 export { getAuthErrorLocalizationKey } from './presentation/utils/getAuthErrorMessage';
+
+// App Service Helper (for configureAppServices)
+export {
+  createAuthService,
+  type IAuthService as IAppAuthService,
+} from './infrastructure/services/app-service-helpers';
+
+// Init Module Factory
+export {
+  createAuthInitModule,
+  type AuthInitModuleConfig,
+} from './init';
