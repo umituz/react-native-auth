@@ -6,7 +6,7 @@
 
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { useAppDesignTokens, ScreenLayout, AtomicIcon, AtomicText } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, ScreenLayout, AtomicIcon, AtomicText, NavigationHeader, useAppNavigation } from "@umituz/react-native-design-system";
 
 import { ProfileSection, type ProfileSectionConfig } from "../components/ProfileSection";
 import { AccountActions, type AccountActionsConfig } from "../components/AccountActions";
@@ -18,6 +18,7 @@ export interface AccountScreenConfig {
     editProfileText?: string;
     onEditProfile?: () => void;
     onSignIn?: () => void;
+    title?: string;
 }
 
 export interface AccountScreenProps {
@@ -26,9 +27,16 @@ export interface AccountScreenProps {
 
 export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
+    const navigation = useAppNavigation();
 
     return (
         <ScreenLayout
+            header={
+                <NavigationHeader
+                    title={config.title || "Account Settings"}
+                    onBackPress={() => navigation.goBack()}
+                />
+            }
             scrollable={true}
             edges={['bottom']}
             backgroundColor={tokens.colors.backgroundPrimary}

@@ -5,8 +5,9 @@
  */
 
 import React from "react";
-import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useAppDesignTokens, AtomicIcon, AtomicText } from "@umituz/react-native-design-system";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { useAppDesignTokens, AtomicIcon, AtomicText, useAlert, AlertType, AlertMode } from "@umituz/react-native-design-system";
+import { useLocalization } from "@umituz/react-native-localization";
 
 export interface AccountActionsConfig {
     logoutText: string;
@@ -30,6 +31,8 @@ export interface AccountActionsProps {
 
 export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
+    const alert = useAlert();
+    const { t } = useLocalization();
     const {
         logoutText,
         deleteAccountText,
@@ -47,41 +50,53 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
     } = config;
 
     const handleLogout = () => {
-        Alert.alert(logoutConfirmTitle, logoutConfirmMessage, [
-            { text: "Cancel", style: "cancel" },
-            {
-                text: logoutText,
-                style: "destructive",
-                onPress: () => {
-                    void (async () => {
+        alert.show(AlertType.WARNING, AlertMode.MODAL, logoutConfirmTitle, logoutConfirmMessage, {
+            actions: [
+                {
+                    id: "cancel",
+                    label: t("common.cancel"),
+                    style: "secondary",
+                    onPress: () => {},
+                },
+                {
+                    id: "confirm",
+                    label: logoutText,
+                    style: "destructive",
+                    onPress: async () => {
                         try {
                             await onLogout();
                         } catch (error) {
                             // Silent error handling
                         }
-                    })();
+                    },
                 },
-            },
-        ]);
+            ],
+        });
     };
 
     const handleDeleteAccount = () => {
-        Alert.alert(deleteConfirmTitle, deleteConfirmMessage, [
-            { text: "Cancel", style: "cancel" },
-            {
-                text: deleteAccountText,
-                style: "destructive",
-                onPress: () => {
-                    void (async () => {
+        alert.show(AlertType.ERROR, AlertMode.MODAL, deleteConfirmTitle, deleteConfirmMessage, {
+            actions: [
+                {
+                    id: "cancel",
+                    label: t("common.cancel"),
+                    style: "secondary",
+                    onPress: () => {},
+                },
+                {
+                    id: "confirm",
+                    label: deleteAccountText,
+                    style: "destructive",
+                    onPress: async () => {
                         try {
                             await onDeleteAccount();
                         } catch (error) {
-                            Alert.alert(deleteErrorTitle, deleteErrorMessage);
+                            alert.showError(deleteErrorTitle, deleteErrorMessage, { mode: AlertMode.MODAL });
                         }
-                    })();
+                    },
                 },
-            },
-        ]);
+            ],
+        });
     };
 
     return (
