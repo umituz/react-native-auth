@@ -69,6 +69,9 @@ export interface UseAuthResult {
  * Must call initializeAuthListener() once in app root.
  */
 export function useAuth(): UseAuthResult {
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    console.log('[useAuth] Hook called');
+  }
   // State from store - using typed selectors
   const user = useAuthStore(selectUser);
   const loading = useAuthStore(selectLoading);
