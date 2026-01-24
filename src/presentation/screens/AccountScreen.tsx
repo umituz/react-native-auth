@@ -6,7 +6,7 @@
 
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { useAppDesignTokens, ScreenLayout, AtomicIcon, AtomicText, useAppNavigation } from "@umituz/react-native-design-system";
+import { useAppDesignTokens, ScreenLayout, AtomicIcon, AtomicText } from "@umituz/react-native-design-system";
 
 import { ProfileSection, type ProfileSectionConfig } from "../components/ProfileSection";
 import { AccountActions, type AccountActionsConfig } from "../components/AccountActions";
@@ -27,7 +27,6 @@ export interface AccountScreenProps {
 
 export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
-    const navigation = useAppNavigation();
 
     return (
         <ScreenLayout
