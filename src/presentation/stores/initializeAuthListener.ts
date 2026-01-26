@@ -16,6 +16,10 @@ import type { AuthListenerOptions } from "../../types/auth-store.types";
 declare const __DEV__: boolean;
 
 let listenerInitialized = false;
+// Reference counter for multiple subscribers
+let listenerRefCount = 0;
+// Actual unsubscribe function from Firebase
+let firebaseUnsubscribe: (() => void) | null = null;
 
 /**
  * Initialize Firebase auth listener
@@ -33,11 +37,29 @@ export function initializeAuthListener(
     });
   }
 
+  // If already initialized, increment ref count and return unsubscribe that decrements
   if (listenerInitialized) {
+    listenerRefCount++;
     if (__DEV__) {
-      console.log("[AuthListener] Already initialized, skipping");
+      console.log("[AuthListener] Already initialized, incrementing ref count:", listenerRefCount);
     }
-    return () => {};
+    // Return function that decrements ref count
+    return () => {
+      listenerRefCount--;
+      if (__DEV__) {
+        console.log("[AuthListener] Ref count decremented:", listenerRefCount);
+      }
+      // Only cleanup when all subscribers unsubscribe
+      if (listenerRefCount <= 0 && firebaseUnsubscribe) {
+        if (__DEV__) {
+          console.log("[AuthListener] Last subscriber, cleaning up");
+        }
+        firebaseUnsubscribe();
+        firebaseUnsubscribe = null;
+        listenerInitialized = false;
+        listenerRefCount = 0;
+      }
+    };
   }
 
   const auth = getFirebaseAuth();
@@ -64,8 +86,9 @@ export function initializeAuthListener(
   }
 
   listenerInitialized = true;
+  listenerRefCount = 1;
 
-  const unsubscribe = onIdTokenChanged(auth, (user) => {
+  firebaseUnsubscribe = onIdTokenChanged(auth, (user) => {
     if (__DEV__) {
       console.log("[AuthListener] onIdTokenChanged:", {
         uid: user?.uid ?? null,
@@ -79,18 +102,40 @@ export function initializeAuthListener(
       if (__DEV__) {
         console.log("[AuthListener] No user, auto signing in anonymously...");
       }
+      // Set loading state while attempting sign-in
+      store.setLoading(true);
+
       void (async () => {
-        try {
-          await anonymousAuthService.signInAnonymously(auth);
-          if (__DEV__) {
-            console.log("[AuthListener] Anonymous sign-in successful");
+        const MAX_RETRIES = 2;
+        const RETRY_DELAY_MS = 1000;
+
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            await anonymousAuthService.signInAnonymously(auth);
+            if (__DEV__) {
+              console.log("[AuthListener] Anonymous sign-in successful");
+            }
+            // Success - the listener will fire again with the new user
+            return;
+          } catch (error) {
+            if (__DEV__) {
+              console.warn(`[AuthListener] Anonymous sign-in attempt ${attempt + 1} failed:`, error);
+            }
+
+            // If not last attempt, wait and retry
+            if (attempt < MAX_RETRIES) {
+              await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+              continue;
+            }
+
+            // Last attempt failed - set error state
+            if (__DEV__) {
+              console.error("[AuthListener] All anonymous sign-in attempts failed");
+            }
+            store.setFirebaseUser(null);
+            store.setLoading(false);
+            store.setInitialized(true);
           }
-        } catch (error) {
-          if (__DEV__) {
-            console.warn("[AuthListener] Anonymous sign-in failed:", error);
-          }
-          store.setFirebaseUser(null);
-          store.setInitialized(true);
         }
       })();
       return;
@@ -110,11 +155,20 @@ export function initializeAuthListener(
   });
 
   return () => {
+    listenerRefCount--;
     if (__DEV__) {
-      console.log("[AuthListener] Unsubscribing");
+      console.log("[AuthListener] Unsubscribing, ref count:", listenerRefCount);
     }
-    unsubscribe();
-    listenerInitialized = false;
+    // Only cleanup when all subscribers unsubscribe
+    if (listenerRefCount <= 0 && firebaseUnsubscribe) {
+      if (__DEV__) {
+        console.log("[AuthListener] Last subscriber, cleaning up listener");
+      }
+      firebaseUnsubscribe();
+      firebaseUnsubscribe = null;
+      listenerInitialized = false;
+      listenerRefCount = 0;
+    }
   };
 }
 
@@ -122,7 +176,12 @@ export function initializeAuthListener(
  * Reset listener state (for testing)
  */
 export function resetAuthListener(): void {
+  if (firebaseUnsubscribe) {
+    firebaseUnsubscribe();
+    firebaseUnsubscribe = null;
+  }
   listenerInitialized = false;
+  listenerRefCount = 0;
 }
 
 /**
