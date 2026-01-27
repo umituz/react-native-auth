@@ -6,5 +6,4 @@
 export {
   createAuthInitModule,
   type AuthInitModuleConfig,
-  type InitModule,
 } from './createAuthInitModule';
