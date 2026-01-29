@@ -7,3 +7,5 @@ export {
   createAuthInitModule,
   type AuthInitModuleConfig,
 } from './createAuthInitModule';
+
+export type { InitModule } from '@umituz/react-native-design-system';
