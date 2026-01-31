@@ -53,7 +53,6 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
             loading={googleLoading}
             fullWidth
             style={styles.socialButton}
-            leftIcon="logo-google"
           >
             {translations.google}
           </AtomicButton>
@@ -67,7 +66,6 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
             loading={appleLoading}
             fullWidth
             style={styles.socialButton}
-            leftIcon="logo-apple"
           >
             {translations.apple}
           </AtomicButton>
