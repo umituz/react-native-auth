@@ -1,103 +1,79 @@
-/**
- * Auth Legal Links Component
- * Display Terms of Service and Privacy Policy links
- */
-
 import React from "react";
 import { View, StyleSheet, Linking } from "react-native";
-import { AtomicButton, AtomicText } from "@umituz/react-native-design-system";
+import { AtomicText, AtomicButton, useAppDesignTokens } from "@umituz/react-native-design-system";
 
-import { useLocalization } from "@umituz/react-native-localization";
+export interface AuthLegalLinksTranslations {
+  termsOfService: string;
+  privacyPolicy: string;
+}
 
 export interface AuthLegalLinksProps {
-  /**
-   * Terms of Service URL
-   */
+  translations: AuthLegalLinksTranslations;
   termsUrl?: string;
-  /**
-   * Privacy Policy URL
-   */
   privacyUrl?: string;
-  /**
-   * Callback when Terms of Service is pressed
-   */
   onTermsPress?: () => void;
-  /**
-   * Callback when Privacy Policy is pressed
-   */
   onPrivacyPress?: () => void;
-  /**
-   * Custom text before links
-   */
   prefixText?: string;
 }
 
 export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
+  translations,
   termsUrl,
   privacyUrl,
   onTermsPress,
   onPrivacyPress,
   prefixText,
 }) => {
-  const { t } = useLocalization();
+  const tokens = useAppDesignTokens();
 
-  const handleTermsPress = () => {
+  const handleTermsPress = async () => {
     if (onTermsPress) {
       onTermsPress();
     } else if (termsUrl) {
-      void Linking.openURL(termsUrl);
+      await Linking.openURL(termsUrl);
     }
   };
 
-  const handlePrivacyPress = () => {
+  const handlePrivacyPress = async () => {
     if (onPrivacyPress) {
       onPrivacyPress();
     } else if (privacyUrl) {
-      void Linking.openURL(privacyUrl);
+      await Linking.openURL(privacyUrl);
     }
   };
 
-  const hasTerms = termsUrl || onTermsPress;
-  const hasPrivacy = privacyUrl || onPrivacyPress;
-
-  if (!hasTerms && !hasPrivacy) {
+  if (!termsUrl && !privacyUrl && !onTermsPress && !onPrivacyPress) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { marginTop: tokens.spacing.lg }]}>
       {prefixText && (
-        <AtomicText
-          type="bodySmall"
-          color="textSecondary"
-          style={styles.prefixText}
-        >
+        <AtomicText type="bodySmall" color="textSecondary" style={styles.prefix}>
           {prefixText}
         </AtomicText>
       )}
-      <View style={styles.linksContainer}>
-        {hasTerms && (
+      <View style={styles.linksRow}>
+        {(termsUrl || onTermsPress) && (
           <AtomicButton
             variant="text"
             size="sm"
-            onPress={handleTermsPress}
-            style={styles.linkButton}
-            title={t("auth.termsOfService")}
-          />
+            onPress={() => { void handleTermsPress(); }}
+          >
+            {translations.termsOfService}
+          </AtomicButton>
         )}
-        {hasTerms && hasPrivacy && (
-          <AtomicText type="bodySmall" color="textSecondary" style={styles.separator}>
-            {" • "}
-          </AtomicText>
+        {(termsUrl || onTermsPress) && (privacyUrl || onPrivacyPress) && (
+          <AtomicText type="bodySmall" color="textSecondary"> & </AtomicText>
         )}
-        {hasPrivacy && (
+        {(privacyUrl || onPrivacyPress) && (
           <AtomicButton
             variant="text"
             size="sm"
-            onPress={handlePrivacyPress}
-            style={styles.linkButton}
-            title={t("auth.privacyPolicy")}
-          />
+            onPress={() => { void handlePrivacyPress(); }}
+          >
+            {translations.privacyPolicy}
+          </AtomicButton>
         )}
       </View>
     </View>
@@ -106,35 +82,13 @@ export const AuthLegalLinks: React.FC<AuthLegalLinksProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 16,
     alignItems: "center",
   },
-  prefixText: {
-    marginBottom: 8,
-    textAlign: "center",
+  prefix: {
+    marginBottom: 4,
   },
-  linksContainer: {
+  linksRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    flexWrap: "wrap",
-  },
-  linkButton: {
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-  },
-  separator: {
-    marginHorizontal: 4,
   },
 });
-
-
-
-
-
-
-
-
-
-
-

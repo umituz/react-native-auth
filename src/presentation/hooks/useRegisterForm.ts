@@ -1,10 +1,4 @@
-/**
- * useRegisterForm Hook
- * Single Responsibility: Handle register form logic
- */
-
 import { useState, useCallback, useMemo } from "react";
-import { useLocalization } from "@umituz/react-native-localization";
 import {
   validateEmail,
   validatePasswordForRegister,
@@ -15,6 +9,16 @@ import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
 import { alertService } from "@umituz/react-native-design-system";
+
+export interface RegisterFormTranslations {
+  successTitle: string;
+  signUpSuccess: string;
+  errors: Record<string, string>;
+}
+
+export interface UseRegisterFormConfig {
+  translations: RegisterFormTranslations;
+}
 
 export interface UseRegisterFormResult {
   displayName: string;
@@ -39,12 +43,9 @@ export interface UseRegisterFormResult {
   displayError: string | null;
 }
 
-/**
- * Hook for register form logic
- */
-export function useRegisterForm(): UseRegisterFormResult {
-  const { t } = useLocalization();
+export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterFormResult {
   const { signUp, loading, error } = useAuth();
+  const translations = config?.translations;
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -58,11 +59,13 @@ export function useRegisterForm(): UseRegisterFormResult {
     confirmPassword?: string;
   }>({});
 
+  const getErrorMessage = useCallback((key: string) => {
+    return translations?.errors?.[key] || key;
+  }, [translations]);
+
   const passwordRequirements = useMemo((): PasswordRequirements => {
     if (!password) {
-      return {
-        hasMinLength: false,
-      };
+      return { hasMinLength: false };
     }
     const result = validatePasswordForRegister(password, DEFAULT_PASSWORD_CONFIG);
     return result.requirements;
@@ -76,9 +79,7 @@ export function useRegisterForm(): UseRegisterFormResult {
     setDisplayName(text);
     setFieldErrors((prev) => {
       const next = { ...prev };
-      if (next.displayName) {
-        delete next.displayName;
-      }
+      if (next.displayName) delete next.displayName;
       return next;
     });
     setLocalError(null);
@@ -88,9 +89,7 @@ export function useRegisterForm(): UseRegisterFormResult {
     setEmail(text);
     setFieldErrors((prev) => {
       const next = { ...prev };
-      if (next.email) {
-        delete next.email;
-      }
+      if (next.email) delete next.email;
       return next;
     });
     setLocalError(null);
@@ -100,12 +99,8 @@ export function useRegisterForm(): UseRegisterFormResult {
     setPassword(text);
     setFieldErrors((prev) => {
       const next = { ...prev };
-      if (next.password) {
-        delete next.password;
-      }
-      if (next.confirmPassword) {
-        delete next.confirmPassword;
-      }
+      if (next.password) delete next.password;
+      if (next.confirmPassword) delete next.confirmPassword;
       return next;
     });
     setLocalError(null);
@@ -115,9 +110,7 @@ export function useRegisterForm(): UseRegisterFormResult {
     setConfirmPassword(text);
     setFieldErrors((prev) => {
       const next = { ...prev };
-      if (next.confirmPassword) {
-        delete next.confirmPassword;
-      }
+      if (next.confirmPassword) delete next.confirmPassword;
       return next;
     });
     setLocalError(null);
@@ -129,39 +122,34 @@ export function useRegisterForm(): UseRegisterFormResult {
 
     const emailResult = validateEmail(email.trim());
     if (!emailResult.isValid && emailResult.error) {
-      setFieldErrors((prev) => ({ ...prev, email: t(emailResult.error as string) }));
+      setFieldErrors((prev) => ({ ...prev, email: getErrorMessage(emailResult.error as string) }));
       return;
     }
 
     const passwordResult = validatePasswordForRegister(password, DEFAULT_PASSWORD_CONFIG);
     if (!passwordResult.isValid && passwordResult.error) {
-      setFieldErrors((prev) => ({ ...prev, password: t(passwordResult.error as string) }));
+      setFieldErrors((prev) => ({ ...prev, password: getErrorMessage(passwordResult.error as string) }));
       return;
     }
 
     const confirmResult = validatePasswordConfirmation(password, confirmPassword);
     if (!confirmResult.isValid && confirmResult.error) {
-      setFieldErrors((prev) => ({ ...prev, confirmPassword: t(confirmResult.error as string) }));
+      setFieldErrors((prev) => ({ ...prev, confirmPassword: getErrorMessage(confirmResult.error as string) }));
       return;
     }
 
     try {
-      await signUp(
-        email.trim(),
-        password,
-        displayName.trim() || undefined,
-      );
-      
-      alertService.success(
-        t("auth.successTitle"),
-        t("auth.signUpSuccess")
-      );
+      await signUp(email.trim(), password, displayName.trim() || undefined);
+
+      if (translations) {
+        alertService.success(translations.successTitle, translations.signUpSuccess);
+      }
     } catch (err: unknown) {
       const localizationKey = getAuthErrorLocalizationKey(err);
-      const errorMessage = t(localizationKey);
+      const errorMessage = getErrorMessage(localizationKey);
       setLocalError(errorMessage);
     }
-  }, [displayName, email, password, confirmPassword, signUp, t]);
+  }, [displayName, email, password, confirmPassword, signUp, translations, getErrorMessage]);
 
   const displayError = localError || error;
 
@@ -183,5 +171,3 @@ export function useRegisterForm(): UseRegisterFormResult {
     displayError,
   };
 }
-
-

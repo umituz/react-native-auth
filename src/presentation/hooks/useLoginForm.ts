@@ -1,14 +1,18 @@
-/**
- * useLoginForm Hook
- * Single Responsibility: Handle login form logic
- */
-
 import { useState, useCallback } from "react";
-import { useLocalization } from "@umituz/react-native-localization";
 import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
 import { validateEmail, validatePasswordForLogin } from "../../infrastructure/utils/AuthValidation";
 import { alertService } from "@umituz/react-native-design-system";
+
+export interface LoginFormTranslations {
+  successTitle: string;
+  signInSuccess: string;
+  errors: Record<string, string>;
+}
+
+export interface UseLoginFormConfig {
+  translations: LoginFormTranslations;
+}
 
 export interface UseLoginFormResult {
   email: string;
@@ -24,15 +28,19 @@ export interface UseLoginFormResult {
   displayError: string | null;
 }
 
-export function useLoginForm(): UseLoginFormResult {
-  const { t } = useLocalization();
+export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const { signIn, loading, error, continueAnonymously } = useAuth();
+  const translations = config?.translations;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  const getErrorMessage = useCallback((key: string) => {
+    return translations?.errors?.[key] || key;
+  }, [translations]);
 
   const handleEmailChange = useCallback(
     (text: string) => {
@@ -61,13 +69,13 @@ export function useLoginForm(): UseLoginFormResult {
 
     const emailResult = validateEmail(email.trim());
     if (!emailResult.isValid && emailResult.error) {
-      setEmailError(t(emailResult.error));
+      setEmailError(getErrorMessage(emailResult.error));
       hasError = true;
     }
 
     const passwordResult = validatePasswordForLogin(password);
     if (!passwordResult.isValid && passwordResult.error) {
-      setPasswordError(t(passwordResult.error));
+      setPasswordError(getErrorMessage(passwordResult.error));
       hasError = true;
     }
 
@@ -75,23 +83,25 @@ export function useLoginForm(): UseLoginFormResult {
 
     try {
       await signIn(email.trim(), password);
-      
-      alertService.success(
-        t("auth.successTitle"),
-        t("auth.signInSuccess")
-      );
+
+      if (translations) {
+        alertService.success(
+          translations.successTitle,
+          translations.signInSuccess
+        );
+      }
     } catch (err: unknown) {
       const localizationKey = getAuthErrorLocalizationKey(err);
-      const errorMessage = t(localizationKey);
+      const errorMessage = getErrorMessage(localizationKey);
       setLocalError(errorMessage);
     }
-  }, [email, password, t, signIn]);
+  }, [email, password, signIn, translations, getErrorMessage]);
 
   const handleContinueAnonymously = useCallback(async () => {
     try {
       await continueAnonymously();
     } catch {
-      // Silent fail - anonymous mode should always work
+      // Silent fail
     }
   }, [continueAnonymously]);
 

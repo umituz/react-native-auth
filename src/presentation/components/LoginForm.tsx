@@ -1,24 +1,29 @@
-/**
- * Login Form Component
- * Single Responsibility: Render login form UI
- */
-
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
 
-declare const __DEV__: boolean;
+export interface LoginFormTranslations {
+  email: string;
+  emailPlaceholder: string;
+  password: string;
+  passwordPlaceholder: string;
+  signIn: string;
+  dontHaveAccount: string;
+  createAccount: string;
+}
 
-interface LoginFormProps {
+export interface LoginFormProps {
+  translations: LoginFormTranslations;
   onNavigateToRegister: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) => {
-  const { t } = useLocalization();
+export const LoginForm: React.FC<LoginFormProps> = ({
+  translations,
+  onNavigateToRegister,
+}) => {
   const passwordRef = useRef<React.ElementRef<typeof TextInput>>(null);
   const {
     email,
@@ -32,28 +37,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
     displayError,
   } = useLoginForm();
 
-  useEffect(() => {
-    if (__DEV__) {
-      console.log("[LoginForm] Mounted/Updated:", {
-        hasEmail: !!email,
-        hasPassword: !!password,
-        loading,
-        hasError: !!displayError,
-      });
-    }
-  }, [email, password, loading, displayError]);
-
-  if (__DEV__) {
-    console.log("[LoginForm] Rendering...");
-  }
-
   return (
     <>
       <AtomicInput
-        label={t("auth.email")}
+        label={translations.email}
         value={email}
         onChangeText={handleEmailChange}
-        placeholder={t("auth.emailPlaceholder")}
+        placeholder={translations.emailPlaceholder}
         keyboardType="email-address"
         autoCapitalize="none"
         disabled={loading}
@@ -68,10 +58,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
 
       <AtomicInput
         ref={passwordRef}
-        label={t("auth.password")}
+        label={translations.password}
         value={password}
         onChangeText={handlePasswordChange}
-        placeholder={t("auth.passwordPlaceholder")}
+        placeholder={translations.passwordPlaceholder}
         secureTextEntry
         showPasswordToggle
         autoCapitalize="none"
@@ -94,12 +84,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToRegister }) =>
         fullWidth
         style={styles.signInButton}
       >
-        {t("auth.signIn")}
+        {translations.signIn}
       </AtomicButton>
 
       <AuthLink
-        text={t("auth.dontHaveAccount")}
-        linkText={t("auth.createAccount")}
+        text={translations.dontHaveAccount}
+        linkText={translations.createAccount}
         onPress={onNavigateToRegister}
         disabled={loading}
       />

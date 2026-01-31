@@ -1,8 +1,3 @@
-/**
- * Auth Navigator
- * Stack navigator for authentication screens (Login, Register)
- */
-
 import React, { useEffect, useState } from "react";
 import {
   StackNavigator,
@@ -12,8 +7,8 @@ import {
   type StackNavigatorConfig,
   type StackScreenProps,
 } from "@umituz/react-native-design-system";
-import { LoginScreen } from "../screens/LoginScreen";
-import { RegisterScreen } from "../screens/RegisterScreen";
+import { LoginScreen, type LoginScreenTranslations } from "../screens/LoginScreen";
+import { RegisterScreen, type RegisterScreenTranslations } from "../screens/RegisterScreen";
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -22,26 +17,21 @@ export type AuthStackParamList = {
 
 const SHOW_REGISTER_KEY = "auth_show_register";
 
+export interface AuthNavigatorTranslations {
+  login: LoginScreenTranslations;
+  register: RegisterScreenTranslations;
+}
+
 export interface AuthNavigatorProps {
-  /**
-   * Terms of Service URL
-   */
+  translations: AuthNavigatorTranslations;
   termsUrl?: string;
-  /**
-   * Privacy Policy URL
-   */
   privacyUrl?: string;
-  /**
-   * Callback when Terms of Service is pressed
-   */
   onTermsPress?: () => void;
-  /**
-   * Callback when Privacy Policy is pressed
-   */
   onPrivacyPress?: () => void;
 }
 
 export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
+  translations,
   termsUrl,
   privacyUrl,
   onTermsPress,
@@ -71,11 +61,21 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     return null;
   }
 
+  const LoginScreenWrapper = (
+    props: StackScreenProps<AuthStackParamList, "Login">
+  ) => (
+    <LoginScreen
+      {...props}
+      translations={translations.login}
+    />
+  );
+
   const RegisterScreenWrapper = (
     props: StackScreenProps<AuthStackParamList, "Register">
   ) => (
     <RegisterScreen
       {...props}
+      translations={translations.register}
       termsUrl={termsUrl}
       privacyUrl={privacyUrl}
       onTermsPress={onTermsPress}
@@ -90,7 +90,7 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
       cardStyle: { backgroundColor: tokens.colors.backgroundPrimary },
     },
     screens: [
-      { name: "Login", component: LoginScreen },
+      { name: "Login", component: LoginScreenWrapper },
       { name: "Register", component: RegisterScreenWrapper },
     ],
   };

@@ -1,15 +1,16 @@
-/**
- * Register Screen
- * Beautiful, production-ready registration screen with validation
- */
-
 import React from "react";
 import { useAppNavigation, AtomicCard, ScreenLayout, useAppDesignTokens } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 import { AuthHeader } from "../components/AuthHeader";
-import { RegisterForm } from "../components/RegisterForm";
+import { RegisterForm, type RegisterFormTranslations } from "../components/RegisterForm";
+
+export interface RegisterScreenTranslations {
+  title: string;
+  subtitle?: string;
+  form: RegisterFormTranslations;
+}
 
 export interface RegisterScreenProps {
+  translations: RegisterScreenTranslations;
   termsUrl?: string;
   privacyUrl?: string;
   onTermsPress?: () => void;
@@ -17,12 +18,12 @@ export interface RegisterScreenProps {
 }
 
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({
+  translations,
   termsUrl,
   privacyUrl,
   onTermsPress,
   onPrivacyPress,
 }) => {
-  const { t } = useLocalization();
   const navigation = useAppNavigation();
   const tokens = useAppDesignTokens();
 
@@ -32,15 +33,16 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
 
   return (
     <ScreenLayout
-        scrollable
-        keyboardAvoiding
-        maxWidth={440}
-        contentContainerStyle={{ justifyContent: "center" }}
-        backgroundColor={tokens.colors.backgroundPrimary}
+      scrollable
+      keyboardAvoiding
+      maxWidth={440}
+      contentContainerStyle={{ justifyContent: "center" }}
+      backgroundColor={tokens.colors.backgroundPrimary}
     >
-      <AuthHeader title={t("auth.createAccount")} />
+      <AuthHeader title={translations.title} subtitle={translations.subtitle} />
       <AtomicCard variant="elevated" padding="lg">
         <RegisterForm
+          translations={translations.form}
           onNavigateToLogin={handleNavigateToLogin}
           termsUrl={termsUrl}
           privacyUrl={privacyUrl}
@@ -51,4 +53,3 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
     </ScreenLayout>
   );
 };
-

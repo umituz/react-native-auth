@@ -1,13 +1,3 @@
-/**
- * Change Password Screen
- * Screen for users to update their password
- *
- * Features:
- * - Current password validation via re-authentication
- * - New password validation (strength, match)
- * - Secure error handling
- */
-
 import React, { useState } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import {
@@ -18,23 +8,49 @@ import {
   AtomicText,
   useAppDesignTokens,
 } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 import {
   updateUserPassword,
   reauthenticateWithPassword,
   getCurrentUserFromGlobal,
 } from "@umituz/react-native-firebase";
 
+export interface ChangePasswordTranslations {
+  title: string;
+  description: string;
+  currentPassword: string;
+  enterCurrentPassword: string;
+  newPassword: string;
+  enterNewPassword: string;
+  confirmPassword: string;
+  enterConfirmPassword: string;
+  requirements: string;
+  minLength: string;
+  uppercase: string;
+  lowercase: string;
+  number: string;
+  specialChar: string;
+  passwordsMatch: string;
+  changePassword: string;
+  changing: string;
+  cancel: string;
+  success: string;
+  error: string;
+  fillAllFields: string;
+  unauthorized: string;
+  signInFailed: string;
+}
+
 export interface ChangePasswordScreenProps {
+  translations: ChangePasswordTranslations;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
+  translations,
   onSuccess,
   onCancel,
 }) => {
-  const { t } = useLocalization();
   const tokens = useAppDesignTokens();
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -43,12 +59,6 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* Removed manual visibility states */
-  /* const [showCurrentPassword, setShowCurrentPassword] = useState(false); */
-  /* const [showNewPassword, setShowNewPassword] = useState(false); */
-  /* const [showConfirmPassword, setShowConfirmPassword] = useState(false); */
-
-  // Validation state
   const isLengthValid = newPassword.length >= 8;
   const hasUppercase = /[A-Z]/.test(newPassword);
   const hasLowercase = /[a-z]/.test(newPassword);
@@ -67,13 +77,13 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
 
   const handleChangePassword = async () => {
     if (!isValid) {
-        Alert.alert(t("common.error"), t("auth.passwordChange.fillAllFields"));
-        return;
+      Alert.alert("Error", translations.fillAllFields);
+      return;
     }
 
     const user = getCurrentUserFromGlobal();
     if (!user) {
-      setError(t("auth.errors.unauthorized"));
+      setError(translations.unauthorized);
       return;
     }
 
@@ -81,44 +91,28 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
     setError(null);
 
     try {
-      // 1. Re-authenticate
       const reauthResult = await reauthenticateWithPassword(user, currentPassword);
       if (!reauthResult.success) {
-        setError(reauthResult.error?.message || t("auth.alerts.error.signInFailed"));
+        setError(reauthResult.error?.message || translations.signInFailed);
         setLoading(false);
         return;
       }
 
-      // 2. Update Password
       const updateResult = await updateUserPassword(user, newPassword);
       if (updateResult.success) {
-        Alert.alert(t("common.success"), t("auth.passwordChange.success"), [
-            { text: "OK", onPress: onSuccess }
+        Alert.alert("Success", translations.success, [
+          { text: "OK", onPress: onSuccess }
         ]);
       } else {
-        setError(updateResult.error?.message || t("auth.passwordChange.error"));
+        setError(updateResult.error?.message || translations.error);
       }
     } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : t("auth.passwordChange.error");
+      const errorMessage = e instanceof Error ? e.message : translations.error;
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  const RequirementsList = () => (
-    <View style={[styles.requirementsContainer, { backgroundColor: tokens.colors.surfaceSecondary }]}>
-      <AtomicText type="labelMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 8 }}>
-        {t("auth.passwordChange.requirements")}
-      </AtomicText>
-      <RequirementItem label={t("auth.passwordChange.minLength")} met={isLengthValid} />
-      <RequirementItem label={t("auth.passwordChange.uppercase")} met={hasUppercase} />
-      <RequirementItem label={t("auth.passwordChange.lowercase")} met={hasLowercase} />
-      <RequirementItem label={t("auth.passwordChange.number")} met={hasNumber} />
-      <RequirementItem label={t("auth.passwordChange.specialChar")} met={hasSpecialChar} />
-      <RequirementItem label={t("auth.passwordChange.passwordsMatch")} met={passwordsMatch} />
-    </View>
-  );
 
   const RequirementItem = ({ label, met }: { label: string; met: boolean }) => (
     <View style={styles.requirementItem}>
@@ -140,20 +134,19 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
   return (
     <ScreenLayout
       scrollable
-      header={<ScreenHeader title={t("auth.passwordChange.title")} />}
+      header={<ScreenHeader title={translations.title} />}
       backgroundColor={tokens.colors.backgroundPrimary}
       edges={["bottom"]}
     >
       <View style={styles.content}>
         <AtomicText type="bodyMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 24 }}>
-          {t("auth.passwordChange.description")}
+          {translations.description}
         </AtomicText>
 
         <View style={styles.form}>
-           {/* Current Password */}
           <AtomicInput
-            label={t("auth.passwordChange.currentPassword")}
-            placeholder={t("auth.passwordChange.enterCurrentPassword")}
+            label={translations.currentPassword}
+            placeholder={translations.enterCurrentPassword}
             value={currentPassword}
             onChangeText={setCurrentPassword}
             secureTextEntry
@@ -161,10 +154,9 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
             variant="filled"
           />
 
-           {/* New Password */}
           <AtomicInput
-            label={t("auth.passwordChange.newPassword")}
-            placeholder={t("auth.passwordChange.enterNewPassword")}
+            label={translations.newPassword}
+            placeholder={translations.enterNewPassword}
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry
@@ -172,10 +164,9 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
             variant="filled"
           />
 
-           {/* Confirm Password */}
           <AtomicInput
-            label={t("auth.passwordChange.confirmPassword")}
-            placeholder={t("auth.passwordChange.enterConfirmPassword")}
+            label={translations.confirmPassword}
+            placeholder={translations.enterConfirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -183,7 +174,17 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
             variant="filled"
           />
 
-          <RequirementsList />
+          <View style={[styles.requirementsContainer, { backgroundColor: tokens.colors.surfaceSecondary }]}>
+            <AtomicText type="labelMedium" style={{ color: tokens.colors.textSecondary, marginBottom: 8 }}>
+              {translations.requirements}
+            </AtomicText>
+            <RequirementItem label={translations.minLength} met={isLengthValid} />
+            <RequirementItem label={translations.uppercase} met={hasUppercase} />
+            <RequirementItem label={translations.lowercase} met={hasLowercase} />
+            <RequirementItem label={translations.number} met={hasNumber} />
+            <RequirementItem label={translations.specialChar} met={hasSpecialChar} />
+            <RequirementItem label={translations.passwordsMatch} met={passwordsMatch} />
+          </View>
 
           {error && (
             <AtomicText style={{ color: tokens.colors.error, marginTop: 16 }}>
@@ -192,14 +193,14 @@ export const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({
           )}
 
           <View style={styles.actions}>
-             <AtomicButton
-              title={t("common.cancel")}
+            <AtomicButton
+              title={translations.cancel}
               onPress={onCancel || (() => {})}
               variant="outline"
               style={{ flex: 1 }}
             />
             <AtomicButton
-              title={loading ? t("auth.passwordChange.changing") : t("auth.passwordChange.changePassword")}
+              title={loading ? translations.changing : translations.changePassword}
               onPress={() => { void handleChangePassword(); }}
               loading={loading}
               disabled={!isValid || loading}

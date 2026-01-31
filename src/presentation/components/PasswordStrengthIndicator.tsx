@@ -1,10 +1,14 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens, AtomicText, type ColorVariant } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
 
+export interface PasswordStrengthTranslations {
+  minLength: string;
+}
+
 export interface PasswordStrengthIndicatorProps {
+  translations: PasswordStrengthTranslations;
   requirements: PasswordRequirements;
   showLabels?: boolean;
 }
@@ -24,10 +28,6 @@ const RequirementDot: React.FC<RequirementDotProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
   const colorKey = isValid ? successColor : pendingColor;
-  
-  // Resolve the color value from the token key for the View background
-  // We use type assertion since we know these are valid specific keys passed from parent
-  // but tokens.colors index signature might be limited
   const dotColor = (tokens.colors as Record<string, string>)[colorKey] || tokens.colors.textTertiary;
 
   return (
@@ -40,33 +40,30 @@ const RequirementDot: React.FC<RequirementDotProps> = ({
   );
 };
 
-export const PasswordStrengthIndicator: React.FC<
-  PasswordStrengthIndicatorProps
-> = ({ requirements, showLabels = true }) => {
+export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
+  translations,
+  requirements,
+  showLabels = true,
+}) => {
   const tokens = useAppDesignTokens();
-  const { t } = useLocalization();
-  
   const successColor: ColorVariant = "success";
   const pendingColor: ColorVariant = "textTertiary";
 
   const items = [
-    { key: "minLength", label: t("auth.passwordReq.minLength"), isValid: requirements.hasMinLength },
+    { key: "minLength", label: translations.minLength, isValid: requirements.hasMinLength },
   ];
 
   if (!showLabels) {
     return (
       <View style={styles.dotsOnly}>
         {items.map((item) => {
-           const colorKey = item.isValid ? successColor : pendingColor;
-           const dotColor = (tokens.colors as Record<string, string>)[colorKey] || tokens.colors.textTertiary;
-           
-           return (
+          const colorKey = item.isValid ? successColor : pendingColor;
+          const dotColor = (tokens.colors as Record<string, string>)[colorKey] || tokens.colors.textTertiary;
+
+          return (
             <View
               key={item.key}
-              style={[
-                styles.dotOnly,
-                { backgroundColor: dotColor },
-              ]}
+              style={[styles.dotOnly, { backgroundColor: dotColor }]}
             />
           );
         })}
@@ -116,4 +113,3 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
-

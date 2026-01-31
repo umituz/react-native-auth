@@ -1,76 +1,75 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  Platform,
-} from "react-native";
-import { Divider, AtomicButton } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
+import { View, StyleSheet } from "react-native";
+import { AtomicText, AtomicButton, useAppDesignTokens } from "@umituz/react-native-design-system";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
+export interface SocialLoginButtonsTranslations {
+  orContinueWith: string;
+  google: string;
+  apple: string;
+}
+
 export interface SocialLoginButtonsProps {
-  /** Enabled providers to display */
+  translations: SocialLoginButtonsTranslations;
   enabledProviders: SocialAuthProvider[];
-  /** Called when Google sign-in is pressed */
   onGooglePress?: () => void;
-  /** Called when Apple sign-in is pressed */
   onApplePress?: () => void;
-  /** Loading state for Google button */
   googleLoading?: boolean;
-  /** Loading state for Apple button */
   appleLoading?: boolean;
-  /** Disable all buttons */
-  disabled?: boolean;
 }
 
 export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
+  translations,
   enabledProviders,
   onGooglePress,
   onApplePress,
   googleLoading = false,
   appleLoading = false,
-  disabled = false,
 }) => {
-  const { t } = useLocalization();
+  const tokens = useAppDesignTokens();
+  const hasGoogle = enabledProviders.includes("google");
+  const hasApple = enabledProviders.includes("apple");
 
-  const safeEnabledProviders = enabledProviders ?? [];
-  const showGoogle = safeEnabledProviders.includes("google");
-  const showApple = safeEnabledProviders.includes("apple") && Platform.OS === "ios";
-
-  if (!showGoogle && !showApple) {
+  if (!hasGoogle && !hasApple) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
-      <Divider text={t("auth.orContinueWith")} spacing="large" />
+    <View style={[styles.container, { marginTop: tokens.spacing.lg }]}>
+      <View style={styles.dividerContainer}>
+        <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
+        <AtomicText type="bodySmall" color="textSecondary" style={styles.dividerText}>
+          {translations.orContinueWith}
+        </AtomicText>
+        <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
+      </View>
 
       <View style={styles.buttonsContainer}>
-        {showGoogle && (
+        {hasGoogle && onGooglePress && (
           <AtomicButton
             variant="outline"
-            onPress={onGooglePress || (() => {})}
+            onPress={onGooglePress}
+            disabled={googleLoading || appleLoading}
             loading={googleLoading}
-            disabled={disabled}
-            icon="logo-google"
             fullWidth
             style={styles.socialButton}
+            leftIcon="logo-google"
           >
-            {t("auth.google")}
+            {translations.google}
           </AtomicButton>
         )}
 
-        {showApple && (
+        {hasApple && onApplePress && (
           <AtomicButton
             variant="outline"
-            onPress={onApplePress || (() => {})}
+            onPress={onApplePress}
+            disabled={googleLoading || appleLoading}
             loading={appleLoading}
-            disabled={disabled}
-            icon="logo-apple"
             fullWidth
             style={styles.socialButton}
+            leftIcon="logo-apple"
           >
-            {t("auth.apple")}
+            {translations.apple}
           </AtomicButton>
         )}
       </View>
@@ -79,16 +78,23 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 24,
+  container: {},
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    marginHorizontal: 16,
   },
   buttonsContainer: {
-    flexDirection: 'row',
-    marginTop: 8,
     gap: 12,
   },
   socialButton: {
-    flex: 1,
+    minHeight: 48,
   },
 });
-

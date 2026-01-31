@@ -1,21 +1,14 @@
-/**
- * Auth Header Component
- * Reusable header for auth screens
- */
-
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 
-interface AuthHeaderProps {
+export interface AuthHeaderProps {
   title: string;
   subtitle?: string;
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
   const tokens = useAppDesignTokens();
-  const { t } = useLocalization();
 
   return (
     <View style={[styles.header, { marginBottom: tokens.spacing.xl, paddingHorizontal: tokens.spacing.md }]}>
@@ -26,7 +19,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
       >
         {title}
       </AtomicText>
-      {(subtitle || t("auth.subtitle")) && (
+      {subtitle && (
         <AtomicText
           type="bodyMedium"
           color="textSecondary"
@@ -35,7 +28,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
             marginTop: tokens.spacing.xs,
           }}
         >
-          {subtitle || t("auth.subtitle")}
+          {subtitle}
         </AtomicText>
       )}
     </View>
@@ -47,14 +40,3 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-
-
-
-
-
-
-
-
-
-
-

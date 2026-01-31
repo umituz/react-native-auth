@@ -129,6 +129,10 @@ export {
 export { AuthProvider } from './presentation/providers/AuthProvider';
 export { useAuth } from './presentation/hooks/useAuth';
 export type { UseAuthResult } from './presentation/hooks/useAuth';
+export { useLoginForm } from './presentation/hooks/useLoginForm';
+export type { LoginFormTranslations as UseLoginFormTranslations, UseLoginFormConfig, UseLoginFormResult } from './presentation/hooks/useLoginForm';
+export { useRegisterForm } from './presentation/hooks/useRegisterForm';
+export type { RegisterFormTranslations as UseRegisterFormTranslations, UseRegisterFormConfig, UseRegisterFormResult } from './presentation/hooks/useRegisterForm';
 export { useAuthRequired } from './presentation/hooks/useAuthRequired';
 export type { UseAuthRequiredResult } from './presentation/hooks/useAuthRequired';
 export { useRequireAuth, useUserId } from './presentation/hooks/useRequireAuth';
@@ -156,33 +160,39 @@ export type { MigrationConfig } from './domain/utils/migration';
 
 // SCREENS & NAVIGATION
 export { LoginScreen } from './presentation/screens/LoginScreen';
+export type { LoginScreenTranslations, LoginScreenProps } from './presentation/screens/LoginScreen';
 export { RegisterScreen } from './presentation/screens/RegisterScreen';
+export type { RegisterScreenTranslations, RegisterScreenProps } from './presentation/screens/RegisterScreen';
 export { AccountScreen } from './presentation/screens/AccountScreen';
 export type { AccountScreenConfig, AccountScreenProps } from './presentation/screens/AccountScreen';
 export { EditProfileScreen } from './presentation/screens/EditProfileScreen';
 export type { EditProfileConfig, EditProfileScreenProps } from './presentation/screens/EditProfileScreen';
 export { ChangePasswordScreen } from './presentation/screens/ChangePasswordScreen';
-export type { ChangePasswordScreenProps } from './presentation/screens/ChangePasswordScreen';
+export type { ChangePasswordTranslations, ChangePasswordScreenProps } from './presentation/screens/ChangePasswordScreen';
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type {
   AuthStackParamList,
+  AuthNavigatorTranslations,
   AuthNavigatorProps,
 } from './presentation/navigation/AuthNavigator';
 
 // COMPONENTS
 export { AuthHeader } from './presentation/components/AuthHeader';
+export type { AuthHeaderProps } from './presentation/components/AuthHeader';
 export { LoginForm } from './presentation/components/LoginForm';
+export type { LoginFormTranslations, LoginFormProps } from './presentation/components/LoginForm';
 export { RegisterForm } from './presentation/components/RegisterForm';
+export type { RegisterFormTranslations, RegisterFormProps } from './presentation/components/RegisterForm';
 export { AuthLegalLinks } from './presentation/components/AuthLegalLinks';
-export type { AuthLegalLinksProps } from './presentation/components/AuthLegalLinks';
+export type { AuthLegalLinksTranslations, AuthLegalLinksProps } from './presentation/components/AuthLegalLinks';
 export { PasswordStrengthIndicator } from './presentation/components/PasswordStrengthIndicator';
-export type { PasswordStrengthIndicatorProps } from './presentation/components/PasswordStrengthIndicator';
+export type { PasswordStrengthTranslations, PasswordStrengthIndicatorProps } from './presentation/components/PasswordStrengthIndicator';
 export { PasswordMatchIndicator } from './presentation/components/PasswordMatchIndicator';
-export type { PasswordMatchIndicatorProps } from './presentation/components/PasswordMatchIndicator';
+export type { PasswordMatchTranslations, PasswordMatchIndicatorProps } from './presentation/components/PasswordMatchIndicator';
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
-export type { AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
+export type { AuthBottomSheetTranslations, AuthBottomSheetProps } from './presentation/components/AuthBottomSheet';
 export { SocialLoginButtons } from './presentation/components/SocialLoginButtons';
-export type { SocialLoginButtonsProps } from './presentation/components/SocialLoginButtons';
+export type { SocialLoginButtonsTranslations, SocialLoginButtonsProps } from './presentation/components/SocialLoginButtons';
 export { ProfileSection } from './presentation/components/ProfileSection';
 export type { ProfileSectionConfig, ProfileSectionProps } from './presentation/components/ProfileSection';
 export { AccountActions } from './presentation/components/AccountActions';

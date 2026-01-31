@@ -1,22 +1,24 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens, AtomicText } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
+
+export interface PasswordMatchTranslations {
+  match: string;
+  noMatch: string;
+}
 
 export interface PasswordMatchIndicatorProps {
+  translations: PasswordMatchTranslations;
   isMatch: boolean;
 }
 
 export const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
+  translations,
   isMatch,
 }) => {
   const tokens = useAppDesignTokens();
-  const { t } = useLocalization();
-
   const color = isMatch ? tokens.colors.success : tokens.colors.error;
-  const text = isMatch
-    ? t("auth.passwordsMatch")
-    : t("auth.passwordsDontMatch");
+  const text = isMatch ? translations.match : translations.noMatch;
 
   return (
     <View style={styles.container}>
@@ -39,4 +41,3 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
 });
-

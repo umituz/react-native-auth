@@ -1,20 +1,33 @@
-/**
- * Register Form Component
- * Single Responsibility: Render register form UI
- */
-
 import React, { useRef } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
-import { AuthLegalLinks } from "./AuthLegalLinks";
-import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
-import { PasswordMatchIndicator } from "./PasswordMatchIndicator";
+import { AuthLegalLinks, type AuthLegalLinksTranslations } from "./AuthLegalLinks";
+import { PasswordStrengthIndicator, type PasswordStrengthTranslations } from "./PasswordStrengthIndicator";
+import { PasswordMatchIndicator, type PasswordMatchTranslations } from "./PasswordMatchIndicator";
 
-interface RegisterFormProps {
+export interface RegisterFormTranslations {
+  displayName: string;
+  displayNamePlaceholder: string;
+  email: string;
+  emailPlaceholder: string;
+  password: string;
+  passwordPlaceholder: string;
+  confirmPassword: string;
+  confirmPasswordPlaceholder: string;
+  signUp: string;
+  alreadyHaveAccount: string;
+  signIn: string;
+  bySigningUp: string;
+  legal: AuthLegalLinksTranslations;
+  passwordStrength: PasswordStrengthTranslations;
+  passwordMatch: PasswordMatchTranslations;
+}
+
+export interface RegisterFormProps {
+  translations: RegisterFormTranslations;
   onNavigateToLogin: () => void;
   termsUrl?: string;
   privacyUrl?: string;
@@ -23,13 +36,13 @@ interface RegisterFormProps {
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
+  translations,
   onNavigateToLogin,
   termsUrl,
   privacyUrl,
   onTermsPress,
   onPrivacyPress,
 }) => {
-  const { t } = useLocalization();
   const emailRef = useRef<React.ElementRef<typeof TextInput>>(null);
   const passwordRef = useRef<React.ElementRef<typeof TextInput>>(null);
   const confirmPasswordRef = useRef<React.ElementRef<typeof TextInput>>(null);
@@ -54,12 +67,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   return (
     <>
       <AtomicInput
-        label={t("auth.displayName")}
+        label={translations.displayName}
         value={displayName}
         onChangeText={handleDisplayNameChange}
-        placeholder={
-          t("auth.displayNamePlaceholder")
-        }
+        placeholder={translations.displayNamePlaceholder}
         autoCapitalize="words"
         disabled={loading}
         state={fieldErrors.displayName ? "error" : "default"}
@@ -72,10 +83,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <AtomicInput
         ref={emailRef}
-        label={t("auth.email")}
+        label={translations.email}
         value={email}
         onChangeText={handleEmailChange}
-        placeholder={t("auth.emailPlaceholder")}
+        placeholder={translations.emailPlaceholder}
         keyboardType="email-address"
         autoCapitalize="none"
         disabled={loading}
@@ -90,10 +101,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <AtomicInput
         ref={passwordRef}
-        label={t("auth.password")}
+        label={translations.password}
         value={password}
         onChangeText={handlePasswordChange}
-        placeholder={t("auth.passwordPlaceholder")}
+        placeholder={translations.passwordPlaceholder}
         secureTextEntry
         showPasswordToggle
         autoCapitalize="none"
@@ -108,15 +119,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         style={styles.input}
       />
       {password.length > 0 && (
-        <PasswordStrengthIndicator requirements={passwordRequirements} />
+        <PasswordStrengthIndicator
+          translations={translations.passwordStrength}
+          requirements={passwordRequirements}
+        />
       )}
 
       <AtomicInput
         ref={confirmPasswordRef}
-        label={t("auth.confirmPassword")}
+        label={translations.confirmPassword}
         value={confirmPassword}
         onChangeText={handleConfirmPasswordChange}
-        placeholder={t("auth.confirmPasswordPlaceholder")}
+        placeholder={translations.confirmPasswordPlaceholder}
         secureTextEntry
         showPasswordToggle
         autoCapitalize="none"
@@ -130,7 +144,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         style={styles.input}
       />
       {confirmPassword.length > 0 && (
-        <PasswordMatchIndicator isMatch={passwordsMatch} />
+        <PasswordMatchIndicator
+          translations={translations.passwordMatch}
+          isMatch={passwordsMatch}
+        />
       )}
 
       <AuthErrorDisplay error={displayError} />
@@ -147,22 +164,23 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         fullWidth
         style={styles.signUpButton}
       >
-        {t("auth.signUp")}
+        {translations.signUp}
       </AtomicButton>
 
       <AuthLink
-        text={t("auth.alreadyHaveAccount")}
-        linkText={t("auth.signIn")}
+        text={translations.alreadyHaveAccount}
+        linkText={translations.signIn}
         onPress={onNavigateToLogin}
         disabled={loading}
       />
 
       <AuthLegalLinks
+        translations={translations.legal}
         termsUrl={termsUrl}
         privacyUrl={privacyUrl}
         onTermsPress={onTermsPress}
         onPrivacyPress={onPrivacyPress}
-        prefixText={t("auth.bySigningUp")}
+        prefixText={translations.bySigningUp}
       />
     </>
   );
@@ -178,4 +196,3 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
-

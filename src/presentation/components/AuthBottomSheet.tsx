@@ -1,8 +1,3 @@
-/**
- * AuthBottomSheet Component
- * Bottom sheet modal for authentication (Login/Register)
- */
-
 import React, { useEffect } from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import {
@@ -12,31 +7,39 @@ import {
   AtomicKeyboardAvoidingView,
   BottomSheetModal,
 } from "@umituz/react-native-design-system";
-import { useLocalization } from "@umituz/react-native-localization";
 import { useAuthBottomSheet, type SocialAuthConfiguration } from "../hooks/useAuthBottomSheet";
-import { LoginForm } from "./LoginForm";
-import { RegisterForm } from "./RegisterForm";
-import { SocialLoginButtons } from "./SocialLoginButtons";
+import { LoginForm, type LoginFormTranslations } from "./LoginForm";
+import { RegisterForm, type RegisterFormTranslations } from "./RegisterForm";
+import { SocialLoginButtons, type SocialLoginButtonsTranslations } from "./SocialLoginButtons";
 import { styles } from "./AuthBottomSheet.styles";
 
 declare const __DEV__: boolean;
 
+export interface AuthBottomSheetTranslations {
+  close: string;
+  signIn: string;
+  signInSubtitle: string;
+  createAccount: string;
+  createAccountSubtitle: string;
+  loginForm: LoginFormTranslations;
+  registerForm: RegisterFormTranslations;
+  socialButtons: SocialLoginButtonsTranslations;
+}
+
 export interface AuthBottomSheetProps {
+  translations: AuthBottomSheetTranslations;
   termsUrl?: string;
   privacyUrl?: string;
   onTermsPress?: () => void;
   onPrivacyPress?: () => void;
-  /** Social auth configuration */
   socialConfig?: SocialAuthConfiguration;
-  /** Called when Google sign-in is requested (overrides internal behavior) */
   onGoogleSignIn?: () => Promise<void>;
-  /** Called when Apple sign-in is requested (overrides internal behavior) */
   onAppleSignIn?: () => Promise<void>;
-  /** Called when auth completes successfully (login or register) */
   onAuthSuccess?: () => void;
 }
 
 export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
+  translations,
   termsUrl,
   privacyUrl,
   onTermsPress,
@@ -47,7 +50,6 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
   onAuthSuccess,
 }) => {
   const tokens = useAppDesignTokens();
-  const { t } = useLocalization();
 
   const {
     modalRef,
@@ -93,7 +95,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           style={styles.closeButton}
           onPress={handleClose}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          accessibilityLabel={t("common.close")}
+          accessibilityLabel={translations.close}
           accessibilityRole="button"
         >
           <AtomicIcon name="close" size="md" color="textSecondary" />
@@ -104,40 +106,44 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          <View style={styles.header}>
+            <AtomicText type="headlineLarge" color="textPrimary" style={styles.title}>
+              {mode === "login" ? translations.signIn : translations.createAccount}
+            </AtomicText>
+            <AtomicText type="bodyLarge" color="textSecondary" style={styles.subtitle}>
+              {mode === "login" ? translations.signInSubtitle : translations.createAccountSubtitle}
+            </AtomicText>
+          </View>
 
-        <View style={styles.header}>
-          <AtomicText type="headlineLarge" color="textPrimary" style={styles.title}>
-            {mode === "login" ? t("auth.signIn") : t("auth.createAccount")}
-          </AtomicText>
-          <AtomicText type="bodyLarge" color="textSecondary" style={styles.subtitle}>
-            {mode === "login" ? t("auth.signInSubtitle") : t("auth.createAccountSubtitle")}
-          </AtomicText>
-        </View>
+          <View style={styles.formContainer}>
+            {mode === "login" ? (
+              <LoginForm
+                translations={translations.loginForm}
+                onNavigateToRegister={handleNavigateToRegister}
+              />
+            ) : (
+              <RegisterForm
+                translations={translations.registerForm}
+                onNavigateToLogin={handleNavigateToLogin}
+                termsUrl={termsUrl}
+                privacyUrl={privacyUrl}
+                onTermsPress={onTermsPress}
+                onPrivacyPress={onPrivacyPress}
+              />
+            )}
 
-        <View style={styles.formContainer}>
-          {mode === "login" ? (
-            <LoginForm onNavigateToRegister={handleNavigateToRegister} />
-          ) : (
-            <RegisterForm
-              onNavigateToLogin={handleNavigateToLogin}
-              termsUrl={termsUrl}
-              privacyUrl={privacyUrl}
-              onTermsPress={onTermsPress}
-              onPrivacyPress={onPrivacyPress}
-            />
-          )}
-
-          {providers.length > 0 && (
-            <SocialLoginButtons
-              enabledProviders={providers}
-              onGooglePress={() => { void handleGoogleSignIn(); }}
-              onApplePress={() => { void handleAppleSignIn(); }}
-              googleLoading={googleLoading}
-              appleLoading={appleLoading}
-            />
-          )}
-        </View>
-      </ScrollView>
+            {providers.length > 0 && (
+              <SocialLoginButtons
+                translations={translations.socialButtons}
+                enabledProviders={providers}
+                onGooglePress={() => { void handleGoogleSignIn(); }}
+                onApplePress={() => { void handleAppleSignIn(); }}
+                googleLoading={googleLoading}
+                appleLoading={appleLoading}
+              />
+            )}
+          </View>
+        </ScrollView>
     </AtomicKeyboardAvoidingView>
     </BottomSheetModal>
   );
