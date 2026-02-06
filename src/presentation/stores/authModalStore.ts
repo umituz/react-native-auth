@@ -53,7 +53,7 @@ export const useAuthModalStore = createStore<AuthModalState, AuthModalActions>({
       callback?: () => void | Promise<void>,
       mode: AuthModalMode = "login",
     ) => {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
+      if (__DEV__) {
         console.log("[authModalStore] showAuthModal called:", {
           mode,
           hasCallback: !!callback,

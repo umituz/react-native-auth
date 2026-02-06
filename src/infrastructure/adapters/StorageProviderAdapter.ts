@@ -9,11 +9,10 @@ import type { IStorageProvider } from "../types/Storage.types";
  * Interface that describes the shape of common storage implementations
  * to avoid using 'any' and resolve lint errors.
  */
-interface StorageLike {
+export interface StorageLike {
   getString?: (
     key: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    defaultValue?: any
+    defaultValue?: string | null
   ) => Promise<{ value: string | null } | null>;
   getItem?: (key: string) => Promise<string | null>;
   setString?: (key: string, value: string) => Promise<void>;
@@ -24,8 +23,8 @@ interface StorageLike {
 export class StorageProviderAdapter implements IStorageProvider {
   private storage: StorageLike;
 
-  constructor(storage: unknown) {
-    this.storage = storage as StorageLike;
+  constructor(storage: StorageLike) {
+    this.storage = storage;
   }
 
   async get(key: string): Promise<string | null> {
@@ -62,6 +61,6 @@ export class StorageProviderAdapter implements IStorageProvider {
   }
 }
 
-export function createStorageProvider(storage: unknown): IStorageProvider {
+export function createStorageProvider(storage: StorageLike): IStorageProvider {
   return new StorageProviderAdapter(storage);
 }

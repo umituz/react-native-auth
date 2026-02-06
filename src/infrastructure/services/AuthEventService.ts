@@ -88,8 +88,10 @@ export class AuthEventService {
       eventListeners.forEach((listener) => {
         try {
           listener(payload);
-        } catch {
-          // Silent fail for listener errors
+        } catch (err) {
+          if (__DEV__) {
+            console.error("[AuthEventService] Listener error:", err);
+          }
         }
       });
     }

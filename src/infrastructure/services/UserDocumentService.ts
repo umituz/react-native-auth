@@ -24,8 +24,6 @@ export type {
   UserDocumentExtras,
 } from "./UserDocument.types";
 
-declare const __DEV__: boolean;
-
 let userDocumentConfig: UserDocumentConfig = {};
 
 export function configureUserDocumentService(config: UserDocumentConfig): void {
@@ -37,7 +35,7 @@ export async function ensureUserDocument(
   extras?: UserDocumentExtras,
 ): Promise<boolean> {
   const db = getFirestore();
-  if (!db || !user.uid) return false;
+  if (!db || !user.uid || user.uid.trim().length === 0) return false;
 
   try {
     let allExtras = extras || {};
@@ -60,8 +58,7 @@ export async function ensureUserDocument(
     await setDoc(userRef, docData, { merge: true });
     return true;
   } catch (error) {
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      // eslint-disable-next-line no-console
+    if (__DEV__) {
       console.error("[UserDocumentService] Failed:", error);
     }
     return false;
@@ -80,7 +77,10 @@ export async function markUserDeleted(userId: string): Promise<boolean> {
       updatedAt: serverTimestamp(),
     }, { merge: true });
     return true;
-  } catch {
+  } catch (error) {
+    if (__DEV__) {
+      console.error("[UserDocumentService] markUserDeleted failed:", error);
+    }
     return false;
   }
 }

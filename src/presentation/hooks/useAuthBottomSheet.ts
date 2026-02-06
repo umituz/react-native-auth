@@ -7,8 +7,6 @@ import { useGoogleAuth, type GoogleAuthConfig } from "./useGoogleAuth";
 import { useAppleAuth } from "./useAppleAuth";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
-declare const __DEV__: boolean;
-
 export interface SocialAuthConfiguration {
   google?: GoogleAuthConfig;
   apple?: { enabled: boolean };
@@ -92,7 +90,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     const justAuthenticated = !prevIsAuthenticatedRef.current && isAuthenticated;
     const justConvertedFromAnonymous = prevIsAnonymousRef.current && !isAnonymous && isAuthenticated;
 
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
+    if (__DEV__) {
       console.log("[useAuthBottomSheet] Auth state effect:", {
         isAuthenticated,
         isAnonymous,
@@ -106,7 +104,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     }
 
     if ((justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous) {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
+      if (__DEV__) {
         console.log("[useAuthBottomSheet] Auto-closing due to successful authentication transition", {
           justAuthenticated,
           justConvertedFromAnonymous,
@@ -119,7 +117,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
       onAuthSuccess?.();
       // Execute callback with delay to ensure auth state has propagated
       setTimeout(() => {
-        if (typeof __DEV__ !== "undefined" && __DEV__) {
+        if (__DEV__) {
           console.log("[useAuthBottomSheet] Executing pending callback after auth");
         }
         executePendingCallback();

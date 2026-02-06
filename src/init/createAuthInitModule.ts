@@ -7,8 +7,6 @@ import type { InitModule } from '@umituz/react-native-design-system';
 import { initializeAuth } from '../infrastructure/services/initializeAuth';
 import type { InitializeAuthOptions } from '../infrastructure/services/initializeAuth';
 
-declare const __DEV__: boolean;
-
 export interface AuthInitModuleConfig {
   /**
    * Firestore collection name for user documents
@@ -104,7 +102,7 @@ export function createAuthInitModule(
           collectExtras,
           storageProvider,
           onUserConverted: async (anonymousId: string, authenticatedId: string) => {
-            if (typeof __DEV__ !== 'undefined' && __DEV__) {
+            if (__DEV__) {
               console.log('[createAuthInitModule] User converted:', {
                 anonymousId: anonymousId.slice(0, 8),
                 authenticatedId: authenticatedId.slice(0, 8),
@@ -115,11 +113,11 @@ export function createAuthInitModule(
             if (onRestorePurchases) {
               try {
                 await onRestorePurchases();
-                if (typeof __DEV__ !== 'undefined' && __DEV__) {
+                if (__DEV__) {
                   console.log('[createAuthInitModule] Purchases restored');
                 }
               } catch (error) {
-                if (typeof __DEV__ !== 'undefined' && __DEV__) {
+                if (__DEV__) {
                   console.error('[createAuthInitModule] Restore failed:', error);
                 }
               }
@@ -132,13 +130,13 @@ export function createAuthInitModule(
           },
         });
 
-        if (typeof __DEV__ !== 'undefined' && __DEV__) {
+        if (__DEV__) {
           console.log('[createAuthInitModule] Auth initialized');
         }
 
         return true;
       } catch (error) {
-        if (typeof __DEV__ !== 'undefined' && __DEV__) {
+        if (__DEV__) {
           console.error('[createAuthInitModule] Error:', error);
         }
         return false;

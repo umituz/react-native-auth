@@ -6,7 +6,7 @@
 import type { AuthUser, AuthProviderType } from "../../domain/entities/AuthUser";
 
 interface ProviderData {
-  providerId: string;
+  providerId: string | null;
 }
 
 interface FirebaseUserLike {
@@ -16,7 +16,7 @@ interface FirebaseUserLike {
   isAnonymous: boolean;
   emailVerified: boolean;
   photoURL: string | null;
-  providerData?: ProviderData[];
+  providerData?: (ProviderData | null)[];
 }
 
 /**
@@ -32,13 +32,13 @@ function extractProvider(user: FirebaseUserLike): AuthProviderType {
     return "unknown";
   }
 
-  const googleProvider = providerData.find((p) => p.providerId === "google.com");
+  const googleProvider = providerData.find((p) => p?.providerId === "google.com");
   if (googleProvider) return "google.com";
 
-  const appleProvider = providerData.find((p) => p.providerId === "apple.com");
+  const appleProvider = providerData.find((p) => p?.providerId === "apple.com");
   if (appleProvider) return "apple.com";
 
-  const passwordProvider = providerData.find((p) => p.providerId === "password");
+  const passwordProvider = providerData.find((p) => p?.providerId === "password");
   if (passwordProvider) return "password";
 
   return "unknown";

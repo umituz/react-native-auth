@@ -45,10 +45,9 @@ export class AuthService implements IAuthService {
     let provider: IAuthProvider;
 
     if ("currentUser" in providerOrAuth) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth as any);
+      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth as Auth);
       await firebaseProvider.initialize();
-      provider = firebaseProvider as unknown as IAuthProvider;
+      provider = firebaseProvider;
     } else {
       provider = providerOrAuth;
       await provider.initialize();

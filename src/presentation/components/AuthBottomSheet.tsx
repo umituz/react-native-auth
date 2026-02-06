@@ -13,8 +13,6 @@ import { RegisterForm, type RegisterFormTranslations } from "./RegisterForm";
 import { SocialLoginButtons, type SocialLoginButtonsTranslations } from "./SocialLoginButtons";
 import { styles } from "./AuthBottomSheet.styles";
 
-declare const __DEV__: boolean;
-
 export interface AuthBottomSheetTranslations {
   close: string;
   signIn: string;

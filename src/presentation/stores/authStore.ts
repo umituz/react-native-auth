@@ -72,7 +72,7 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     initialized: state.initialized,
   }),
   migrate: (persistedState: unknown, version: number) => {
-    const state = persistedState as Partial<AuthState>;
+    const state = (persistedState && typeof persistedState === "object" ? persistedState : {}) as Partial<AuthState>;
     if (version < 2) {
       return {
         ...initialAuthState,
@@ -80,7 +80,7 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
         initialized: state.initialized ?? false,
       };
     }
-    return { ...initialAuthState, ...state } as AuthState;
+    return { ...initialAuthState, ...state };
   },
   actions: (set, get) => ({
     setFirebaseUser: (firebaseUser) => {

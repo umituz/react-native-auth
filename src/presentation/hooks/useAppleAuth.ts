@@ -36,8 +36,7 @@ export function useAppleAuth(): UseAppleAuthResult {
       return { success: false, error: "Apple Sign-In is not available" };
     }
 
-    const result = await signInWithApple();
-    return result;
+    return signInWithApple();
   }, [appleAvailable, signInWithApple]);
 
   return {

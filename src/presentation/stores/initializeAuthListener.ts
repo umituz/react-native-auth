@@ -13,7 +13,8 @@ import { useAuthStore } from "./authStore";
 import { getAuthService } from "../../infrastructure/services/AuthService";
 import type { AuthListenerOptions } from "../../types/auth-store.types";
 
-declare const __DEV__: boolean;
+const MAX_ANONYMOUS_RETRIES = 2;
+const ANONYMOUS_RETRY_DELAY_MS = 1000;
 
 let listenerInitialized = false;
 // Reference counter for multiple subscribers
@@ -106,10 +107,7 @@ export function initializeAuthListener(
       store.setLoading(true);
 
       void (async () => {
-        const MAX_RETRIES = 2;
-        const RETRY_DELAY_MS = 1000;
-
-        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        for (let attempt = 0; attempt <= MAX_ANONYMOUS_RETRIES; attempt++) {
           try {
             await anonymousAuthService.signInAnonymously(auth);
             if (__DEV__) {
@@ -123,8 +121,8 @@ export function initializeAuthListener(
             }
 
             // If not last attempt, wait and retry
-            if (attempt < MAX_RETRIES) {
-              await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+            if (attempt < MAX_ANONYMOUS_RETRIES) {
+              await new Promise(resolve => setTimeout(resolve, ANONYMOUS_RETRY_DELAY_MS));
               continue;
             }
 

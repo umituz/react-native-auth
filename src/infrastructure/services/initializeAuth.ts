@@ -27,6 +27,7 @@ export interface InitializeAuthOptions {
 }
 
 let isInitialized = false;
+let initializationPromise: Promise<{ success: boolean; auth: Auth | null }> | null = null;
 const conversionState: { current: ConversionState } = {
   current: { previousUserId: null, wasAnonymous: false },
 };
@@ -40,6 +41,21 @@ export async function initializeAuth(
   if (isInitialized) {
     return { success: true, auth: getFirebaseAuth() };
   }
+  // Prevent race condition: return existing promise if initialization is in progress
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+  initializationPromise = doInitializeAuth(options);
+  try {
+    return await initializationPromise;
+  } finally {
+    initializationPromise = null;
+  }
+}
+
+async function doInitializeAuth(
+  options: InitializeAuthOptions
+): Promise<{ success: boolean; auth: Auth | null }> {
 
   const {
     userCollection = "users",
@@ -63,8 +79,10 @@ export async function initializeAuth(
 
   try {
     await initializeAuthService(auth, authConfig, storageProvider);
-  } catch {
-    // Continue without email/password auth
+  } catch (error) {
+    if (__DEV__) {
+      console.warn("[initializeAuth] Auth service init failed, continuing:", error);
+    }
   }
 
   const handleAuthStateChange = createAuthStateHandler(conversionState, {
@@ -74,7 +92,13 @@ export async function initializeAuth(
 
   initializeAuthListener({
     autoAnonymousSignIn,
-    onAuthStateChange: (user) => void handleAuthStateChange(user),
+    onAuthStateChange: (user) => {
+      handleAuthStateChange(user).catch((err) => {
+        if (__DEV__) {
+          console.error("[initializeAuth] Auth state change handler error:", err);
+        }
+      });
+    },
   });
 
   isInitialized = true;

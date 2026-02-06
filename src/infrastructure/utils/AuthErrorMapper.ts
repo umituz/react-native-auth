@@ -49,11 +49,6 @@ export function mapFirebaseAuthError(error: unknown): Error {
       return new AuthWrongPasswordError();
 
     case "auth/invalid-credential":
-      return new AuthError(
-        "Invalid email or password. Please check your credentials.",
-        "AUTH_INVALID_CREDENTIAL"
-      );
-
     case "auth/invalid-login-credentials":
       return new AuthError(
         "Invalid email or password. Please check your credentials.",

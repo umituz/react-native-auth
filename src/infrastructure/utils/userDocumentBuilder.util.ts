@@ -16,7 +16,7 @@ export function getSignUpMethod(user: UserDocumentUser): string | undefined {
   if (user.isAnonymous) return "anonymous";
   if (user.email) {
     const providerData = (
-      user as unknown as { providerData?: { providerId: string }[] }
+      user as unknown as { providerData?: { providerId: string | null }[] }
     ).providerData;
     if (providerData && providerData.length > 0) {
       const providerId = providerData[0]?.providerId;

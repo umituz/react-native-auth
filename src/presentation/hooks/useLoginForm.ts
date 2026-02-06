@@ -100,8 +100,10 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const handleContinueAnonymously = useCallback(async () => {
     try {
       await continueAnonymously();
-    } catch {
-      // Silent fail
+    } catch (error) {
+      if (__DEV__) {
+        console.warn("[useLoginForm] Continue anonymously failed:", error);
+      }
     }
   }, [continueAnonymously]);
 

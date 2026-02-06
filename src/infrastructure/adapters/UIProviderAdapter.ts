@@ -8,13 +8,10 @@ import type { IUIProvider } from "../types/UI.types";
 
 export class UIProviderAdapter implements IUIProvider {
   private theme: DesignTokens | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private localization: any = null;
+  private localization: Record<string, unknown> | null = null;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(theme?: DesignTokens, localization?: any) {
+  constructor(theme?: DesignTokens, localization?: Record<string, unknown>) {
     this.theme = theme || null;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.localization = localization || null;
   }
 
@@ -22,8 +19,7 @@ export class UIProviderAdapter implements IUIProvider {
     return this.theme;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getLocalization(): any {
+  getLocalization(): Record<string, unknown> | null {
     return this.localization;
   }
 
@@ -31,9 +27,7 @@ export class UIProviderAdapter implements IUIProvider {
     this.theme = theme;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  updateLocalization(localization: any): void {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  updateLocalization(localization: Record<string, unknown>): void {
     this.localization = localization;
   }
 }
@@ -43,8 +37,7 @@ export class UIProviderAdapter implements IUIProvider {
  */
 export function createUIProvider(
   theme?: DesignTokens,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  localization?: any
+  localization?: Record<string, unknown>
 ): IUIProvider {
   return new UIProviderAdapter(theme, localization);
 }

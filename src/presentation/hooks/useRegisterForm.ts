@@ -122,19 +122,19 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
 
     const emailResult = validateEmail(email.trim());
     if (!emailResult.isValid && emailResult.error) {
-      setFieldErrors((prev) => ({ ...prev, email: getErrorMessage(emailResult.error as string) }));
+      setFieldErrors((prev) => ({ ...prev, email: getErrorMessage(emailResult.error!) }));
       return;
     }
 
     const passwordResult = validatePasswordForRegister(password, DEFAULT_PASSWORD_CONFIG);
     if (!passwordResult.isValid && passwordResult.error) {
-      setFieldErrors((prev) => ({ ...prev, password: getErrorMessage(passwordResult.error as string) }));
+      setFieldErrors((prev) => ({ ...prev, password: getErrorMessage(passwordResult.error!) }));
       return;
     }
 
     const confirmResult = validatePasswordConfirmation(password, confirmPassword);
     if (!confirmResult.isValid && confirmResult.error) {
-      setFieldErrors((prev) => ({ ...prev, confirmPassword: getErrorMessage(confirmResult.error as string) }));
+      setFieldErrors((prev) => ({ ...prev, confirmPassword: getErrorMessage(confirmResult.error!) }));
       return;
     }
 

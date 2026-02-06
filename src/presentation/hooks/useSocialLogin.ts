@@ -80,8 +80,7 @@ export function useSocialLogin(config?: UseSocialLoginConfig): UseSocialLoginRes
       return { success: false, error: "Apple Sign-In is not available" };
     }
 
-    const result = await firebaseSignInWithApple();
-    return result;
+    return firebaseSignInWithApple();
   }, [appleAvailable, firebaseSignInWithApple]);
 
   return {

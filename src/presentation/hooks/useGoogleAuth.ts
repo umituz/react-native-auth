@@ -71,8 +71,10 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
       if (idToken) {
         setIsLoading(true);
         signInWithGoogleToken(idToken)
-          .catch(() => {
-            // Silent error handling
+          .catch((error) => {
+            if (__DEV__) {
+              console.error("[useGoogleAuth] Firebase sign-in failed:", error);
+            }
           })
           .finally(() => {
             setIsLoading(false);

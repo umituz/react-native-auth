@@ -33,7 +33,6 @@ export function validatePasswordForLogin(password: string): ValidationResult {
 export function validatePasswordForRegister(
   password: string,
   config: PasswordConfig,
-  _validationConfig: ValidationConfig = DEFAULT_VAL_CONFIG
 ): PasswordStrengthResult {
   const req: PasswordRequirements = {
     hasMinLength: password.length >= config.minLength,
