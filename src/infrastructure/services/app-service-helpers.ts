@@ -3,10 +3,11 @@
  * Creates ready-to-use auth service for configureAppServices
  */
 
-import { useAuthStore, selectIsAuthenticated, selectUserId } from "../../presentation/stores/authStore";
+import { useAuthStore } from "../../presentation/stores/authStore";
+import { selectIsAuthenticated, selectUserId } from "../../presentation/stores/auth.selectors";
 import { useAuthModalStore } from "../../presentation/stores/authModalStore";
 
-export interface IAuthService {
+export interface IAppAuthServiceHelper {
   getUserId: () => string | null;
   isAuthenticated: () => boolean;
   requireAuth: () => string;
@@ -15,7 +16,7 @@ export interface IAuthService {
 /**
  * Creates an auth service implementation for configureAppServices
  */
-export function createAuthService(): IAuthService {
+export function createAuthService(): IAppAuthServiceHelper {
   return {
     getUserId: () => selectUserId(useAuthStore.getState()),
     isAuthenticated: () => selectIsAuthenticated(useAuthStore.getState()),
@@ -24,7 +25,11 @@ export function createAuthService(): IAuthService {
         useAuthModalStore.getState().showAuthModal();
         throw new Error("Auth required");
       }
-      return selectUserId(useAuthStore.getState()) ?? "";
+      const userId = selectUserId(useAuthStore.getState());
+      if (!userId) {
+        throw new Error("User ID missing");
+      }
+      return userId;
     },
   };
 }

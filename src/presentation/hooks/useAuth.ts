@@ -7,8 +7,8 @@
  */
 
 import { useCallback } from "react";
+import { useAuthStore } from "../stores/authStore";
 import {
-  useAuthStore,
   selectUser,
   selectLoading,
   selectError,
@@ -21,8 +21,8 @@ import {
   selectIsAnonymous,
   selectIsAuthReady,
   selectIsRegisteredUser,
-  type UserType,
-} from "../stores/authStore";
+} from "../stores/auth.selectors";
+import type { UserType } from "../../types/auth-store.types";
 import {
   useSignInMutation,
   useSignUpMutation,

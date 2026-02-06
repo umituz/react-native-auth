@@ -14,14 +14,6 @@ import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthState, AuthActions, UserType } from "../../types/auth-store.types";
 import { initialAuthState } from "../../types/auth-store.types";
 import {
-  selectUser,
-  selectLoading,
-  selectIsAnonymousState,
-  selectError,
-  selectFirebaseUserId,
-  selectSetLoading,
-  selectSetError,
-  selectSetIsAnonymous,
   selectUserId,
   selectIsAuthenticated,
   selectIsAnonymous,
@@ -30,19 +22,8 @@ import {
   selectIsRegisteredUser,
 } from "./auth.selectors";
 
-// Re-export types for convenience
-export type { AuthState, AuthActions, UserType };
-
-// Re-export selectors
+// Re-export public selectors (consumed by index.ts)
 export {
-  selectUser,
-  selectLoading,
-  selectIsAnonymousState,
-  selectError,
-  selectFirebaseUserId,
-  selectSetLoading,
-  selectSetError,
-  selectSetIsAnonymous,
   selectUserId,
   selectIsAuthenticated,
   selectIsAnonymous,
@@ -51,7 +32,10 @@ export {
   selectIsRegisteredUser,
 };
 
-// Re-export listener functions
+// Re-export public types (consumed by index.ts)
+export type { AuthState, AuthActions, UserType };
+
+// Re-export listener functions (consumed by index.ts)
 export {
   initializeAuthListener,
   resetAuthListener,

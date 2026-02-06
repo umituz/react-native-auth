@@ -10,7 +10,8 @@
  * ```
  */
 
-import { useAuthStore, selectIsAuthenticated, selectFirebaseUserId } from "../stores/authStore";
+import { useAuthStore } from "../stores/authStore";
+import { selectIsAuthenticated, selectFirebaseUserId } from "../stores/auth.selectors";
 
 /**
  * Get userId or throw if not authenticated

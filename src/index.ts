@@ -227,7 +227,7 @@ export { getAuthErrorLocalizationKey } from './presentation/utils/getAuthErrorMe
 // App Service Helper (for configureAppServices)
 export {
   createAuthService,
-  type IAuthService as IAppAuthService,
+  type IAppAuthServiceHelper,
 } from './infrastructure/services/app-service-helpers';
 
 // Init Module Factory

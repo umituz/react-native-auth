@@ -17,7 +17,8 @@
  */
 
 import { useCallback } from "react";
-import { useAuthStore, selectIsAuthenticated, selectLoading, selectFirebaseUserId } from "../stores/authStore";
+import { useAuthStore } from "../stores/authStore";
+import { selectIsAuthenticated, selectLoading, selectFirebaseUserId } from "../stores/auth.selectors";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { selectShowAuthModal } from "../stores/auth.selectors";
 

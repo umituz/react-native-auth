@@ -129,8 +129,10 @@ export class FirebaseAuthProvider implements IAuthProvider {
           await updateProfile(userCredential.user, {
             displayName: credentials.displayName.trim(),
           });
-        } catch {
-          // Don't fail signup if display name update fails
+        } catch (error) {
+          if (__DEV__) {
+            console.warn("[FirebaseAuthProvider] Failed to update display name:", error);
+          }
         }
       }
 
