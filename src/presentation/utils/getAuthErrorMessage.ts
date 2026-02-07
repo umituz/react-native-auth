@@ -80,3 +80,11 @@ export function getAuthErrorLocalizationKey(error: unknown): string {
   // Default to unknown error
   return "auth.errors.unknownError";
 }
+
+/**
+ * Resolve an error key to a localized message using the provided error map.
+ * Falls back to the key itself if no translation is found.
+ */
+export function resolveErrorMessage(key: string, errors?: Record<string, string>): string {
+  return errors?.[key] || key;
+}

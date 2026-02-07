@@ -74,7 +74,7 @@ export class AuthService implements IAuthService {
       authEventService.emitUserAuthenticated(user.uid);
       return user;
     } catch (error) {
-      authTracker.logOperationError("sign-up", error, { email: params.email });
+      authTracker.logOperationError("Sign up", error, { email: params.email });
       throw error;
     }
   }
@@ -88,7 +88,7 @@ export class AuthService implements IAuthService {
       authEventService.emitUserAuthenticated(user.uid);
       return user;
     } catch (error) {
-      authTracker.logOperationError("sign-in", error, { email: params.email });
+      authTracker.logOperationError("Sign in", error, { email: params.email });
       throw error;
     }
   }
@@ -100,7 +100,7 @@ export class AuthService implements IAuthService {
       await this.clearAnonymousModeIfNeeded();
       authTracker.logOperationSuccess("Sign out");
     } catch (error) {
-      authTracker.logOperationError("sign-out", error);
+      authTracker.logOperationError("Sign out", error);
       throw error;
     }
   }

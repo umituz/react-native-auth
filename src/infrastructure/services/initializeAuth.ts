@@ -77,12 +77,12 @@ async function doInitializeAuth(
     collectExtras: collectExtras || collectDeviceExtras,
   });
 
+  let authServiceInitFailed = false;
   try {
     await initializeAuthService(auth, authConfig, storageProvider);
   } catch (error) {
-    if (__DEV__) {
-      console.warn("[initializeAuth] Auth service init failed, continuing:", error);
-    }
+    authServiceInitFailed = true;
+    console.warn("[initializeAuth] Auth service init failed, continuing:", error);
   }
 
   const handleAuthStateChange = createAuthStateHandler(conversionState, {
@@ -101,8 +101,12 @@ async function doInitializeAuth(
     },
   });
 
+  if (authServiceInitFailed) {
+    console.warn("[initializeAuth] Auth service initialization failed. Some auth features may not work.");
+  }
+
   isInitialized = true;
-  return { success: true, auth };
+  return { success: !authServiceInitFailed, auth };
 }
 
 export function isAuthInitialized(): boolean {

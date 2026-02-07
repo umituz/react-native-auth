@@ -6,7 +6,7 @@ import {
 } from "../../infrastructure/utils/AuthValidation";
 import { DEFAULT_PASSWORD_CONFIG } from "../../domain/value-objects/AuthConfig";
 import { useAuth } from "./useAuth";
-import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
+import { getAuthErrorLocalizationKey, resolveErrorMessage } from "../utils/getAuthErrorMessage";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
 import { alertService } from "@umituz/react-native-design-system";
 
@@ -60,7 +60,7 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
   }>({});
 
   const getErrorMessage = useCallback((key: string) => {
-    return translations?.errors?.[key] || key;
+    return resolveErrorMessage(key, translations?.errors);
   }, [translations]);
 
   const passwordRequirements = useMemo((): PasswordRequirements => {

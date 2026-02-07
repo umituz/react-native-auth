@@ -22,7 +22,7 @@ interface FirebaseUserLike {
 /**
  * Extract auth provider from Firebase user's providerData
  */
-function extractProvider(user: FirebaseUserLike): AuthProviderType {
+export function extractProvider(user: FirebaseUserLike): AuthProviderType {
   if (user.isAnonymous) {
     return "anonymous";
   }

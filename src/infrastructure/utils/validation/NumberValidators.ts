@@ -1,4 +1,5 @@
 import { ValidationResult } from './types';
+import { calculateAge } from './DateValidators';
 
 /**
  * Validate numeric range
@@ -40,13 +41,7 @@ export const validateAge = (
   minAge: number,
   errorKey?: string
 ): ValidationResult => {
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-
+  const age = calculateAge(birthDate);
   const isValid = age >= minAge;
   return {
     isValid,

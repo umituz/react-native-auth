@@ -98,10 +98,7 @@ export const selectUserType = (state: AuthStore): UserType => {
     return "none";
   }
 
-  const isAnonymous =
-    state.firebaseUser?.isAnonymous ?? state.user?.isAnonymous ?? false;
-
-  return isAnonymous ? "anonymous" : "authenticated";
+  return selectIsAnonymous(state) ? "anonymous" : "authenticated";
 };
 
 /**
@@ -117,5 +114,5 @@ export const selectIsAuthReady = (state: AuthStore): boolean => {
  */
 export const selectIsRegisteredUser = (state: AuthStore): boolean => {
   if (!state.initialized) return false;
-  return !!state.user && !state.isAnonymous && !state.user.isAnonymous;
+  return selectIsAuthenticated(state);
 };

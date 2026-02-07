@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "./useAuth";
-import { getAuthErrorLocalizationKey } from "../utils/getAuthErrorMessage";
+import { getAuthErrorLocalizationKey, resolveErrorMessage } from "../utils/getAuthErrorMessage";
 import { validateEmail, validatePasswordForLogin } from "../../infrastructure/utils/AuthValidation";
 import { alertService } from "@umituz/react-native-design-system";
 
@@ -39,7 +39,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const [localError, setLocalError] = useState<string | null>(null);
 
   const getErrorMessage = useCallback((key: string) => {
-    return translations?.errors?.[key] || key;
+    return resolveErrorMessage(key, translations?.errors);
   }, [translations]);
 
   const handleEmailChange = useCallback(

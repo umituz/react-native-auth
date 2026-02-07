@@ -1,6 +1,7 @@
 import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
+import type { ValidationResult } from "./validation/types";
 
-export interface ValidationResult { isValid: boolean; error?: string; }
+export type { ValidationResult };
 export interface PasswordStrengthResult extends ValidationResult { requirements: PasswordRequirements; }
 export interface PasswordRequirements {
   hasMinLength: boolean;
@@ -34,12 +35,14 @@ export function validatePasswordForRegister(
   password: string,
   config: PasswordConfig,
 ): PasswordStrengthResult {
+  if (!password) {
+    return { isValid: false, error: "auth.validation.passwordRequired", requirements: { hasMinLength: false } };
+  }
+
   const req: PasswordRequirements = {
     hasMinLength: password.length >= config.minLength,
   };
 
-  if (!password) return { isValid: false, error: "auth.validation.passwordRequired", requirements: req };
-  
   if (!req.hasMinLength) return { isValid: false, error: "auth.validation.passwordTooShort", requirements: req };
 
   return { isValid: true, requirements: req };

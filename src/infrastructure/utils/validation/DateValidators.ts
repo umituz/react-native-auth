@@ -1,6 +1,19 @@
 import { ValidationResult } from './types';
 
 /**
+ * Calculate age from a birth date
+ */
+export function calculateAge(birthDate: Date): number {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+/**
  * Validate date of birth
  */
 export const validateDateOfBirth = (
@@ -12,12 +25,7 @@ export const validateDateOfBirth = (
     return { isValid: false, error: "Please enter a valid date" };
   }
 
-  const today = new Date();
-  let age = today.getFullYear() - date.getFullYear();
-  const m = today.getMonth() - date.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < date.getDate())) {
-    age--;
-  }
+  const age = calculateAge(date);
 
   if (age < minAge) {
     return { isValid: false, error: errorKey || `You must be at least ${minAge} years old` };

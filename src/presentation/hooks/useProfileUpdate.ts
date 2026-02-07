@@ -4,7 +4,7 @@
  * Apps should use Firebase SDK directly or backend API
  */
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useAuth } from "./useAuth";
 import type { UpdateProfileParams } from "../../domain/entities/UserProfile";
 
@@ -16,8 +16,6 @@ export interface UseProfileUpdateReturn {
 
 export const useProfileUpdate = (): UseProfileUpdateReturn => {
     const { user } = useAuth();
-    const [isUpdating] = useState(false);
-    const [error] = useState<string | null>(null);
 
     const updateProfile = useCallback(
         (_params: UpdateProfileParams) => {
@@ -37,8 +35,8 @@ export const useProfileUpdate = (): UseProfileUpdateReturn => {
 
     return {
         updateProfile,
-        isUpdating,
-        error,
+        isUpdating: false,
+        error: null,
     };
 };
 

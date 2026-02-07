@@ -101,6 +101,7 @@ export {
   validateAge,
 } from './infrastructure/utils/validation/NumberValidators';
 export {
+  calculateAge,
   validateDateOfBirth,
   validateDateRange,
 } from './infrastructure/utils/validation/DateValidators';
@@ -222,7 +223,7 @@ export type { UserType, AuthState, AuthActions } from './presentation/stores/aut
 export type { AuthListenerOptions } from './types/auth-store.types';
 
 // UTILITIES
-export { getAuthErrorLocalizationKey } from './presentation/utils/getAuthErrorMessage';
+export { getAuthErrorLocalizationKey, resolveErrorMessage } from './presentation/utils/getAuthErrorMessage';
 
 // App Service Helper (for configureAppServices)
 export {

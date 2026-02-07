@@ -8,25 +8,27 @@ import type {
   UserDocumentUser,
   UserDocumentExtras,
 } from "../../infrastructure/services/UserDocument.types";
+import { extractProvider } from "./UserMapper";
+import type { AuthProviderType } from "../../domain/entities/AuthUser";
+
+/**
+ * Map AuthProviderType to sign-up method string
+ */
+const PROVIDER_TO_SIGNUP_METHOD: Record<string, string> = {
+  "google.com": "google",
+  "apple.com": "apple",
+  "password": "email",
+  "anonymous": "anonymous",
+};
 
 /**
  * Gets the sign-up method from user provider data
+ * Uses extractProvider from UserMapper as single source of truth for provider detection
  */
 export function getSignUpMethod(user: UserDocumentUser): string | undefined {
-  if (user.isAnonymous) return "anonymous";
-  if (user.email) {
-    const providerData = (
-      user as unknown as { providerData?: { providerId: string | null }[] }
-    ).providerData;
-    if (providerData && providerData.length > 0) {
-      const providerId = providerData[0]?.providerId;
-      if (providerId === "google.com") return "google";
-      if (providerId === "apple.com") return "apple";
-      if (providerId === "password") return "email";
-    }
-    return "email";
-  }
-  return undefined;
+  const provider: AuthProviderType = extractProvider(user as Parameters<typeof extractProvider>[0]);
+  if (provider === "unknown") return user.email ? "email" : undefined;
+  return PROVIDER_TO_SIGNUP_METHOD[provider];
 }
 
 /**
@@ -59,6 +61,20 @@ export function buildBaseData(
 }
 
 /**
+ * Apply anonymous-to-authenticated conversion fields to document data
+ */
+function applyConversionFields(data: Record<string, unknown>, extras?: UserDocumentExtras): void {
+  if (extras?.previousAnonymousUserId) {
+    data.previousAnonymousUserId = extras.previousAnonymousUserId;
+    data.convertedFromAnonymous = true;
+    data.convertedAt = serverTimestamp();
+  }
+  if (extras?.signUpMethod) {
+    data.signUpMethod = extras.signUpMethod;
+  }
+}
+
+/**
  * Builds user document data for creation
  */
 export function buildCreateData(
@@ -74,13 +90,7 @@ export function buildCreateData(
     lastLoginAt: serverTimestamp(),
   };
 
-  if (extras?.previousAnonymousUserId) {
-    createData.previousAnonymousUserId = extras.previousAnonymousUserId;
-    createData.convertedFromAnonymous = true;
-    createData.convertedAt = serverTimestamp();
-  }
-
-  if (extras?.signUpMethod) createData.signUpMethod = extras.signUpMethod;
+  applyConversionFields(createData, extras);
 
   return createData;
 }
@@ -98,12 +108,7 @@ export function buildUpdateData(
     updatedAt: serverTimestamp(),
   };
 
-  if (extras?.previousAnonymousUserId) {
-    updateData.previousAnonymousUserId = extras.previousAnonymousUserId;
-    updateData.convertedFromAnonymous = true;
-    updateData.convertedAt = serverTimestamp();
-    if (extras?.signUpMethod) updateData.signUpMethod = extras.signUpMethod;
-  }
+  applyConversionFields(updateData, extras);
 
   return updateData;
 }
