@@ -32,10 +32,11 @@ export class FirebaseAuthProvider implements IAuthProvider {
     }
   }
 
-  async initialize(): Promise<void> {
+  initialize(): Promise<void> {
     if (!this.auth) {
       throw new Error("Firebase Auth instance must be provided");
     }
+    return Promise.resolve();
   }
 
   setAuth(auth: Auth): void {

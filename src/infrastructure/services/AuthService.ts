@@ -45,7 +45,7 @@ export class AuthService implements IAuthService {
     let provider: IAuthProvider;
 
     if ("currentUser" in providerOrAuth) {
-      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth as Auth);
+      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth);
       await firebaseProvider.initialize();
       provider = firebaseProvider;
     } else {
