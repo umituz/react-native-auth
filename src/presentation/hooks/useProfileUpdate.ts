@@ -27,8 +27,7 @@ export const useProfileUpdate = (): UseProfileUpdateReturn => {
                 return Promise.reject(new Error("Anonymous users cannot update profile"));
             }
 
-            // Note: App should implement this via Firebase SDK
-            return Promise.reject(new Error("Profile update should be implemented by app"));
+            return Promise.reject(new Error("Profile update not implemented - use Firebase SDK directly"));
         },
         [user],
     );

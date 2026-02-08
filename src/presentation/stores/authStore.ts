@@ -18,29 +18,8 @@ import {
   selectIsAuthenticated,
   selectIsAnonymous,
   selectUserType,
-  selectIsAuthReady,
   selectIsRegisteredUser,
 } from "./auth.selectors";
-
-// Re-export public selectors (consumed by index.ts)
-export {
-  selectUserId,
-  selectIsAuthenticated,
-  selectIsAnonymous,
-  selectUserType,
-  selectIsAuthReady,
-  selectIsRegisteredUser,
-};
-
-// Re-export public types (consumed by index.ts)
-export type { AuthState, AuthActions, UserType };
-
-// Re-export listener functions (consumed by index.ts)
-export {
-  initializeAuthListener,
-  resetAuthListener,
-  isAuthListenerInitialized,
-} from "./initializeAuthListener";
 
 // =============================================================================
 // STORE
@@ -96,9 +75,10 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
       if (__DEV__) {
         console.log("[AuthStore] setIsAnonymous:", { isAnonymous, hadUser: !!user });
       }
-      // Also update user.isAnonymous when converting from anonymous
-      if (user && !isAnonymous && user.isAnonymous) {
-        set({ isAnonymous, user: { ...user, isAnonymous: false } });
+      // Update user.isAnonymous flag to match the new state
+      // This handles both anonymous → registered and registered → anonymous conversions
+      if (user && user.isAnonymous !== isAnonymous) {
+        set({ isAnonymous, user: { ...user, isAnonymous } });
       } else {
         set({ isAnonymous });
       }

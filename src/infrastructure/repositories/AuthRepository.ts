@@ -36,6 +36,11 @@ export class AuthRepository implements IAuthRepository {
         const password = sanitizePassword(params.password);
         const displayName = params.displayName ? sanitizeName(params.displayName) : undefined;
 
+        // Log if display name was sanitized
+        if (__DEV__ && params.displayName && displayName && params.displayName !== displayName) {
+            console.warn("[AuthRepository] Display name was sanitized during sign up. Original:", params.displayName, "Sanitized:", displayName);
+        }
+
         // Validate email
         const emailResult = validateEmail(email);
         if (!emailResult.isValid) {

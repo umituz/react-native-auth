@@ -98,10 +98,8 @@ export class AuthEventService {
   }
 }
 
-// Export singleton instance for backward compatibility
 export const authEventService = AuthEventService.getInstance();
 
-// Helper functions
 export function emitUserAuthenticated(userId: string): void {
   authEventService.emitUserAuthenticated(userId);
 }

@@ -1,10 +1,39 @@
 /**
  * Sanitization Utilities
  * Secure input cleaning for user data
+ *
+ * @module Sanitization
+ * @description Provides input sanitization functions to prevent XSS attacks,
+ * injection attacks, and ensure data integrity. All user inputs should be
+ * sanitized before storage or processing.
+ *
+ * Security Limits:
+ * These constants define maximum lengths for various input fields to prevent
+ * DoS attacks and ensure database integrity. They are based on industry standards:
+ *
+ * - EMAIL_MAX_LENGTH: 254 (RFC 5321 - maximum email address length)
+ * - PASSWORD_MAX_LENGTH: 128 (NIST recommendations)
+ * - NAME_MAX_LENGTH: 100 (Reasonable limit for display names)
+ * - GENERAL_TEXT_MAX_LENGTH: 500 (Prevents abuse of text fields)
+ *
+ * @note These limits are currently hardcoded for security. If you need to
+ * customize them for your application, you can:
+ * 1. Create your own sanitization functions with custom limits
+ * 2. Use the helper functions like `isWithinLengthLimit()` for validation
+ * 3. Submit a PR to make these limits configurable via AuthConfig
  */
 
 /**
  * Security constants for input validation
+ *
+ * @constant
+ * @type {readonly [key: string]: number}
+ *
+ * @property {number} EMAIL_MAX_LENGTH - Maximum email length per RFC 5321
+ * @property {number} PASSWORD_MIN_LENGTH - Minimum password length (configurable via AuthConfig)
+ * @property {number} PASSWORD_MAX_LENGTH - Maximum password length to prevent DoS
+ * @property {number} NAME_MAX_LENGTH - Maximum display name length
+ * @property {number} GENERAL_TEXT_MAX_LENGTH - Maximum general text input length
  */
 export const SECURITY_LIMITS = {
   EMAIL_MAX_LENGTH: 254, // RFC 5321
@@ -13,6 +42,24 @@ export const SECURITY_LIMITS = {
   NAME_MAX_LENGTH: 100,
   GENERAL_TEXT_MAX_LENGTH: 500,
 } as const;
+
+/**
+ * Type for security limit keys
+ */
+export type SecurityLimitKey = keyof typeof SECURITY_LIMITS;
+
+/**
+ * Get a specific security limit value
+ * @param key - The security limit key
+ * @returns The security limit value
+ * @example
+ * ```ts
+ * const maxEmailLength = getSecurityLimit('EMAIL_MAX_LENGTH'); // 254
+ * ```
+ */
+export function getSecurityLimit(key: SecurityLimitKey): number {
+  return SECURITY_LIMITS[key];
+}
 
 /**
  * Trim and normalize whitespace
@@ -34,13 +81,14 @@ export const sanitizeEmail = (email: string): string => {
 
 /**
  * Sanitize password
- * - Only trim (preserve case and special chars)
+ * - Trim leading/trailing whitespace to prevent login issues
+ * - Preserve case and special chars
  * - Limit length to prevent DoS
  */
 export const sanitizePassword = (password: string): string => {
-  // Don't trim password to preserve intentional spaces
-  // Only limit length
-  return password.substring(0, SECURITY_LIMITS.PASSWORD_MAX_LENGTH);
+  // Trim leading/trailing spaces to prevent authentication issues
+  // Internal spaces are preserved for special use cases
+  return password.trim().substring(0, SECURITY_LIMITS.PASSWORD_MAX_LENGTH);
 };
 
 /**

@@ -130,11 +130,16 @@ export function useAuth(): UseAuthResult {
   const signOut = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       await signOutMutation.mutateAsync();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Sign out failed";
+      setError(errorMessage);
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, signOutMutation]);
+  }, [setLoading, setError, signOutMutation]);
 
   const continueAnonymously = useCallback(async () => {
     try {

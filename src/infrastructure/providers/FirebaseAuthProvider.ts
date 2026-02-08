@@ -131,9 +131,13 @@ export class FirebaseAuthProvider implements IAuthProvider {
             displayName: credentials.displayName.trim(),
           });
         } catch (error) {
-          if (__DEV__) {
-            console.warn("[FirebaseAuthProvider] Failed to update display name:", error);
-          }
+          // Log the error but don't fail the entire sign-up process
+          // The account was created successfully, only the display name update failed
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          console.warn(
+            `[FirebaseAuthProvider] Account created but display name update failed: ${errorMessage}. ` +
+            "User can update their display name later from profile settings."
+          );
         }
       }
 

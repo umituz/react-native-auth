@@ -15,11 +15,10 @@ import type { AuthListenerOptions } from "../../types/auth-store.types";
 
 const MAX_ANONYMOUS_RETRIES = 2;
 const ANONYMOUS_RETRY_DELAY_MS = 1000;
+const ANONYMOUS_SIGNIN_TIMEOUT_MS = 10000;
 
 let listenerInitialized = false;
-// Reference counter for multiple subscribers
 let listenerRefCount = 0;
-// Actual unsubscribe function from Firebase
 let firebaseUnsubscribe: (() => void) | null = null;
 
 /**
@@ -75,19 +74,23 @@ export function initializeAuthListener(
     return () => {};
   }
 
+  listenerInitialized = true;
+  listenerRefCount = 1;
+
+  // Initialize listener first, then check anonymous mode
+  // This prevents race conditions where the listener fires before we set up state
   const service = getAuthService();
   if (service) {
     const isAnonymous = service.getIsAnonymousMode();
     if (__DEV__) {
       console.log("[AuthListener] Service isAnonymousMode:", isAnonymous);
     }
+    // Set anonymous mode flag before setting up listener
+    // This ensures consistent state when listener first fires
     if (isAnonymous) {
       store.setIsAnonymous(true);
     }
   }
-
-  listenerInitialized = true;
-  listenerRefCount = 1;
 
   firebaseUnsubscribe = onIdTokenChanged(auth, (user) => {
     if (__DEV__) {
@@ -106,36 +109,60 @@ export function initializeAuthListener(
       // Set loading state while attempting sign-in
       store.setLoading(true);
 
+      // Start anonymous sign-in process
+      // Don't return early - let the listener continue to handle state changes
       void (async () => {
-        for (let attempt = 0; attempt <= MAX_ANONYMOUS_RETRIES; attempt++) {
-          try {
-            await anonymousAuthService.signInAnonymously(auth);
-            if (__DEV__) {
-              console.log("[AuthListener] Anonymous sign-in successful");
-            }
-            // Success - the listener will fire again with the new user
-            return;
-          } catch (error) {
-            if (__DEV__) {
-              console.warn(`[AuthListener] Anonymous sign-in attempt ${attempt + 1} failed:`, error);
-            }
+        // Add timeout protection
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Anonymous sign-in timeout")), ANONYMOUS_SIGNIN_TIMEOUT_MS)
+        );
 
-            // If not last attempt, wait and retry
-            if (attempt < MAX_ANONYMOUS_RETRIES) {
-              await new Promise(resolve => setTimeout(resolve, ANONYMOUS_RETRY_DELAY_MS));
-              continue;
-            }
+        try {
+          // Race between sign-in and timeout
+          await Promise.race([
+            (async () => {
+              for (let attempt = 0; attempt < MAX_ANONYMOUS_RETRIES; attempt++) {
+                try {
+                  await anonymousAuthService.signInAnonymously(auth);
+                  if (__DEV__) {
+                    console.log("[AuthListener] Anonymous sign-in successful");
+                  }
+                  // Success - the listener will fire again with the new user
+                  return;
+                } catch (error) {
+                  if (__DEV__) {
+                    console.warn(`[AuthListener] Anonymous sign-in attempt ${attempt + 1} failed:`, error);
+                  }
 
-            // Last attempt failed - set error state
-            if (__DEV__) {
-              console.error("[AuthListener] All anonymous sign-in attempts failed");
-            }
-            store.setFirebaseUser(null);
-            store.setLoading(false);
-            store.setInitialized(true);
+                  // If not last attempt, wait and retry
+                  if (attempt < MAX_ANONYMOUS_RETRIES - 1) {
+                    await new Promise(resolve => setTimeout(resolve, ANONYMOUS_RETRY_DELAY_MS));
+                    continue;
+                  }
+
+                  // All attempts failed
+                  throw error;
+                }
+              }
+            })(),
+            timeoutPromise,
+          ]);
+        } catch (error) {
+          // All attempts failed or timeout - set error state
+          if (__DEV__) {
+            console.error("[AuthListener] All anonymous sign-in attempts failed:", error);
           }
+          store.setFirebaseUser(null);
+          store.setLoading(false);
+          store.setInitialized(true);
+          store.setError("Failed to sign in anonymously. Please check your connection.");
         }
       })();
+
+      // Continue execution - don't return early
+      // The listener will be triggered again when sign-in succeeds
+      // For now, set null user and let loading state indicate in-progress
+      store.setFirebaseUser(null);
       return;
     }
 

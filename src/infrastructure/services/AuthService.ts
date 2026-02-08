@@ -9,7 +9,7 @@ import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import { FirebaseAuthProvider } from "../providers/FirebaseAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
-import { DEFAULT_AUTH_CONFIG } from "../../domain/value-objects/AuthConfig";
+import { sanitizeAuthConfig } from "../../domain/value-objects/AuthConfig";
 import { AuthRepository } from "../repositories/AuthRepository";
 import { AnonymousModeService } from "./AnonymousModeService";
 import { authEventService } from "./AuthEventService";
@@ -24,11 +24,8 @@ export class AuthService implements IAuthService {
   private config: AuthConfig;
 
   constructor(config: Partial<AuthConfig> = {}, storageProvider?: IStorageProvider) {
-    this.config = {
-      ...DEFAULT_AUTH_CONFIG,
-      ...config,
-      password: { ...DEFAULT_AUTH_CONFIG.password, ...config.password },
-    };
+    // Validate and sanitize configuration
+    this.config = sanitizeAuthConfig(config);
 
     this.anonymousModeService = new AnonymousModeService();
     this.storageProvider = storageProvider;
@@ -120,7 +117,10 @@ export class AuthService implements IAuthService {
 
   getCurrentUser(): AuthUser | null {
     if (!this.initialized) return null;
-    return this.anonymousModeService.getIsAnonymousMode() ? null : this.repositoryInstance.getCurrentUser();
+    // Return the actual Firebase user regardless of anonymous mode
+    // The caller should check the user's isAnonymous property if needed
+    // This ensures proper anonymous to registered user conversion
+    return this.repositoryInstance.getCurrentUser();
   }
 
   getIsAnonymousMode(): boolean {

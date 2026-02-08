@@ -29,25 +29,30 @@ export class AnonymousModeService {
     }
   }
 
-  private async save(storageProvider: IStorageProvider): Promise<void> {
+  private async save(storageProvider: IStorageProvider): Promise<boolean> {
     try {
       await storageProvider.set(this.storageKey, this.isAnonymousMode.toString());
+      return true;
     } catch (err) {
       if (__DEV__) {
         console.error("[AnonymousModeService] Storage save failed:", err);
       }
+      return false;
     }
   }
 
-  async clear(storageProvider: IStorageProvider): Promise<void> {
+  async clear(storageProvider: IStorageProvider): Promise<boolean> {
     try {
       await storageProvider.remove(this.storageKey);
+      this.isAnonymousMode = false;
+      return true;
     } catch (err) {
       if (__DEV__) {
         console.error("[AnonymousModeService] Storage clear failed:", err);
       }
+      this.isAnonymousMode = false;
+      return false;
     }
-    this.isAnonymousMode = false;
   }
 
   async enable(storageProvider: IStorageProvider, provider?: IAuthProvider): Promise<void> {
@@ -63,7 +68,10 @@ export class AnonymousModeService {
     }
 
     this.isAnonymousMode = true;
-    await this.save(storageProvider);
+    const saved = await this.save(storageProvider);
+    if (!saved && __DEV__) {
+      console.warn("[AnonymousModeService] Anonymous mode enabled but not persisted to storage. Mode will be lost on app restart.");
+    }
     emitAnonymousModeEnabled();
   }
 
@@ -79,12 +87,10 @@ export class AnonymousModeService {
     callback: (user: AuthUser | null) => void
   ): (user: AuthUser | null) => void {
     return (user: AuthUser | null) => {
-      // Don't update if in anonymous mode
-      if (!this.isAnonymousMode) {
-        callback(user);
-      } else {
-        callback(null);
-      }
+      // In anonymous mode, still pass the actual Firebase user
+      // The store will handle setting the isAnonymous flag appropriately
+      // This allows proper anonymous to registered user conversion
+      callback(user);
     };
   }
 }
