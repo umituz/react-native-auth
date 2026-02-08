@@ -5,12 +5,12 @@
 
 import { useMutation } from "@umituz/react-native-design-system";
 import { getAuthService } from "../../../infrastructure/services/AuthService";
-import type { SignUpParams, SignInParams } from "../../../application/ports/IAuthService";
+import type { AuthCredentials, SignUpCredentials } from "../../../application/ports/IAuthProvider";
 import type { AuthUser } from "../../../domain/entities/AuthUser";
 
 export const useSignUpMutation = () => {
     return useMutation({
-        mutationFn: async (params: SignUpParams): Promise<AuthUser> => {
+        mutationFn: async (params: SignUpCredentials): Promise<AuthUser> => {
             const service = getAuthService();
             if (!service) throw new Error("Auth Service not initialized");
             return service.signUp(params);
@@ -20,7 +20,7 @@ export const useSignUpMutation = () => {
 
 export const useSignInMutation = () => {
     return useMutation({
-        mutationFn: async (params: SignInParams): Promise<AuthUser> => {
+        mutationFn: async (params: AuthCredentials): Promise<AuthUser> => {
             const service = getAuthService();
             if (!service) throw new Error("Auth Service not initialized");
             return service.signIn(params);

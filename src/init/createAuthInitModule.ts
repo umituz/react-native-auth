@@ -9,21 +9,10 @@ import type { InitializeAuthOptions } from '../infrastructure/services/initializ
 
 export interface AuthInitModuleConfig {
   /**
-   * Firestore collection name for user documents
-   * @default "users"
-   */
-  userCollection?: string;
-
-  /**
    * Whether to auto sign-in as anonymous user
    * @default true
    */
   autoAnonymousSignIn?: boolean;
-
-  /**
-   * Function to collect device extras for user document
-   */
-  collectExtras?: InitializeAuthOptions['collectExtras'];
 
   /**
    * Storage provider for auth persistence
@@ -80,9 +69,7 @@ export function createAuthInitModule(
   config: AuthInitModuleConfig = {}
 ): InitModule {
   const {
-    userCollection = 'users',
     autoAnonymousSignIn = true,
-    collectExtras,
     storageProvider,
     onRestorePurchases,
     onUserConverted,
@@ -97,9 +84,7 @@ export function createAuthInitModule(
     init: async () => {
       try {
         await initializeAuth({
-          userCollection,
           autoAnonymousSignIn,
-          collectExtras,
           storageProvider,
           onUserConverted: async (anonymousId: string, authenticatedId: string) => {
             if (__DEV__) {

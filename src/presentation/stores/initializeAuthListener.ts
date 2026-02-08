@@ -20,6 +20,8 @@ const ANONYMOUS_SIGNIN_TIMEOUT_MS = 10000;
 let listenerInitialized = false;
 let listenerRefCount = 0;
 let firebaseUnsubscribe: (() => void) | null = null;
+let anonymousSignInInProgress = false; // Prevent race conditions
+let initializationInProgress = false; // Prevent duplicate initialization
 
 /**
  * Initialize Firebase auth listener
@@ -34,7 +36,18 @@ export function initializeAuthListener(
     console.log("[AuthListener] initializeAuthListener called:", {
       autoAnonymousSignIn,
       alreadyInitialized: listenerInitialized,
+      initializationInProgress,
     });
+  }
+
+  // Prevent duplicate initialization - return existing unsubscribe if already initializing
+  if (initializationInProgress) {
+    if (__DEV__) {
+      console.warn("[AuthListener] Initialization already in progress, returning existing unsubscribe");
+    }
+    return () => {
+      // No-op - will be handled by the initial initialization
+    };
   }
 
   // If already initialized, increment ref count and return unsubscribe that decrements
@@ -58,9 +71,13 @@ export function initializeAuthListener(
         firebaseUnsubscribe = null;
         listenerInitialized = false;
         listenerRefCount = 0;
+        anonymousSignInInProgress = false;
       }
     };
   }
+
+  // Mark initialization as in progress
+  initializationInProgress = true;
 
   const auth = getFirebaseAuth();
   const store = useAuthStore.getState();
@@ -69,6 +86,7 @@ export function initializeAuthListener(
     if (__DEV__) {
       console.log("[AuthListener] No Firebase auth, marking initialized");
     }
+    initializationInProgress = false;
     store.setLoading(false);
     store.setInitialized(true);
     return () => {};
@@ -103,21 +121,31 @@ export function initializeAuthListener(
     }
 
     if (!user && autoAnonymousSignIn) {
+      // Prevent race condition: only one anonymous sign-in at a time
+      if (anonymousSignInInProgress) {
+        if (__DEV__) {
+          console.log("[AuthListener] Anonymous sign-in already in progress, skipping");
+        }
+        store.setFirebaseUser(null);
+        return;
+      }
+
       if (__DEV__) {
         console.log("[AuthListener] No user, auto signing in anonymously...");
       }
       // Set loading state while attempting sign-in
       store.setLoading(true);
+      anonymousSignInInProgress = true;
 
-      // Start anonymous sign-in process
-      // Don't return early - let the listener continue to handle state changes
+      // Start anonymous sign-in without blocking the listener
+      // The listener will be triggered again when sign-in completes
       void (async () => {
-        // Add timeout protection
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Anonymous sign-in timeout")), ANONYMOUS_SIGNIN_TIMEOUT_MS)
-        );
-
         try {
+          // Add timeout protection
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Anonymous sign-in timeout")), ANONYMOUS_SIGNIN_TIMEOUT_MS)
+          );
+
           // Race between sign-in and timeout
           await Promise.race([
             (async () => {
@@ -156,6 +184,8 @@ export function initializeAuthListener(
           store.setLoading(false);
           store.setInitialized(true);
           store.setError("Failed to sign in anonymously. Please check your connection.");
+        } finally {
+          anonymousSignInInProgress = false;
         }
       })();
 
@@ -163,6 +193,7 @@ export function initializeAuthListener(
       // The listener will be triggered again when sign-in succeeds
       // For now, set null user and let loading state indicate in-progress
       store.setFirebaseUser(null);
+      initializationInProgress = false;
       return;
     }
 
@@ -179,6 +210,8 @@ export function initializeAuthListener(
     onAuthStateChange?.(user);
   });
 
+  initializationInProgress = false;
+
   return () => {
     listenerRefCount--;
     if (__DEV__) {
@@ -193,6 +226,8 @@ export function initializeAuthListener(
       firebaseUnsubscribe = null;
       listenerInitialized = false;
       listenerRefCount = 0;
+      anonymousSignInInProgress = false;
+      initializationInProgress = false;
     }
   };
 }
@@ -207,6 +242,8 @@ export function resetAuthListener(): void {
   }
   listenerInitialized = false;
   listenerRefCount = 0;
+  anonymousSignInInProgress = false;
+  initializationInProgress = false;
 }
 
 /**

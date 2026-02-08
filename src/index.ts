@@ -39,14 +39,11 @@ export {
 } from './domain/value-objects/AuthConfig';
 
 export type { UserProfile, UpdateProfileParams } from './domain/entities/UserProfile';
-export { migrateUserData, configureMigration } from './domain/utils/migration';
-export type { MigrationConfig } from './domain/utils/migration';
 
 // =============================================================================
 // APPLICATION LAYER
 // =============================================================================
 
-export type { IAuthService, SignUpParams, SignInParams } from './application/ports/IAuthService';
 export type {
   IAuthProvider,
   AuthCredentials,
@@ -70,17 +67,6 @@ export {
   createStorageProvider,
   StorageProviderAdapter,
 } from './infrastructure/adapters/StorageProviderAdapter';
-export {
-  ensureUserDocument,
-  markUserDeleted,
-  configureUserDocumentService,
-} from './infrastructure/services/UserDocumentService';
-export type {
-  UserDocumentConfig,
-  UserDocumentExtras,
-  UserDocumentUser,
-} from './infrastructure/services/UserDocumentService';
-
 export {
   initializeAuth,
   isAuthInitialized,
@@ -171,22 +157,24 @@ export { RegisterScreen } from './presentation/screens/RegisterScreen';
 export type { RegisterScreenProps } from './presentation/screens/RegisterScreen';
 
 export { AccountScreen } from './presentation/screens/AccountScreen';
-export type { AccountScreenProps } from './presentation/screens/AccountScreen';
+export type { AccountScreenProps, AccountScreenConfig } from './presentation/screens/AccountScreen';
 
 export { EditProfileScreen } from './presentation/screens/EditProfileScreen';
 export type { EditProfileScreenProps } from './presentation/screens/EditProfileScreen';
 
-export { ChangePasswordScreen } from './presentation/screens/change-password';
-export type { ChangePasswordScreenProps } from './presentation/screens/change-password';
-
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type { AuthStackParamList } from './presentation/navigation/AuthNavigator';
+
+export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
+export { ProfileSection } from './presentation/components/ProfileSection';
+export type { ProfileSectionProps, ProfileSectionConfig } from './presentation/components/ProfileSection';
 
 // =============================================================================
 // STORES
 // =============================================================================
 
 export { useAuthStore } from './presentation/stores/authStore';
+export { useAuthModalStore } from './presentation/stores/authModalStore';
 export {
   initializeAuthListener,
   resetAuthListener,
@@ -194,6 +182,7 @@ export {
 } from './presentation/stores/initializeAuthListener';
 export type { AuthState, AuthActions, UserType } from './types/auth-store.types';
 export type { AuthListenerOptions } from './types/auth-store.types';
+export * from './presentation/stores/auth.selectors';
 
 // =============================================================================
 // UTILITIES

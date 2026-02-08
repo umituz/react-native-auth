@@ -70,6 +70,10 @@ export class AuthEventService {
       const index = eventListeners.indexOf(listener);
       if (index > -1) {
         eventListeners.splice(index, 1);
+        // Clean up empty arrays to prevent memory leaks
+        if (eventListeners.length === 0) {
+          this.listeners.delete(event);
+        }
       }
     };
   }

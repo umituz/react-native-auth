@@ -164,10 +164,14 @@ export class FirebaseAuthProvider implements IAuthProvider {
   }
 
   getCurrentUser(): AuthUser | null {
-    if (!this.auth?.currentUser) {
+    if (!this.auth) {
       return null;
     }
-    return mapToAuthUser(this.auth.currentUser);
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) {
+      return null;
+    }
+    return mapToAuthUser(currentUser);
   }
 
   onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {

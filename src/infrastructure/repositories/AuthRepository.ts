@@ -7,7 +7,7 @@
 import type { IAuthRepository } from "../../application/ports/IAuthRepository";
 import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
-import type { SignUpParams, SignInParams } from "../../application/ports/IAuthService";
+import type { AuthCredentials, SignUpCredentials } from "../../application/ports/IAuthProvider";
 import {
     AuthValidationError,
     AuthWeakPasswordError,
@@ -31,7 +31,7 @@ export class AuthRepository implements IAuthRepository {
         this.config = config;
     }
 
-    async signUp(params: SignUpParams): Promise<AuthUser> {
+    async signUp(params: SignUpCredentials): Promise<AuthUser> {
         const email = sanitizeEmail(params.email);
         const password = sanitizePassword(params.password);
         const displayName = params.displayName ? sanitizeName(params.displayName) : undefined;
@@ -64,7 +64,7 @@ export class AuthRepository implements IAuthRepository {
         return this.provider.signUp({ email, password, displayName });
     }
 
-    async signIn(params: SignInParams): Promise<AuthUser> {
+    async signIn(params: AuthCredentials): Promise<AuthUser> {
         const email = sanitizeEmail(params.email);
         const password = sanitizePassword(params.password);
 

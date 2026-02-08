@@ -32,14 +32,17 @@ export function extractProvider(user: FirebaseUserLike): AuthProviderType {
     return "unknown";
   }
 
-  const googleProvider = providerData.find((p) => p?.providerId === "google.com");
-  if (googleProvider) return "google.com";
+  // Filter out null providers and find the first valid one
+  const validProviders = providerData.filter((p): p is ProviderData => p != null);
 
-  const appleProvider = providerData.find((p) => p?.providerId === "apple.com");
-  if (appleProvider) return "apple.com";
+  const googleProvider = validProviders.find((p) => p.providerId === "google.com");
+  if (googleProvider && googleProvider.providerId) return "google.com";
 
-  const passwordProvider = providerData.find((p) => p?.providerId === "password");
-  if (passwordProvider) return "password";
+  const appleProvider = validProviders.find((p) => p.providerId === "apple.com");
+  if (appleProvider && appleProvider.providerId) return "apple.com";
+
+  const passwordProvider = validProviders.find((p) => p.providerId === "password");
+  if (passwordProvider && passwordProvider.providerId) return "password";
 
   return "unknown";
 }

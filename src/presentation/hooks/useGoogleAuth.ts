@@ -29,21 +29,33 @@ export interface UseGoogleAuthResult {
   signInWithGoogle: () => Promise<SocialAuthResult>;
   googleLoading: boolean;
   googleConfigured: boolean;
+  googleError: string | null;
 }
 
 const PLACEHOLDER_CLIENT_ID = "000000000000-placeholder.apps.googleusercontent.com";
+
+/**
+ * Validate Google auth config
+ */
+function validateGoogleConfig(config?: GoogleAuthConfig): boolean {
+  if (!config) return false;
+
+  const hasValidClientId =
+    !!(config.iosClientId && config.iosClientId !== PLACEHOLDER_CLIENT_ID) ||
+    !!(config.webClientId && config.webClientId !== PLACEHOLDER_CLIENT_ID) ||
+    !!(config.androidClientId && config.androidClientId !== PLACEHOLDER_CLIENT_ID);
+
+  return hasValidClientId;
+}
 
 /**
  * Hook for Google authentication with expo-auth-session
  */
 export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
   const [isLoading, setIsLoading] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
 
-  const googleConfigured = !!(
-    config?.iosClientId ||
-    config?.webClientId ||
-    config?.androidClientId
-  );
+  const googleConfigured = validateGoogleConfig(config);
 
   const socialAuthConfig: SocialAuthConfig = {
     google: config,
@@ -70,8 +82,11 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
       const idToken = googleResponse.authentication?.idToken;
       if (idToken) {
         setIsLoading(true);
+        setGoogleError(null);
         signInWithGoogleToken(idToken)
           .catch((error) => {
+            const errorMessage = error instanceof Error ? error.message : "Firebase sign-in failed";
+            setGoogleError(errorMessage);
             if (__DEV__) {
               console.error("[useGoogleAuth] Firebase sign-in failed:", error);
             }
@@ -80,23 +95,33 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
             setIsLoading(false);
           });
       }
+    } else if (googleResponse?.type === "error") {
+      setGoogleError("Google authentication failed");
+      setIsLoading(false);
     }
   }, [googleResponse, signInWithGoogleToken]);
 
   const signInWithGoogle = useCallback(async (): Promise<SocialAuthResult> => {
     if (!promptGoogleAsync) {
-      return { success: false, error: "expo-auth-session is not available" };
+      const error = "expo-auth-session is not available";
+      setGoogleError(error);
+      return { success: false, error };
     }
 
     if (!googleConfigured) {
-      return { success: false, error: "Google Sign-In is not configured" };
+      const error = "Google Sign-In is not configured. Please provide valid client IDs.";
+      setGoogleError(error);
+      return { success: false, error };
     }
 
     if (!request) {
-      return { success: false, error: "Google Sign-In not ready" };
+      const error = "Google Sign-In not ready";
+      setGoogleError(error);
+      return { success: false, error };
     }
 
     setIsLoading(true);
+    setGoogleError(null);
     try {
       const result = await promptGoogleAsync();
 
@@ -108,14 +133,20 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
       }
 
       if (result.type === "cancel") {
-        return { success: false, error: "Google Sign-In was cancelled" };
+        const error = "Google Sign-In was cancelled";
+        setGoogleError(error);
+        return { success: false, error };
       }
 
-      return { success: false, error: "Google Sign-In failed" };
+      const error = "Google Sign-In failed";
+      setGoogleError(error);
+      return { success: false, error };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Google sign-in failed";
+      setGoogleError(errorMessage);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Google sign-in failed",
+        error: errorMessage,
       };
     } finally {
       setIsLoading(false);
@@ -126,5 +157,6 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
     signInWithGoogle,
     googleLoading: isLoading || firebaseLoading,
     googleConfigured,
+    googleError,
   };
 }

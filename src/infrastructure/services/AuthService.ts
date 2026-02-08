@@ -4,7 +4,7 @@
  */
 
 import type { Auth } from "firebase/auth";
-import type { IAuthService, SignUpParams, SignInParams } from "../../application/ports/IAuthService";
+import type { AuthCredentials, SignUpCredentials } from "../../application/ports/IAuthProvider";
 import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import { FirebaseAuthProvider } from "../providers/FirebaseAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
@@ -13,10 +13,9 @@ import { sanitizeAuthConfig } from "../../domain/value-objects/AuthConfig";
 import { AuthRepository } from "../repositories/AuthRepository";
 import { AnonymousModeService } from "./AnonymousModeService";
 import { authEventService } from "./AuthEventService";
-import { authTracker } from "../utils/auth-tracker.util";
 import type { IStorageProvider } from "../types/Storage.types";
 
-export class AuthService implements IAuthService {
+export class AuthService {
   private repository!: AuthRepository;
   private anonymousModeService: AnonymousModeService;
   private storageProvider?: IStorageProvider;
@@ -62,44 +61,23 @@ export class AuthService implements IAuthService {
     return this.initialized;
   }
 
-  async signUp(params: SignUpParams): Promise<AuthUser> {
-    authTracker.logOperationStarted("Sign up", { email: params.email });
-    try {
-      const user = await this.repositoryInstance.signUp(params);
-      await this.clearAnonymousModeIfNeeded();
-      authTracker.logOperationSuccess("Sign up", { userId: user.uid });
-      authEventService.emitUserAuthenticated(user.uid);
-      return user;
-    } catch (error) {
-      authTracker.logOperationError("Sign up", error, { email: params.email });
-      throw error;
-    }
+  async signUp(params: SignUpCredentials): Promise<AuthUser> {
+    const user = await this.repositoryInstance.signUp(params);
+    await this.clearAnonymousModeIfNeeded();
+    authEventService.emitUserAuthenticated(user.uid);
+    return user;
   }
 
-  async signIn(params: SignInParams): Promise<AuthUser> {
-    authTracker.logOperationStarted("Sign in", { email: params.email });
-    try {
-      const user = await this.repositoryInstance.signIn(params);
-      await this.clearAnonymousModeIfNeeded();
-      authTracker.logOperationSuccess("Sign in", { userId: user.uid });
-      authEventService.emitUserAuthenticated(user.uid);
-      return user;
-    } catch (error) {
-      authTracker.logOperationError("Sign in", error, { email: params.email });
-      throw error;
-    }
+  async signIn(params: AuthCredentials): Promise<AuthUser> {
+    const user = await this.repositoryInstance.signIn(params);
+    await this.clearAnonymousModeIfNeeded();
+    authEventService.emitUserAuthenticated(user.uid);
+    return user;
   }
 
   async signOut(): Promise<void> {
-    authTracker.logOperationStarted("Sign out");
-    try {
-      await this.repositoryInstance.signOut();
-      await this.clearAnonymousModeIfNeeded();
-      authTracker.logOperationSuccess("Sign out");
-    } catch (error) {
-      authTracker.logOperationError("Sign out", error);
-      throw error;
-    }
+    await this.repositoryInstance.signOut();
+    await this.clearAnonymousModeIfNeeded();
   }
 
   private async clearAnonymousModeIfNeeded(): Promise<void> {

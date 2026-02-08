@@ -1,7 +1,10 @@
 import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
-import type { ValidationResult } from "./validation/types";
 
-export type { ValidationResult };
+export interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
 export interface PasswordStrengthResult extends ValidationResult { requirements: PasswordRequirements; }
 export interface PasswordRequirements {
   hasMinLength: boolean;

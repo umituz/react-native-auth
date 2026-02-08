@@ -103,6 +103,8 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
       });
     }
 
+    let timeoutId: NodeJS.Timeout | undefined;
+
     if ((justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous) {
       if (__DEV__) {
         console.log("[useAuthBottomSheet] Auto-closing due to successful authentication transition", {
@@ -116,7 +118,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
       // Notify auth success
       onAuthSuccess?.();
       // Execute callback with delay to ensure auth state has propagated
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         if (__DEV__) {
           console.log("[useAuthBottomSheet] Executing pending callback after auth");
         }
@@ -127,6 +129,13 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     prevIsAuthenticatedRef.current = isAuthenticated;
     prevIsVisibleRef.current = isVisible;
     prevIsAnonymousRef.current = isAnonymous;
+
+    // Cleanup timeout on unmount or dependency change
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, hideAuthModal, onAuthSuccess]);
 
   const handleNavigateToRegister = useCallback(() => {

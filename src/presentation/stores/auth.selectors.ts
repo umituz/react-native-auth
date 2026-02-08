@@ -71,34 +71,40 @@ export const selectShowAuthModal = (state: { showAuthModal: (callback?: () => vo
 
 /**
  * Get current user ID
+ * Uses firebaseUser as single source of truth
  */
 export const selectUserId = (state: AuthStore): string | null => {
-  return state.firebaseUser?.uid ?? state.user?.uid ?? null;
+  return state.firebaseUser?.uid ?? null;
 };
 
 /**
- * Check if user is authenticated (not anonymous)
+ * Check if user is authenticated (has a valid Firebase user, not anonymous)
+ * Uses firebaseUser as single source of truth
  */
 export const selectIsAuthenticated = (state: AuthStore): boolean => {
-  return !!state.user && !state.isAnonymous && !state.user.isAnonymous;
+  const hasFirebaseUser = !!state.firebaseUser;
+  const isNotAnonymous = !state.firebaseUser?.isAnonymous;
+  return hasFirebaseUser && isNotAnonymous;
 };
 
 /**
  * Check if user is anonymous
+ * Uses firebaseUser as single source of truth
  */
 export const selectIsAnonymous = (state: AuthStore): boolean => {
-  return state.firebaseUser?.isAnonymous ?? state.user?.isAnonymous ?? false;
+  return state.firebaseUser?.isAnonymous ?? false;
 };
 
 /**
  * Get current user type
+ * Derived from firebaseUser state
  */
 export const selectUserType = (state: AuthStore): UserType => {
-  if (!state.firebaseUser && !state.user) {
+  if (!state.firebaseUser) {
     return "none";
   }
 
-  return selectIsAnonymous(state) ? "anonymous" : "authenticated";
+  return state.firebaseUser.isAnonymous ? "anonymous" : "authenticated";
 };
 
 /**

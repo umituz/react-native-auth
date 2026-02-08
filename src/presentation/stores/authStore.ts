@@ -71,17 +71,14 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     },
 
     setIsAnonymous: (isAnonymous) => {
-      const { user } = get();
+      const { firebaseUser } = get();
       if (__DEV__) {
-        console.log("[AuthStore] setIsAnonymous:", { isAnonymous, hadUser: !!user });
+        console.log("[AuthStore] setIsAnonymous:", { isAnonymous, hasFirebaseUser: !!firebaseUser });
       }
-      // Update user.isAnonymous flag to match the new state
-      // This handles both anonymous → registered and registered → anonymous conversions
-      if (user && user.isAnonymous !== isAnonymous) {
-        set({ isAnonymous, user: { ...user, isAnonymous } });
-      } else {
-        set({ isAnonymous });
-      }
+      // Only update the isAnonymous flag
+      // The user object will be updated by setFirebaseUser when needed
+      // This prevents inconsistencies between firebaseUser and user
+      set({ isAnonymous });
     },
 
     setError: (error) => {
