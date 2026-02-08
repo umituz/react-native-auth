@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { useAppDesignTokens, AtomicText, AtomicSpinner } from "@umituz/react-native-design-system";
+import { StyleSheet } from "react-native";
+import { useAppDesignTokens, AtomicText, AtomicSpinner, ScreenLayout } from "@umituz/react-native-design-system";
 import { EditProfileAvatar } from "../components/EditProfileAvatar";
 import { EditProfileForm } from "../components/EditProfileForm";
 import { EditProfileActions } from "../components/EditProfileActions";
@@ -45,15 +45,19 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ config }) 
 
     if (config.isLoading) {
         return (
-            <View style={[styles.loading, { backgroundColor: tokens.colors.backgroundPrimary }]}>
+            <ScreenLayout
+                backgroundColor={tokens.colors.backgroundPrimary}
+                contentContainerStyle={styles.loadingContainer}
+            >
                 <AtomicSpinner size="lg" color="primary" fullContainer />
-            </View>
+            </ScreenLayout>
         );
     }
 
     return (
-        <ScrollView
-            style={[styles.container, { backgroundColor: tokens.colors.backgroundPrimary }]}
+        <ScreenLayout
+            scrollable
+            backgroundColor={tokens.colors.backgroundPrimary}
             contentContainerStyle={styles.content}
         >
             <AtomicText type="headlineSmall" style={styles.title}>
@@ -79,21 +83,18 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ config }) 
                 onCancel={config.onCancel}
                 labels={config.labels}
             />
-        </ScrollView>
+        </ScreenLayout>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    content: {
-        padding: 16,
-    },
-    loading: {
+    loadingContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+    },
+    content: {
+        padding: 16,
     },
     title: {
         marginBottom: 24,

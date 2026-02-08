@@ -9,6 +9,7 @@ import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey, resolveErrorMessage } from "../utils/getAuthErrorMessage";
 import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
 import { alertService } from "@umituz/react-native-design-system";
+import { clearFieldErrors, clearFieldError } from "../utils/form/formErrorUtils";
 
 export interface RegisterFormTranslations {
   successTitle: string;
@@ -77,42 +78,25 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
 
   const handleDisplayNameChange = useCallback((text: string) => {
     setDisplayName(text);
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      if (next.displayName) delete next.displayName;
-      return next;
-    });
+    clearFieldError(setFieldErrors, "displayName");
     setLocalError(null);
   }, []);
 
   const handleEmailChange = useCallback((text: string) => {
     setEmail(text);
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      if (next.email) delete next.email;
-      return next;
-    });
+    clearFieldError(setFieldErrors, "email");
     setLocalError(null);
   }, []);
 
   const handlePasswordChange = useCallback((text: string) => {
     setPassword(text);
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      if (next.password) delete next.password;
-      if (next.confirmPassword) delete next.confirmPassword;
-      return next;
-    });
+    clearFieldErrors(setFieldErrors, ["password", "confirmPassword"]);
     setLocalError(null);
   }, []);
 
   const handleConfirmPasswordChange = useCallback((text: string) => {
     setConfirmPassword(text);
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      if (next.confirmPassword) delete next.confirmPassword;
-      return next;
-    });
+    clearFieldError(setFieldErrors, "confirmPassword");
     setLocalError(null);
   }, []);
 

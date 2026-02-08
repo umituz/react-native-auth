@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback } from "react";
+import { validateEmail } from "../../infrastructure/utils/AuthValidation";
 
 export interface ProfileEditFormState {
     displayName: string;
@@ -63,8 +64,11 @@ export const useProfileEdit = (
             errors.push("Display name is required");
         }
 
-        if (formState.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email)) {
-            errors.push("Invalid email format");
+        if (formState.email) {
+            const emailResult = validateEmail(formState.email);
+            if (!emailResult.isValid && emailResult.error) {
+                errors.push(emailResult.error);
+            }
         }
 
         return {

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { useAppDesignTokens, AtomicIcon, AtomicText, useAlert, AlertType, AlertMode } from "@umituz/react-native-design-system";
+import { actionButtonStyle } from "../utils/commonStyles";
 
 export interface AccountActionsConfig {
   logoutText: string;
@@ -99,12 +100,12 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
     <View style={styles.container}>
       {showChangePassword && onChangePassword && changePasswordText && (
         <TouchableOpacity
-          style={[styles.actionButton, { borderColor: tokens.colors.border }]}
+          style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
           onPress={onChangePassword}
           activeOpacity={0.7}
         >
           <AtomicIcon name="key-outline" size="md" color="textPrimary" />
-          <AtomicText style={styles.actionText} color="textPrimary">
+          <AtomicText style={actionButtonStyle.text} color="textPrimary">
             {changePasswordText}
           </AtomicText>
           <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
@@ -112,24 +113,24 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
       )}
 
       <TouchableOpacity
-        style={[styles.actionButton, { borderColor: tokens.colors.border }]}
+        style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
         onPress={handleLogout}
         activeOpacity={0.7}
       >
         <AtomicIcon name="log-out-outline" size="md" color="error" />
-        <AtomicText style={styles.actionText} color="error">
+        <AtomicText style={actionButtonStyle.text} color="error">
           {logoutText}
         </AtomicText>
         <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.actionButton, { borderColor: tokens.colors.border }]}
+        style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
         onPress={handleDeleteAccount}
         activeOpacity={0.7}
       >
         <AtomicIcon name="trash-outline" size="md" color="error" />
-        <AtomicText style={styles.actionText} color="error">
+        <AtomicText style={actionButtonStyle.text} color="error">
           {deleteAccountText}
         </AtomicText>
         <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
@@ -141,19 +142,5 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
 const styles = StyleSheet.create({
   container: {
     gap: 12,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 12,
-  },
-  actionText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
   },
 });
