@@ -81,22 +81,11 @@ export class FirebaseAuthProvider implements IAuthProvider {
 
       // Convert anonymous user to permanent account
       if (currentUser && isAnonymous) {
-        if (__DEV__) {
-          console.log("[FirebaseAuthProvider] Converting anonymous user to authenticated:", {
-            anonymousId: currentUser.uid.slice(0, 8),
-          });
-        }
-
         // Reload user to refresh token before linking (prevents token-expired errors)
         try {
           await currentUser.reload();
-          if (__DEV__) {
-            console.log("[FirebaseAuthProvider] User reloaded successfully");
-          }
-        } catch (reloadError) {
-          if (__DEV__) {
-            console.log("[FirebaseAuthProvider] Reload failed, proceeding with link:", reloadError);
-          }
+        } catch {
+          // Reload failed, proceed with link anyway
         }
 
         const credential = EmailAuthProvider.credential(
@@ -105,19 +94,8 @@ export class FirebaseAuthProvider implements IAuthProvider {
         );
 
         userCredential = await linkWithCredential(currentUser, credential);
-
-        if (__DEV__) {
-          console.log("[FirebaseAuthProvider] Anonymous user converted successfully:", {
-            userId: userCredential.user.uid.slice(0, 8),
-            sameUser: currentUser.uid === userCredential.user.uid,
-          });
-        }
       } else {
         // Create new user
-        if (__DEV__) {
-          console.log("[FirebaseAuthProvider] Creating new user account");
-        }
-
         userCredential = await createUserWithEmailAndPassword(
           this.auth,
           credentials.email.trim(),
@@ -130,14 +108,9 @@ export class FirebaseAuthProvider implements IAuthProvider {
           await updateProfile(userCredential.user, {
             displayName: credentials.displayName.trim(),
           });
-        } catch (error) {
-          // Log the error but don't fail the entire sign-up process
-          // The account was created successfully, only the display name update failed
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
-          console.warn(
-            `[FirebaseAuthProvider] Account created but display name update failed: ${errorMessage}. ` +
-            "User can update their display name later from profile settings."
-          );
+        } catch {
+          // Silently fail - the account was created successfully,
+          // only the display name update failed. User can update it later.
         }
       }
 

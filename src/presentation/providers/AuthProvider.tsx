@@ -66,9 +66,6 @@ export function AuthProvider({ children, ErrorFallback = DefaultErrorFallback }:
       unsubscribe = initializeAuthListener();
     } catch (err) {
       const errorObj = err instanceof Error ? err : new Error("Unknown initialization error");
-      if (__DEV__) {
-        console.error("[AuthProvider] Initialization failed:", errorObj);
-      }
       setError(errorObj);
     }
 
@@ -76,10 +73,8 @@ export function AuthProvider({ children, ErrorFallback = DefaultErrorFallback }:
       if (unsubscribe) {
         try {
           unsubscribe();
-        } catch (cleanupError) {
-          if (__DEV__) {
-            console.warn("[AuthProvider] Cleanup failed:", cleanupError);
-          }
+        } catch {
+          // Silently fail - cleanup errors are handled elsewhere
         }
       }
     };

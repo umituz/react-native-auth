@@ -78,13 +78,6 @@ export const useAccountManagement = (
       throw new Error("Cannot delete anonymous account");
     }
 
-    if (__DEV__) {
-      console.log("[useAccountManagement] Starting delete account", {
-        userId: user.uid,
-        provider: user.provider,
-      });
-    }
-
     setIsDeletingAccount(true);
 
     try {

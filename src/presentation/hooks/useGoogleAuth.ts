@@ -87,9 +87,6 @@ export function useGoogleAuth(config?: GoogleAuthConfig): UseGoogleAuthResult {
           .catch((error) => {
             const errorMessage = error instanceof Error ? error.message : "Firebase sign-in failed";
             setGoogleError(errorMessage);
-            if (__DEV__) {
-              console.error("[useGoogleAuth] Firebase sign-in failed:", error);
-            }
           })
           .finally(() => {
             setIsLoading(false);

@@ -87,24 +87,12 @@ export function createAuthInitModule(
           autoAnonymousSignIn,
           storageProvider,
           onUserConverted: async (anonymousId: string, authenticatedId: string) => {
-            if (__DEV__) {
-              console.log('[createAuthInitModule] User converted:', {
-                anonymousId: anonymousId.slice(0, 8),
-                authenticatedId: authenticatedId.slice(0, 8),
-              });
-            }
-
             // Restore purchases after conversion (if callback provided)
             if (onRestorePurchases) {
               try {
                 await onRestorePurchases();
-                if (__DEV__) {
-                  console.log('[createAuthInitModule] Purchases restored');
-                }
-              } catch (error) {
-                if (__DEV__) {
-                  console.error('[createAuthInitModule] Restore failed:', error);
-                }
+              } catch {
+                // Silently fail - purchase restoration errors are handled elsewhere
               }
             }
 
@@ -115,15 +103,8 @@ export function createAuthInitModule(
           },
         });
 
-        if (__DEV__) {
-          console.log('[createAuthInitModule] Auth initialized');
-        }
-
         return true;
-      } catch (error) {
-        if (__DEV__) {
-          console.error('[createAuthInitModule] Error:', error);
-        }
+      } catch {
         return false;
       }
     },

@@ -35,10 +35,8 @@ export function createAuthStateHandler(
     if (conversion.isConversion && onUserConverted && state.current.previousUserId) {
       try {
         await onUserConverted(state.current.previousUserId, currentUserId);
-      } catch (error) {
-        if (__DEV__) {
-          console.warn("[AuthStateHandler] User conversion callback failed:", error);
-        }
+      } catch {
+        // Silently fail - conversion callback errors are handled elsewhere
       }
     }
 

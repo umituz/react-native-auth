@@ -45,36 +45,18 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     }
     return { ...initialAuthState, ...state };
   },
-  actions: (set, get) => ({
+  actions: (set, _get) => ({
     setFirebaseUser: (firebaseUser) => {
-      const prevState = get();
       const user = firebaseUser ? mapToAuthUser(firebaseUser) : null;
       const isAnonymous = firebaseUser?.isAnonymous ?? false;
-
-      if (__DEV__) {
-        console.log("[AuthStore] setFirebaseUser:", {
-          uid: firebaseUser?.uid ?? null,
-          isAnonymous,
-          prevIsAnonymous: prevState.isAnonymous,
-          hasUser: !!user,
-        });
-      }
-
       set({ firebaseUser, user, loading: false, isAnonymous });
     },
 
     setLoading: (loading) => {
-      if (__DEV__) {
-        console.log("[AuthStore] setLoading:", loading);
-      }
       set({ loading });
     },
 
     setIsAnonymous: (isAnonymous) => {
-      const { firebaseUser } = get();
-      if (__DEV__) {
-        console.log("[AuthStore] setIsAnonymous:", { isAnonymous, hasFirebaseUser: !!firebaseUser });
-      }
       // Only update the isAnonymous flag
       // The user object will be updated by setFirebaseUser when needed
       // This prevents inconsistencies between firebaseUser and user
@@ -82,23 +64,14 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     },
 
     setError: (error) => {
-      if (__DEV__ && error) {
-        console.log("[AuthStore] setError:", error);
-      }
       set({ error });
     },
 
     setInitialized: (initialized) => {
-      if (__DEV__) {
-        console.log("[AuthStore] setInitialized:", initialized);
-      }
       set({ initialized });
     },
 
     reset: () => {
-      if (__DEV__) {
-        console.log("[AuthStore] reset");
-      }
       set(initialAuthState);
     },
   }),

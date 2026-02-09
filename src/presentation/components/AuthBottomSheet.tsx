@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import {
   useAppDesignTokens,
@@ -62,22 +62,6 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     handleGoogleSignIn,
     handleAppleSignIn,
   } = useAuthBottomSheet({ socialConfig, onGoogleSignIn, onAppleSignIn, onAuthSuccess });
-
-  useEffect(() => {
-    if (__DEV__) {
-      console.log("[AuthBottomSheet] Rendered with:", {
-        mode,
-        providersCount: providers.length,
-        hasModalRef: !!modalRef.current,
-        hasTermsUrl: !!termsUrl,
-        hasPrivacyUrl: !!privacyUrl,
-      });
-    }
-  }, [mode, providers.length, termsUrl, privacyUrl, modalRef]);
-
-  if (__DEV__) {
-    console.log("[AuthBottomSheet] Rendering...");
-  }
 
   return (
     <BottomSheetModal

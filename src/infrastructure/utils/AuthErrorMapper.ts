@@ -122,10 +122,6 @@ export function mapFirebaseAuthError(error: unknown): Error {
       );
 
     default:
-      // Log unknown errors in development for debugging
-      if (__DEV__ && code) {
-        console.warn(`[AuthErrorMapper] Unknown Firebase Auth code: ${code}`, error);
-      }
       return new AuthError(message, code || "AUTH_UNKNOWN_ERROR");
   }
 }

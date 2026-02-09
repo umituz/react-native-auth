@@ -21,20 +21,9 @@ export interface DeleteAccountOptions {
 export async function handleAccountDeletion(
   callbacks: DeleteAccountCallbacks
 ): Promise<void> {
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Starting deletion with auto-reauthenticate");
-  }
-
   const result = await deleteCurrentUser({ autoReauthenticate: true });
 
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] First attempt result:", result);
-  }
-
   if (result.success) {
-    if (__DEV__) {
-      console.log("[AccountDeleteHandler] Delete successful");
-    }
     return;
   }
 
@@ -44,9 +33,6 @@ export async function handleAccountDeletion(
   }
 
   if (result.error) {
-    if (__DEV__) {
-      console.log("[AccountDeleteHandler] Delete failed:", result.error);
-    }
     throw new Error(result.error.message);
   }
 }
@@ -71,21 +57,10 @@ async function handleReauthentication(
 }
 
 async function retryWithPassword(onPasswordRequired: () => Promise<string | null>): Promise<void> {
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Prompting for password");
-  }
-
   const password = await onPasswordRequired();
 
   if (!password) {
-    if (__DEV__) {
-      console.log("[AccountDeleteHandler] Password prompt cancelled");
-    }
     throw new Error("Password required to delete account");
-  }
-
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Retrying with password");
   }
 
   const result = await deleteCurrentUser({
@@ -93,14 +68,7 @@ async function retryWithPassword(onPasswordRequired: () => Promise<string | null
     password,
   });
 
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Password retry result:", result);
-  }
-
   if (result.success) {
-    if (__DEV__) {
-      console.log("[AccountDeleteHandler] Delete successful after password reauth");
-    }
     return;
   }
 
@@ -110,34 +78,15 @@ async function retryWithPassword(onPasswordRequired: () => Promise<string | null
 }
 
 async function retryWithSocialAuth(onReauthRequired: () => Promise<boolean>): Promise<void> {
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Requesting social auth reauth");
-  }
-
   const reauthSuccess = await onReauthRequired();
-
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Reauth result:", reauthSuccess);
-  }
 
   if (!reauthSuccess) {
     throw new Error("Reauthentication required to delete account");
   }
 
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Retrying deletion after reauth");
-  }
-
   const result = await deleteCurrentUser({ autoReauthenticate: false });
 
-  if (__DEV__) {
-    console.log("[AccountDeleteHandler] Reauth retry result:", result);
-  }
-
   if (result.success) {
-    if (__DEV__) {
-      console.log("[AccountDeleteHandler] Delete successful after reauth");
-    }
     return;
   }
 

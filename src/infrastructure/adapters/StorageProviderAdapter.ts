@@ -37,10 +37,7 @@ export class StorageProviderAdapter implements IStorageProvider {
       } else {
         throw new Error("Unsupported storage implementation");
       }
-    } catch (error) {
-      if (__DEV__) {
-        console.warn("[StorageProviderAdapter] Failed to get value for key:", key, error);
-      }
+    } catch {
       return null;
     }
   }

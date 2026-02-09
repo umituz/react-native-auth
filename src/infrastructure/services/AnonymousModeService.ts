@@ -21,10 +21,7 @@ export class AnonymousModeService {
       const value = await storageProvider.get(this.storageKey);
       this.isAnonymousMode = value === "true";
       return this.isAnonymousMode;
-    } catch (error) {
-      if (__DEV__) {
-        console.warn("[AnonymousModeService] Storage load failed:", error);
-      }
+    } catch {
       return false;
     }
   }
@@ -33,10 +30,7 @@ export class AnonymousModeService {
     try {
       await storageProvider.set(this.storageKey, this.isAnonymousMode.toString());
       return true;
-    } catch (err) {
-      if (__DEV__) {
-        console.error("[AnonymousModeService] Storage save failed:", err);
-      }
+    } catch {
       return false;
     }
   }
@@ -46,10 +40,7 @@ export class AnonymousModeService {
       await storageProvider.remove(this.storageKey);
       this.isAnonymousMode = false;
       return true;
-    } catch (err) {
-      if (__DEV__) {
-        console.error("[AnonymousModeService] Storage clear failed:", err);
-      }
+    } catch {
       this.isAnonymousMode = false;
       return false;
     }
@@ -60,18 +51,13 @@ export class AnonymousModeService {
     if (provider?.getCurrentUser()) {
       try {
         await provider.signOut();
-      } catch (error) {
-        if (__DEV__) {
-          console.warn("[AnonymousModeService] Sign out failed during mode switch:", error);
-        }
+      } catch {
+        // Silently fail - sign out errors are handled elsewhere
       }
     }
 
     this.isAnonymousMode = true;
-    const saved = await this.save(storageProvider);
-    if (!saved && __DEV__) {
-      console.warn("[AnonymousModeService] Anonymous mode enabled but not persisted to storage. Mode will be lost on app restart.");
-    }
+    await this.save(storageProvider);
     emitAnonymousModeEnabled();
   }
 

@@ -65,9 +65,8 @@ async function doInitializeAuth(
   let authServiceInitFailed = false;
   try {
     await initializeAuthService(auth, authConfig, storageProvider);
-  } catch (error) {
+  } catch {
     authServiceInitFailed = true;
-    console.warn("[initializeAuth] Auth service init failed, continuing:", error);
   }
 
   const handleAuthStateChange = createAuthStateHandler(conversionState, {
@@ -78,17 +77,9 @@ async function doInitializeAuth(
   initializeAuthListener({
     autoAnonymousSignIn,
     onAuthStateChange: (user) => {
-      handleAuthStateChange(user).catch((err) => {
-        if (__DEV__) {
-          console.error("[initializeAuth] Auth state change handler error:", err);
-        }
-      });
+      void handleAuthStateChange(user);
     },
   });
-
-  if (authServiceInitFailed) {
-    console.warn("[initializeAuth] Auth service initialization failed. Some auth features may not work.");
-  }
 
   isInitialized = true;
   return { success: !authServiceInitFailed, auth };

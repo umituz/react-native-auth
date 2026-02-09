@@ -1,15 +1,21 @@
 import { useState, useCallback, useMemo } from "react";
 import {
-  validateEmail,
   validatePasswordForRegister,
-  validatePasswordConfirmation,
+  type PasswordRequirements,
 } from "../../infrastructure/utils/AuthValidation";
 import { DEFAULT_PASSWORD_CONFIG } from "../../domain/value-objects/AuthConfig";
 import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey, resolveErrorMessage } from "../utils/getAuthErrorMessage";
-import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
+import { validateRegisterForm, errorsToFieldErrors } from "../utils/form/formValidation.util";
 import { alertService } from "@umituz/react-native-design-system";
 import { clearFieldErrors, clearFieldError } from "../utils/form/formErrorUtils";
+
+export type FieldErrors = {
+  displayName?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+};
 
 export interface RegisterFormTranslations {
   successTitle: string;
@@ -26,12 +32,7 @@ export interface UseRegisterFormResult {
   email: string;
   password: string;
   confirmPassword: string;
-  fieldErrors: {
-    displayName?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-  };
+  fieldErrors: FieldErrors;
   localError: string | null;
   loading: boolean;
   passwordRequirements: PasswordRequirements;
@@ -53,12 +54,7 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{
-    displayName?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const getErrorMessage = useCallback((key: string) => {
     return resolveErrorMessage(key, translations?.errors);
@@ -76,49 +72,51 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
     return password.length > 0 && password === confirmPassword;
   }, [password, confirmPassword]);
 
+  const clearFormErrors = useCallback(() => {
+    setLocalError(null);
+    setFieldErrors({});
+  }, []);
+
   const handleDisplayNameChange = useCallback((text: string) => {
     setDisplayName(text);
     clearFieldError(setFieldErrors, "displayName");
-    setLocalError(null);
-  }, []);
+    if (localError) setLocalError(null);
+  }, [localError]);
 
   const handleEmailChange = useCallback((text: string) => {
     setEmail(text);
     clearFieldError(setFieldErrors, "email");
-    setLocalError(null);
-  }, []);
+    if (localError) setLocalError(null);
+  }, [localError]);
 
   const handlePasswordChange = useCallback((text: string) => {
     setPassword(text);
     clearFieldErrors(setFieldErrors, ["password", "confirmPassword"]);
-    setLocalError(null);
-  }, []);
+    if (localError) setLocalError(null);
+  }, [localError]);
 
   const handleConfirmPasswordChange = useCallback((text: string) => {
     setConfirmPassword(text);
     clearFieldError(setFieldErrors, "confirmPassword");
-    setLocalError(null);
-  }, []);
+    if (localError) setLocalError(null);
+  }, [localError]);
 
   const handleSignUp = useCallback(async () => {
-    setLocalError(null);
-    setFieldErrors({});
+    clearFormErrors();
 
-    const emailResult = validateEmail(email.trim());
-    if (!emailResult.isValid && emailResult.error) {
-      setFieldErrors((prev) => ({ ...prev, email: getErrorMessage(emailResult.error!) }));
-      return;
-    }
+    const validation = validateRegisterForm(
+      {
+        displayName: displayName.trim() || undefined,
+        email: email.trim(),
+        password,
+        confirmPassword,
+      },
+      getErrorMessage,
+      DEFAULT_PASSWORD_CONFIG
+    );
 
-    const passwordResult = validatePasswordForRegister(password, DEFAULT_PASSWORD_CONFIG);
-    if (!passwordResult.isValid && passwordResult.error) {
-      setFieldErrors((prev) => ({ ...prev, password: getErrorMessage(passwordResult.error!) }));
-      return;
-    }
-
-    const confirmResult = validatePasswordConfirmation(password, confirmPassword);
-    if (!confirmResult.isValid && confirmResult.error) {
-      setFieldErrors((prev) => ({ ...prev, confirmPassword: getErrorMessage(confirmResult.error!) }));
+    if (!validation.isValid) {
+      setFieldErrors(errorsToFieldErrors(validation.errors));
       return;
     }
 
@@ -130,10 +128,9 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
       }
     } catch (err: unknown) {
       const localizationKey = getAuthErrorLocalizationKey(err);
-      const errorMessage = getErrorMessage(localizationKey);
-      setLocalError(errorMessage);
+      setLocalError(getErrorMessage(localizationKey));
     }
-  }, [displayName, email, password, confirmPassword, signUp, translations, getErrorMessage]);
+  }, [displayName, email, password, confirmPassword, signUp, translations, getErrorMessage, clearFormErrors]);
 
   const displayError = localError || error;
 

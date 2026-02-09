@@ -72,17 +72,8 @@ async function performAnonymousSignIn(
     for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
             await anonymousAuthService.signInAnonymously(auth);
-
-            if (__DEV__) {
-                console.log("[AnonymousSignInHandler] Anonymous sign-in successful");
-            }
-
             return;
         } catch (error) {
-            if (__DEV__) {
-                console.warn(`[AnonymousSignInHandler] Attempt ${attempt + 1}/${maxRetries} failed:`, error);
-            }
-
             // If not last attempt, wait and retry
             if (attempt < maxRetries - 1) {
                 await new Promise(resolve => setTimeout(resolve, retryDelay));
@@ -110,9 +101,6 @@ export function createAnonymousSignInHandler(
 ): () => Promise<void> {
     return async () => {
         if (!auth) {
-            if (__DEV__) {
-                console.warn("[AnonymousSignInHandler] No auth instance");
-            }
             store.setFirebaseUser(null);
             store.setLoading(false);
             store.setInitialized(true);
@@ -125,21 +113,13 @@ export function createAnonymousSignInHandler(
             auth,
             {
                 onSignInStart: () => {
-                    if (__DEV__) {
-                        console.log("[AnonymousSignInHandler] Starting anonymous sign-in");
-                    }
+                    // Sign-in starting
                 },
                 onSignInSuccess: () => {
-                    if (__DEV__) {
-                        console.log("[AnonymousSignInHandler] Anonymous sign-in successful");
-                    }
                     // Listener will be triggered again with the new user
                     store.setFirebaseUser(null);
                 },
-                onSignInFailure: (error) => {
-                    if (__DEV__) {
-                        console.error("[AnonymousSignInHandler] All attempts failed:", error);
-                    }
+                onSignInFailure: () => {
                     store.setFirebaseUser(null);
                     store.setLoading(false);
                     store.setInitialized(true);

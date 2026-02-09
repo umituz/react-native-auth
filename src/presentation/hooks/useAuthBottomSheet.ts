@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Platform } from "react-native";
 import type { BottomSheetModalRef } from "@umituz/react-native-design-system";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleAuth, type GoogleAuthConfig } from "./useGoogleAuth";
 import { useAppleAuth } from "./useAppleAuth";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
+import {
+  useAuthTransitions,
+  executeAfterAuth,
+} from "../utils/authTransition.util";
+import { determineEnabledProviders } from "../utils/socialAuthHandler.util";
 
 export interface SocialAuthConfiguration {
   google?: GoogleAuthConfig;
@@ -22,7 +26,7 @@ interface UseAuthBottomSheetParams {
 
 export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
   const { socialConfig, onGoogleSignIn, onAppleSignIn, onAuthSuccess } = params;
-  
+
   const modalRef = useRef<BottomSheetModalRef>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
@@ -37,37 +41,14 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
 
   // Determine enabled providers
   const providers = useMemo<SocialAuthProvider[]>(() => {
-    const result: SocialAuthProvider[] = [];
-
-    if (Platform.OS === "ios" && socialConfig?.apple?.enabled && appleAvailable) {
-      result.push("apple");
-    }
-
-    if (googleConfigured) {
-      result.push("google");
-    }
-
-    return result;
-  }, [socialConfig?.apple?.enabled, appleAvailable, googleConfigured]);
+    return determineEnabledProviders(socialConfig, appleAvailable, googleConfigured);
+  }, [socialConfig, appleAvailable, googleConfigured]);
 
   // Handle visibility sync with modalRef
   useEffect(() => {
-    if (__DEV__) {
-      console.log('[useAuthBottomSheet] Visibility changed:', {
-        isVisible,
-        hasModalRef: !!modalRef.current,
-        modalRefMethods: modalRef.current ? Object.keys(modalRef.current) : [],
-      });
-    }
     if (isVisible) {
-      if (__DEV__) {
-        console.log('[useAuthBottomSheet] Calling present()');
-      }
       modalRef.current?.present();
     } else {
-      if (__DEV__) {
-        console.log('[useAuthBottomSheet] Calling dismiss()');
-      }
       modalRef.current?.dismiss();
     }
   }, [isVisible]);
@@ -82,61 +63,24 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     handleDismiss();
   }, [handleDismiss]);
 
-  const prevIsAuthenticatedRef = useRef(isAuthenticated);
-  const prevIsVisibleRef = useRef(isVisible);
-  const prevIsAnonymousRef = useRef(isAnonymous);
+  // Handle auth transitions
+  useAuthTransitions(
+    { isAuthenticated, isAnonymous, isVisible },
+    (result) => {
+      if (result.shouldClose) {
+        modalRef.current?.dismiss();
+        hideAuthModal();
+        onAuthSuccess?.();
 
-  useEffect(() => {
-    const justAuthenticated = !prevIsAuthenticatedRef.current && isAuthenticated;
-    const justConvertedFromAnonymous = prevIsAnonymousRef.current && !isAnonymous && isAuthenticated;
-
-    if (__DEV__) {
-      console.log("[useAuthBottomSheet] Auth state effect:", {
-        isAuthenticated,
-        isAnonymous,
-        isVisible,
-        prevIsAuthenticated: prevIsAuthenticatedRef.current,
-        prevIsAnonymous: prevIsAnonymousRef.current,
-        justAuthenticated,
-        justConvertedFromAnonymous,
-        willClose: (justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous,
-      });
-    }
-
-    let timeoutId: NodeJS.Timeout | undefined;
-
-    if ((justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous) {
-      if (__DEV__) {
-        console.log("[useAuthBottomSheet] Auto-closing due to successful authentication transition", {
-          justAuthenticated,
-          justConvertedFromAnonymous,
+        const timeoutId = executeAfterAuth(() => {
+          executePendingCallback();
         });
+
+        // Cleanup timeout on unmount
+        return () => clearTimeout(timeoutId);
       }
-      // Close modal and hide first
-      modalRef.current?.dismiss();
-      hideAuthModal();
-      // Notify auth success
-      onAuthSuccess?.();
-      // Execute callback with delay to ensure auth state has propagated
-      timeoutId = setTimeout(() => {
-        if (__DEV__) {
-          console.log("[useAuthBottomSheet] Executing pending callback after auth");
-        }
-        executePendingCallback();
-      }, 100);
     }
-
-    prevIsAuthenticatedRef.current = isAuthenticated;
-    prevIsVisibleRef.current = isVisible;
-    prevIsAnonymousRef.current = isAnonymous;
-
-    // Cleanup timeout on unmount or dependency change
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [isAuthenticated, isVisible, isAnonymous, executePendingCallback, hideAuthModal, onAuthSuccess]);
+  );
 
   const handleNavigateToRegister = useCallback(() => {
     setMode("register");

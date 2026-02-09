@@ -146,10 +146,8 @@ export function useAuth(): UseAuthResult {
       setLoading(true);
       await anonymousModeMutation.mutateAsync();
       setIsAnonymous(true);
-    } catch (error) {
-      if (__DEV__) {
-        console.warn("[useAuth] continueAnonymously failed:", error);
-      }
+    } catch {
+      // Silently fail - anonymous mode is optional
       setIsAnonymous(true);
     } finally {
       setLoading(false);
