@@ -23,9 +23,7 @@ export class AuthService {
   private config: AuthConfig;
 
   constructor(config: Partial<AuthConfig> = {}, storageProvider?: IStorageProvider) {
-    // Validate and sanitize configuration
     this.config = sanitizeAuthConfig(config);
-
     this.anonymousModeService = new AnonymousModeService();
     this.storageProvider = storageProvider;
   }
@@ -87,17 +85,12 @@ export class AuthService {
   }
 
   async setAnonymousMode(): Promise<void> {
-    if (!this.storageProvider) {
-      throw new Error("Storage provider is required for anonymous mode");
-    }
+    if (!this.storageProvider) throw new Error("Storage provider is required for anonymous mode");
     await this.anonymousModeService.enable(this.storageProvider);
   }
 
   getCurrentUser(): AuthUser | null {
     if (!this.initialized) return null;
-    // Return the actual Firebase user regardless of anonymous mode
-    // The caller should check the user's isAnonymous property if needed
-    // This ensures proper anonymous to registered user conversion
     return this.repositoryInstance.getCurrentUser();
   }
 

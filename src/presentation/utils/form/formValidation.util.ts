@@ -39,16 +39,7 @@ export interface ProfileFormValues {
   email: string;
 }
 
-/**
- * Validate login form fields
- * @param values - Form values to validate
- * @param getErrorMessage - Function to get localized error messages
- * @returns Validation result
- */
-export function validateLoginForm(
-  values: LoginFormValues,
-  getErrorMessage: (key: string) => string
-): FormValidationResult {
+export function validateLoginForm(values: LoginFormValues, getErrorMessage: (key: string) => string): FormValidationResult {
   const errors: FormValidationError[] = [];
 
   const emailResult = validateEmail(values.email.trim());
@@ -61,19 +52,9 @@ export function validateLoginForm(
     errors.push({ field: "password", message: getErrorMessage(passwordResult.error) });
   }
 
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
+  return { isValid: errors.length === 0, errors };
 }
 
-/**
- * Validate register form fields
- * @param values - Form values to validate
- * @param getErrorMessage - Function to get localized error messages
- * @param passwordConfig - Password configuration
- * @returns Validation result
- */
 export function validateRegisterForm(
   values: RegisterFormValues,
   getErrorMessage: (key: string) => string,
@@ -96,17 +77,9 @@ export function validateRegisterForm(
     errors.push({ field: "confirmPassword", message: getErrorMessage(confirmResult.error) });
   }
 
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
+  return { isValid: errors.length === 0, errors };
 }
 
-/**
- * Validate profile form fields
- * @param values - Form values to validate
- * @returns Validation result
- */
 export function validateProfileForm(values: ProfileFormValues): FormValidationResult {
   const errors: FormValidationError[] = [];
 
@@ -121,20 +94,10 @@ export function validateProfileForm(values: ProfileFormValues): FormValidationRe
     }
   }
 
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
+  return { isValid: errors.length === 0, errors };
 }
 
-/**
- * Convert validation errors to field error object
- * @param errors - Validation errors
- * @returns Object mapping field names to error messages
- */
-export function errorsToFieldErrors(
-  errors: FormValidationError[]
-): Record<string, string> {
+export function errorsToFieldErrors(errors: FormValidationError[]): Record<string, string> {
   const result: Record<string, string> = {};
   for (const error of errors) {
     result[error.field] = error.message;
@@ -142,32 +105,13 @@ export function errorsToFieldErrors(
   return result;
 }
 
-/**
- * Hook for form validation with error message resolution
- * @param getErrorMessage - Function to get localized error messages
- * @returns Validation functions
- */
 export function useFormValidation(getErrorMessage: (key: string) => string) {
-  const validateLogin = useCallback(
-    (values: LoginFormValues) => validateLoginForm(values, getErrorMessage),
-    [getErrorMessage]
-  );
-
+  const validateLogin = useCallback((values: LoginFormValues) => validateLoginForm(values, getErrorMessage), [getErrorMessage]);
   const validateRegister = useCallback(
-    (values: RegisterFormValues, passwordConfig: PasswordConfig) =>
-      validateRegisterForm(values, getErrorMessage, passwordConfig),
+    (values: RegisterFormValues, passwordConfig: PasswordConfig) => validateRegisterForm(values, getErrorMessage, passwordConfig),
     [getErrorMessage]
   );
+  const validateProfile = useCallback((values: ProfileFormValues) => validateProfileForm(values), []);
 
-  const validateProfile = useCallback(
-    (values: ProfileFormValues) => validateProfileForm(values),
-    []
-  );
-
-  return {
-    validateLogin,
-    validateRegister,
-    validateProfile,
-    errorsToFieldErrors,
-  };
+  return { validateLogin, validateRegister, validateProfile, errorsToFieldErrors };
 }

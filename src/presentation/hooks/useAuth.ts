@@ -1,9 +1,6 @@
 /**
  * useAuth Hook
  * React hook for authentication state management
- *
- * Uses centralized Zustand store for auth state.
- * Single source of truth - no duplicate subscriptions.
  */
 
 import { useCallback } from "react";
@@ -32,44 +29,23 @@ import {
 import type { AuthUser } from "../../domain/entities/AuthUser";
 
 export interface UseAuthResult {
-  /** Current authenticated user */
   user: AuthUser | null;
-  /** Current user ID (uid) */
   userId: string | null;
-  /** Current user type */
   userType: UserType;
-  /** Whether auth state is loading */
   loading: boolean;
-  /** Whether auth is ready (initialized and not loading) */
   isAuthReady: boolean;
-  /** Whether user is anonymous */
   isAnonymous: boolean;
-  /** Whether user is authenticated (not anonymous) */
   isAuthenticated: boolean;
-  /** Whether user is a registered user (authenticated AND not anonymous) */
   isRegisteredUser: boolean;
-  /** Current error message */
   error: string | null;
-  /** Sign up function */
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
-  /** Sign in function */
   signIn: (email: string, password: string) => Promise<void>;
-  /** Sign out function */
   signOut: () => Promise<void>;
-  /** Continue anonymously function */
   continueAnonymously: () => Promise<void>;
-  /** Set error manually (for form validation, etc.) */
   setError: (error: string | null) => void;
 }
 
-/**
- * Hook for authentication state management
- *
- * Uses centralized Zustand store - all components share the same state.
- * Must call initializeAuthListener() once in app root.
- */
 export function useAuth(): UseAuthResult {
-  // State from store - using typed selectors
   const user = useAuthStore(selectUser);
   const loading = useAuthStore(selectLoading);
   const error = useAuthStore(selectError);
@@ -79,13 +55,10 @@ export function useAuth(): UseAuthResult {
   const isAnonymous = useAuthStore(selectIsAnonymous);
   const isAuthReady = useAuthStore(selectIsAuthReady);
   const isRegisteredUser = useAuthStore(selectIsRegisteredUser);
-
-  // Actions from store - using typed selectors
   const setLoading = useAuthStore(selectSetLoading);
   const setError = useAuthStore(selectSetError);
   const setIsAnonymous = useAuthStore(selectSetIsAnonymous);
 
-  // Mutations
   const signInMutation = useSignInMutation();
   const signUpMutation = useSignUpMutation();
   const signOutMutation = useSignOutMutation();
@@ -99,8 +72,7 @@ export function useAuth(): UseAuthResult {
         await signUpMutation.mutateAsync({ email, password, displayName });
         setIsAnonymous(false);
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Sign up failed";
-        setError(errorMessage);
+        setError(err instanceof Error ? err.message : "Sign up failed");
         throw err;
       } finally {
         setLoading(false);
@@ -117,8 +89,7 @@ export function useAuth(): UseAuthResult {
         await signInMutation.mutateAsync({ email, password });
         setIsAnonymous(false);
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Sign in failed";
-        setError(errorMessage);
+        setError(err instanceof Error ? err.message : "Sign in failed");
         throw err;
       } finally {
         setLoading(false);
@@ -133,8 +104,7 @@ export function useAuth(): UseAuthResult {
       setError(null);
       await signOutMutation.mutateAsync();
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Sign out failed";
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : "Sign out failed");
       throw err;
     } finally {
       setLoading(false);
@@ -147,7 +117,6 @@ export function useAuth(): UseAuthResult {
       await anonymousModeMutation.mutateAsync();
       setIsAnonymous(true);
     } catch {
-      // Silently fail - anonymous mode is optional
       setIsAnonymous(true);
     } finally {
       setLoading(false);
@@ -155,19 +124,7 @@ export function useAuth(): UseAuthResult {
   }, [setIsAnonymous, setLoading, anonymousModeMutation]);
 
   return {
-    user,
-    userId,
-    userType,
-    loading,
-    isAuthReady,
-    isAnonymous,
-    isAuthenticated,
-    isRegisteredUser,
-    error,
-    signUp,
-    signIn,
-    signOut,
-    continueAnonymously,
-    setError,
+    user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, isRegisteredUser, error,
+    signUp, signIn, signOut, continueAnonymously, setError,
   };
 }
