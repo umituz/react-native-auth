@@ -47,12 +47,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
   const handleLogout = () => {
     alert.show(AlertType.WARNING, AlertMode.MODAL, logoutConfirmTitle, logoutConfirmMessage, {
       actions: [
-        {
-          id: "cancel",
-          label: cancelText,
-          style: "secondary",
-          onPress: () => {},
-        },
+        { id: "cancel", label: cancelText, style: "secondary", onPress: () => {} },
         {
           id: "confirm",
           label: logoutText,
@@ -72,12 +67,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
   const handleDeleteAccount = () => {
     alert.show(AlertType.ERROR, AlertMode.MODAL, deleteConfirmTitle, deleteConfirmMessage, {
       actions: [
-        {
-          id: "cancel",
-          label: cancelText,
-          style: "secondary",
-          onPress: () => {},
-        },
+        { id: "cancel", label: cancelText, style: "secondary", onPress: () => {} },
         {
           id: "confirm",
           label: deleteAccountText,
@@ -97,40 +87,22 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
   return (
     <View style={styles.container}>
       {showChangePassword && onChangePassword && changePasswordText && (
-        <TouchableOpacity
-          style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
-          onPress={onChangePassword}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]} onPress={onChangePassword} activeOpacity={0.7}>
           <AtomicIcon name="key-outline" size="md" color="textPrimary" />
-          <AtomicText style={actionButtonStyle.text} color="textPrimary">
-            {changePasswordText}
-          </AtomicText>
+          <AtomicText style={actionButtonStyle.text} color="textPrimary">{changePasswordText}</AtomicText>
           <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
         </TouchableOpacity>
       )}
 
-      <TouchableOpacity
-        style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
-        onPress={handleLogout}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]} onPress={handleLogout} activeOpacity={0.7}>
         <AtomicIcon name="log-out-outline" size="md" color="error" />
-        <AtomicText style={actionButtonStyle.text} color="error">
-          {logoutText}
-        </AtomicText>
+        <AtomicText style={actionButtonStyle.text} color="error">{logoutText}</AtomicText>
         <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
-        onPress={handleDeleteAccount}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]} onPress={handleDeleteAccount} activeOpacity={0.7}>
         <AtomicIcon name="trash-outline" size="md" color="error" />
-        <AtomicText style={actionButtonStyle.text} color="error">
-          {deleteAccountText}
-        </AtomicText>
+        <AtomicText style={actionButtonStyle.text} color="error">{deleteAccountText}</AtomicText>
         <AtomicIcon name="chevron-forward" size="sm" color="textSecondary" />
       </TouchableOpacity>
     </View>
@@ -138,7 +110,5 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 12,
-  },
+  container: { gap: 12 },
 });

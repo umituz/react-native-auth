@@ -119,10 +119,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         style={styles.input}
       />
       {password.length > 0 && (
-        <PasswordStrengthIndicator
-          translations={translations.passwordStrength}
-          requirements={passwordRequirements}
-        />
+        <PasswordStrengthIndicator translations={translations.passwordStrength} requirements={passwordRequirements} />
       )}
 
       <AtomicInput
@@ -144,10 +141,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         style={styles.input}
       />
       {confirmPassword.length > 0 && (
-        <PasswordMatchIndicator
-          translations={translations.passwordMatch}
-          isMatch={passwordsMatch}
-        />
+        <PasswordMatchIndicator translations={translations.passwordMatch} isMatch={passwordsMatch} />
       )}
 
       <AuthErrorDisplay error={displayError} />
@@ -155,24 +149,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <AtomicButton
         variant="primary"
         onPress={() => { void handleSignUp(); }}
-        disabled={
-          loading ||
-          !email.trim() ||
-          !password.trim() ||
-          !confirmPassword.trim()
-        }
+        disabled={loading || !email.trim() || !password.trim() || !confirmPassword.trim()}
         fullWidth
         style={styles.signUpButton}
       >
         {translations.signUp}
       </AtomicButton>
 
-      <AuthLink
-        text={translations.alreadyHaveAccount}
-        linkText={translations.signIn}
-        onPress={onNavigateToLogin}
-        disabled={loading}
-      />
+      <AuthLink text={translations.alreadyHaveAccount} linkText={translations.signIn} onPress={onNavigateToLogin} disabled={loading} />
 
       <AuthLegalLinks
         translations={translations.legal}
@@ -187,12 +171,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  input: {
-    marginBottom: 20,
-  },
-  signUpButton: {
-    minHeight: 52,
-    marginBottom: 16,
-    marginTop: 8,
-  },
+  input: { marginBottom: 20 },
+  signUpButton: { minHeight: 52, marginBottom: 16, marginTop: 8 },
 });
