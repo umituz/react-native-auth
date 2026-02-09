@@ -4,7 +4,6 @@
  */
 
 import { useCallback } from "react";
-import type { MutationFunction } from "@tanstack/react-query";
 
 export interface AuthOperationOptions {
   setLoading: (loading: boolean) => void;
@@ -16,7 +15,7 @@ export interface AuthOperationOptions {
  * Create an auth operation wrapper with consistent error handling
  */
 export function createAuthOperation<T>(
-  mutation: MutationFunction<unknown, T>,
+  mutation: (params: T) => Promise<unknown>,
   options: AuthOperationOptions
 ) {
   const { setLoading, setError, onSuccess } = options;
@@ -26,7 +25,7 @@ export function createAuthOperation<T>(
       try {
         setLoading(true);
         setError(null);
-        await mutation.mutateAsync(params);
+        await mutation(params);
         onSuccess?.();
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "Operation failed";
@@ -44,7 +43,7 @@ export function createAuthOperation<T>(
  * Create auth operation that doesn't throw on failure
  */
 export function createSilentAuthOperation<T>(
-  mutation: MutationFunction<unknown, T>,
+  mutation: (params: T) => Promise<unknown>,
   options: AuthOperationOptions
 ) {
   const { setLoading, setError, onSuccess } = options;
@@ -54,7 +53,7 @@ export function createSilentAuthOperation<T>(
       try {
         setLoading(true);
         setError(null);
-        await mutation.mutateAsync(params);
+        await mutation(params as T);
         onSuccess?.();
       } catch {
         // Silently fail
