@@ -28,8 +28,6 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
   const { socialConfig, onGoogleSignIn, onAppleSignIn, onAuthSuccess } = params;
 
   const modalRef = useRef<BottomSheetModalRef>(null);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
 
   const { isVisible, mode, hideAuthModal, setMode, executePendingCallback, clearPendingCallback } =
     useAuthModalStore();
@@ -43,6 +41,10 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
   const providers = useMemo<SocialAuthProvider[]>(() => {
     return determineEnabledProviders(socialConfig, appleAvailable, googleConfigured);
   }, [socialConfig, appleAvailable, googleConfigured]);
+
+  // Social auth loading states
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
 
   // Handle visibility sync with modalRef
   useEffect(() => {
@@ -90,7 +92,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     setMode("login");
   }, [setMode]);
 
-  const handleGoogleSignInInternal = useCallback(async () => {
+  const handleGoogleSignIn = useCallback(async () => {
     setGoogleLoading(true);
     try {
       if (onGoogleSignIn) {
@@ -103,7 +105,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     }
   }, [onGoogleSignIn, signInWithGoogle]);
 
-  const handleAppleSignInInternal = useCallback(async () => {
+  const handleAppleSignIn = useCallback(async () => {
     setAppleLoading(true);
     try {
       if (onAppleSignIn) {
@@ -126,7 +128,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     handleClose,
     handleNavigateToRegister,
     handleNavigateToLogin,
-    handleGoogleSignIn: handleGoogleSignInInternal,
-    handleAppleSignIn: handleAppleSignInInternal,
+    handleGoogleSignIn,
+    handleAppleSignIn,
   };
 }

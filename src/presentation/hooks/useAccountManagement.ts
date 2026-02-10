@@ -49,14 +49,44 @@ export const useAccountManagement = (
     passwordPromptConfirm = "Confirm",
   } = options;
 
+  const PASSWORD_PROMPT_TIMEOUT_MS = 300000; // 5 minutes
+
   const defaultPasswordPrompt = useCallback((): Promise<string | null> => {
     return new Promise((resolve) => {
+      let resolved = false;
+
+      const timeoutId = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          resolve(null); // Treat timeout as cancellation
+        }
+      }, PASSWORD_PROMPT_TIMEOUT_MS);
+
       Alert.prompt(
         passwordPromptTitle,
         passwordPromptMessage,
         [
-          { text: passwordPromptCancel, style: "cancel", onPress: () => resolve(null) },
-          { text: passwordPromptConfirm, onPress: (pwd?: string) => resolve(pwd || null) },
+          {
+            text: passwordPromptCancel,
+            style: "cancel",
+            onPress: () => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timeoutId);
+                resolve(null);
+              }
+            }
+          },
+          {
+            text: passwordPromptConfirm,
+            onPress: (pwd?: string) => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timeoutId);
+                resolve(pwd || null);
+              }
+            }
+          },
         ],
         "secure-text"
       );

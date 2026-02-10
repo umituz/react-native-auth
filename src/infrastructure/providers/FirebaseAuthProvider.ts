@@ -60,7 +60,13 @@ export class FirebaseAuthProvider implements IAuthProvider {
       let userCredential;
 
       if (currentUser && isAnonymous) {
-        try { await currentUser.reload(); } catch { /* Reload failed, proceed */ }
+        // Try to reload to get fresh user data, but don't fail if it doesn't work
+        try {
+          await currentUser.reload();
+        } catch (reloadError) {
+          // Log the reload error but proceed - the user might still be valid
+          console.warn("[FirebaseAuthProvider] User reload failed during anonymous upgrade:", reloadError);
+        }
         const credential = EmailAuthProvider.credential(credentials.email.trim(), credentials.password);
         userCredential = await linkWithCredential(currentUser, credential);
       } else {
@@ -70,8 +76,10 @@ export class FirebaseAuthProvider implements IAuthProvider {
       if (credentials.displayName && userCredential.user) {
         try {
           await updateProfile(userCredential.user, { displayName: credentials.displayName.trim() });
-        } catch {
-          /* Display name update failed, account created successfully */
+        } catch (profileError) {
+          // Display name update failed, but account was created successfully
+          // Log this for debugging but don't fail the entire operation
+          console.warn("[FirebaseAuthProvider] Display name update failed:", profileError);
         }
       }
 

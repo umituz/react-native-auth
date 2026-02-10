@@ -20,34 +20,24 @@ export interface SocialAuthConfig {
 }
 
 /**
- * Hook for managing social auth loading states
+ * Hook for managing a single social auth provider's loading state
+ * @returns Loading state and handler creator
  */
 export function useSocialAuthLoading() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
 
-  const createGoogleHandler = useCallback(
-    (handler: () => Promise<void>) => {
+  const createHandler = useCallback(
+    (setter: (loading: boolean) => void, signInHandler?: () => Promise<void>) => {
       return async () => {
-        setGoogleLoading(true);
-        try {
-          await handler();
-        } finally {
-          setGoogleLoading(false);
+        if (!signInHandler) {
+          throw new Error("Sign-in handler not available");
         }
-      };
-    },
-    []
-  );
-
-  const createAppleHandler = useCallback(
-    (handler: () => Promise<void>) => {
-      return async () => {
-        setAppleLoading(true);
+        setter(true);
         try {
-          await handler();
+          await signInHandler();
         } finally {
-          setAppleLoading(false);
+          setter(false);
         }
       };
     },
@@ -59,8 +49,7 @@ export function useSocialAuthLoading() {
     appleLoading,
     setGoogleLoading,
     setAppleLoading,
-    createGoogleHandler,
-    createAppleHandler,
+    createHandler,
   };
 }
 
@@ -86,21 +75,15 @@ export function determineEnabledProviders(
 }
 
 /**
- * Create social auth handlers
+ * Select the appropriate sign-in handler from external and internal options
+ * @param externalHandler - External handler provided by parent
+ * @param internalHandler - Internal handler from auth hook
+ * @returns The selected handler or undefined
  */
-export function createSocialAuthHandlers(
-  googleSignIn: (() => Promise<void>) | undefined,
-  appleSignIn: (() => Promise<void>) | undefined,
-  internalGoogleHandler: (() => Promise<void>) | undefined,
-  internalAppleHandler: (() => Promise<void>) | undefined
-): SocialAuthHandlers {
-  const googleHandler = googleSignIn || internalGoogleHandler;
-  const appleHandler = appleSignIn || internalAppleHandler;
-
-  return {
-    googleLoading: false,
-    appleLoading: false,
-    handleGoogleSignIn: googleHandler || (async () => {}),
-    handleAppleSignIn: appleHandler || (async () => {}),
-  };
+export function selectSignInHandler(
+  externalHandler?: () => Promise<void>,
+  internalHandler?: () => Promise<void>
+): (() => Promise<void>) | undefined {
+  return externalHandler ?? internalHandler;
 }
+

@@ -15,7 +15,7 @@ import {
   completeListenerSetup,
 } from "../../infrastructure/utils/listener/listenerLifecycle.util";
 import {
-  isInitializationInProgress,
+  startInitialization,
   isListenerInitialized,
   resetListenerState,
   decrementRefCount,
@@ -30,8 +30,12 @@ export function initializeAuthListener(
 ): () => void {
   const { autoAnonymousSignIn = true, onAuthStateChange } = options;
 
-  // Prevent duplicate initialization
-  if (isInitializationInProgress()) {
+  // Atomic check-and-set to prevent race conditions
+  if (!startInitialization()) {
+    // Either already initializing or initialized - handle accordingly
+    if (isListenerInitialized()) {
+      return handleExistingInitialization()!;
+    }
     return handleInitializationInProgress();
   }
 
@@ -44,6 +48,8 @@ export function initializeAuthListener(
   const store = useAuthStore.getState();
 
   if (!auth) {
+    // Reset initialization state since we can't proceed
+    completeListenerSetup();
     return handleNoFirebaseAuth(store);
   }
 

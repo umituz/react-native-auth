@@ -45,7 +45,7 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     }
     return { ...initialAuthState, ...state };
   },
-  actions: (set, _get) => ({
+  actions: (set, get) => ({
     setFirebaseUser: (firebaseUser) => {
       const user = firebaseUser ? mapToAuthUser(firebaseUser) : null;
       const isAnonymous = firebaseUser?.isAnonymous ?? false;
@@ -57,10 +57,18 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     },
 
     setIsAnonymous: (isAnonymous) => {
-      // Only update the isAnonymous flag
-      // The user object will be updated by setFirebaseUser when needed
-      // This prevents inconsistencies between firebaseUser and user
-      set({ isAnonymous });
+      const currentState = get();
+      // Only update isAnonymous if it's consistent with the firebaseUser state
+      // If we have a firebaseUser, isAnonymous should match it
+      const currentUserIsAnonymous = currentState.firebaseUser?.isAnonymous ?? false;
+
+      if (currentState.firebaseUser) {
+        // We have a firebase user - sync isAnonymous with it
+        set({ isAnonymous: currentUserIsAnonymous });
+      } else {
+        // No firebase user yet, allow setting isAnonymous for anonymous mode preference
+        set({ isAnonymous });
+      }
     },
 
     setError: (error) => {

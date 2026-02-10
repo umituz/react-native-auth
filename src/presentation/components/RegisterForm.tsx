@@ -1,12 +1,13 @@
 import React, { useRef } from "react";
 import { StyleSheet, TextInput } from "react-native";
-import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicButton } from "@umituz/react-native-design-system";
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
 import { AuthLegalLinks, type AuthLegalLinksTranslations } from "./AuthLegalLinks";
 import { PasswordStrengthIndicator, type PasswordStrengthTranslations } from "./PasswordStrengthIndicator";
 import { PasswordMatchIndicator, type PasswordMatchTranslations } from "./PasswordMatchIndicator";
+import { FormTextInput, FormEmailInput, FormPasswordInput } from "./form";
 
 export interface RegisterFormTranslations {
   displayName: string;
@@ -66,79 +67,57 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <>
-      <AtomicInput
-        label={translations.displayName}
+      <FormTextInput
         value={displayName}
         onChangeText={handleDisplayNameChange}
+        label={translations.displayName}
         placeholder={translations.displayNamePlaceholder}
-        autoCapitalize="words"
+        error={fieldErrors.displayName}
         disabled={loading}
-        state={fieldErrors.displayName ? "error" : "default"}
-        helperText={fieldErrors.displayName || undefined}
-        returnKeyType="next"
+        autoCapitalize="words"
         onSubmitEditing={() => emailRef.current?.focus()}
-        blurOnSubmit={false}
-        style={styles.input}
+        returnKeyType="next"
       />
 
-      <AtomicInput
+      <FormEmailInput
         ref={emailRef}
-        label={translations.email}
         value={email}
         onChangeText={handleEmailChange}
+        label={translations.email}
         placeholder={translations.emailPlaceholder}
-        keyboardType="email-address"
-        autoCapitalize="none"
+        error={fieldErrors.email}
         disabled={loading}
-        state={fieldErrors.email ? "error" : "default"}
-        helperText={fieldErrors.email || undefined}
-        returnKeyType="next"
         onSubmitEditing={() => passwordRef.current?.focus()}
-        blurOnSubmit={false}
-        textContentType="emailAddress"
-        style={styles.input}
+        returnKeyType="next"
       />
 
-      <AtomicInput
+      <FormPasswordInput
         ref={passwordRef}
-        label={translations.password}
         value={password}
         onChangeText={handlePasswordChange}
+        label={translations.password}
         placeholder={translations.passwordPlaceholder}
-        secureTextEntry
-        showPasswordToggle
-        autoCapitalize="none"
-        autoCorrect={false}
+        error={fieldErrors.password}
         disabled={loading}
-        state={fieldErrors.password ? "error" : "default"}
-        helperText={fieldErrors.password || undefined}
-        returnKeyType="next"
         onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-        blurOnSubmit={false}
-        textContentType="oneTimeCode"
-        style={styles.input}
+        returnKeyType="next"
+        style={styles.passwordInput}
       />
       {password.length > 0 && (
         <PasswordStrengthIndicator translations={translations.passwordStrength} requirements={passwordRequirements} />
       )}
 
-      <AtomicInput
+      <FormPasswordInput
         ref={confirmPasswordRef}
-        label={translations.confirmPassword}
         value={confirmPassword}
         onChangeText={handleConfirmPasswordChange}
+        label={translations.confirmPassword}
         placeholder={translations.confirmPasswordPlaceholder}
-        secureTextEntry
-        showPasswordToggle
-        autoCapitalize="none"
-        autoCorrect={false}
+        error={fieldErrors.confirmPassword}
         disabled={loading}
-        state={fieldErrors.confirmPassword ? "error" : "default"}
-        helperText={fieldErrors.confirmPassword || undefined}
-        returnKeyType="done"
         onSubmitEditing={() => { void handleSignUp(); }}
-        textContentType="oneTimeCode"
-        style={styles.input}
+        returnKeyType="done"
+        style={styles.confirmPasswordInput}
       />
       {confirmPassword.length > 0 && (
         <PasswordMatchIndicator translations={translations.passwordMatch} isMatch={passwordsMatch} />
@@ -171,6 +150,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  input: { marginBottom: 20 },
+  passwordInput: { marginBottom: 4 },
+  confirmPasswordInput: { marginBottom: 4 },
   signUpButton: { minHeight: 52, marginBottom: 16, marginTop: 8 },
 });

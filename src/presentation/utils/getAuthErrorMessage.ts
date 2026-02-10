@@ -32,52 +32,29 @@ export function getAuthErrorLocalizationKey(error: unknown): string {
   };
 
   // Check error name for specific error types
-  if (error.name === "AuthInvalidEmailError") {
-    return "auth.errors.invalidEmail";
-  }
-  if (error.name === "AuthWeakPasswordError") {
-    return "auth.errors.weakPassword";
-  }
-  if (error.name === "AuthUserNotFoundError") {
-    return "auth.errors.userNotFound";
-  }
-  if (error.name === "AuthWrongPasswordError") {
-    return "auth.errors.wrongPassword";
-  }
-  if (error.name === "AuthEmailAlreadyInUseError") {
-    return "auth.errors.emailAlreadyInUse";
-  }
-  if (error.name === "AuthNetworkError") {
-    return "auth.errors.networkError";
-  }
-  if (error.name === "AuthConfigurationError") {
-    return "auth.errors.configurationError";
-  }
-  if (error.name === "AuthInitializationError") {
-    return "auth.errors.authNotInitialized";
+  const errorNameMap: Record<string, string> = {
+    AuthInvalidEmailError: "auth.errors.invalidEmail",
+    AuthWeakPasswordError: "auth.errors.weakPassword",
+    AuthUserNotFoundError: "auth.errors.userNotFound",
+    AuthWrongPasswordError: "auth.errors.wrongPassword",
+    AuthEmailAlreadyInUseError: "auth.errors.emailAlreadyInUse",
+    AuthNetworkError: "auth.errors.networkError",
+    AuthConfigurationError: "auth.errors.configurationError",
+    AuthInitializationError: "auth.errors.authNotInitialized",
+  };
+
+  // First check by error name (most specific)
+  const mappedByName = errorNameMap[error.name];
+  if (mappedByName) {
+    return mappedByName;
   }
 
-  // Use code if available
+  // Then check by error code
   if (code && errorCodeMap[code]) {
     return errorCodeMap[code];
   }
 
-  // Check error message for specific patterns
-  const message = error.message.toLowerCase();
-  if (message.includes("too many requests")) {
-    return "auth.errors.tooManyRequests";
-  }
-  if (message.includes("user account has been disabled") || message.includes("user disabled")) {
-    return "auth.errors.userDisabled";
-  }
-  if (message.includes("not properly configured") || message.includes("configuration")) {
-    return "auth.errors.configurationError";
-  }
-  if (message.includes("not enabled") || message.includes("operation not allowed")) {
-    return "auth.errors.operationNotAllowed";
-  }
-
-  // Default to unknown error
+  // Default to unknown error - don't leak system information through error messages
   return "auth.errors.unknownError";
 }
 

@@ -70,6 +70,7 @@ export function useAuth(): UseAuthResult {
         setLoading(true);
         setError(null);
         await signUpMutation.mutateAsync({ email, password, displayName });
+        // Only clear anonymous flag after successful signup
         setIsAnonymous(false);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Sign up failed");
@@ -87,6 +88,7 @@ export function useAuth(): UseAuthResult {
         setLoading(true);
         setError(null);
         await signInMutation.mutateAsync({ email, password });
+        // Only clear anonymous flag after successful signin
         setIsAnonymous(false);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Sign in failed");
@@ -114,14 +116,18 @@ export function useAuth(): UseAuthResult {
   const continueAnonymously = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       await anonymousModeMutation.mutateAsync();
+      // Only set anonymous flag after successful mutation
       setIsAnonymous(true);
-    } catch {
-      setIsAnonymous(true);
+    } catch (err: unknown) {
+      // Don't set anonymous flag on error - let user try again or choose another option
+      setError(err instanceof Error ? err.message : "Failed to continue anonymously");
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [setIsAnonymous, setLoading, anonymousModeMutation]);
+  }, [setIsAnonymous, setLoading, setError, anonymousModeMutation]);
 
   return {
     user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, isRegisteredUser, error,

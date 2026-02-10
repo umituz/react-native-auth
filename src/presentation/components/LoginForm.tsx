@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
 import { StyleSheet, TextInput } from "react-native";
-import { AtomicInput, AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicButton } from "@umituz/react-native-design-system";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
+import { FormEmailInput, FormPasswordInput } from "./form";
 
 export interface LoginFormTranslations {
   email: string;
@@ -39,40 +40,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <>
-      <AtomicInput
-        label={translations.email}
+      <FormEmailInput
         value={email}
         onChangeText={handleEmailChange}
+        label={translations.email}
         placeholder={translations.emailPlaceholder}
-        keyboardType="email-address"
-        autoCapitalize="none"
+        error={emailError}
         disabled={loading}
-        state={emailError ? "error" : "default"}
-        helperText={emailError || undefined}
-        returnKeyType="next"
         onSubmitEditing={() => passwordRef.current?.focus()}
-        blurOnSubmit={false}
-        textContentType="emailAddress"
-        style={styles.input}
+        returnKeyType="next"
       />
 
-      <AtomicInput
+      <FormPasswordInput
         ref={passwordRef}
-        label={translations.password}
         value={password}
         onChangeText={handlePasswordChange}
+        label={translations.password}
         placeholder={translations.passwordPlaceholder}
-        secureTextEntry
-        showPasswordToggle
-        autoCapitalize="none"
-        autoCorrect={false}
+        error={passwordError}
         disabled={loading}
-        state={passwordError ? "error" : "default"}
-        helperText={passwordError || undefined}
-        returnKeyType="done"
         onSubmitEditing={() => { void handleSignIn(); }}
-        textContentType="oneTimeCode"
-        style={styles.input}
+        returnKeyType="done"
       />
 
       <AuthErrorDisplay error={displayError} />
@@ -98,9 +86,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  input: {
-    marginBottom: 20,
-  },
   signInButton: {
     minHeight: 52,
     marginBottom: 16,

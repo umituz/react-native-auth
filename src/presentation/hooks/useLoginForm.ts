@@ -3,6 +3,7 @@ import { useAuth } from "./useAuth";
 import { getAuthErrorLocalizationKey, resolveErrorMessage } from "../utils/getAuthErrorMessage";
 import { validateLoginForm } from "../utils/form/formValidation.util";
 import { alertService } from "@umituz/react-native-design-system";
+import { useFormFields } from "../utils/form/useFormField.hook";
 
 export interface LoginFormTranslations {
   successTitle: string;
@@ -32,43 +33,55 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const { signIn, loading, error, continueAnonymously } = useAuth();
   const translations = config?.translations;
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  const clearLocalError = useCallback(() => {
+    setLocalError(null);
+  }, []);
+
+  const clearFieldErrorsState = useCallback(() => {
+    setEmailError(null);
+    setPasswordError(null);
+    setLocalError(null);
+  }, []);
+
+  const { fields, updateField } = useFormFields(
+    { email: "", password: "" },
+    null,
+    { clearLocalError }
+  );
 
   const getErrorMessage = useCallback((key: string) => {
     return resolveErrorMessage(key, translations?.errors);
   }, [translations]);
 
   const clearErrors = useCallback(() => {
-    setEmailError(null);
-    setPasswordError(null);
-    setLocalError(null);
-  }, []);
+    clearFieldErrorsState();
+  }, [clearFieldErrorsState]);
 
   const handleEmailChange = useCallback(
     (text: string) => {
-      setEmail(text);
-      if (emailError || localError) clearErrors();
+      updateField("email", text);
+      if (emailError || localError) clearFieldErrorsState();
     },
-    [emailError, localError, clearErrors],
+    [updateField, emailError, localError, clearFieldErrorsState]
   );
 
   const handlePasswordChange = useCallback(
     (text: string) => {
-      setPassword(text);
-      if (passwordError || localError) clearErrors();
+      updateField("password", text);
+      if (passwordError || localError) clearFieldErrorsState();
     },
-    [passwordError, localError, clearErrors],
+    [updateField, passwordError, localError, clearFieldErrorsState]
   );
 
   const handleSignIn = useCallback(async () => {
     clearErrors();
 
     const validation = validateLoginForm(
-      { email: email.trim(), password },
+      { email: fields.email.trim(), password: fields.password },
       getErrorMessage
     );
 
@@ -81,7 +94,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     }
 
     try {
-      await signIn(email.trim(), password);
+      await signIn(fields.email.trim(), fields.password);
 
       if (translations) {
         alertService.success(
@@ -93,7 +106,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
       const localizationKey = getAuthErrorLocalizationKey(err);
       setLocalError(getErrorMessage(localizationKey));
     }
-  }, [email, password, signIn, translations, getErrorMessage, clearErrors]);
+  }, [fields, signIn, translations, getErrorMessage, clearErrors, updateField]);
 
   const handleContinueAnonymously = useCallback(async () => {
     try {
@@ -106,8 +119,8 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const displayError = localError || error;
 
   return {
-    email,
-    password,
+    email: fields.email,
+    password: fields.password,
     emailError,
     passwordError,
     localError,

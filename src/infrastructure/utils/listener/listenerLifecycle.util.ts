@@ -74,11 +74,21 @@ export function setupAuthListener(
     }
   }
 
-  const unsubscribe = onIdTokenChanged(auth, (user) => {
-    handleAuthStateChange(user, store, auth, autoAnonymousSignIn, onAuthStateChange);
-  });
+  try {
+    const unsubscribe = onIdTokenChanged(auth, (user) => {
+      handleAuthStateChange(user, store, auth, autoAnonymousSignIn, onAuthStateChange);
+    });
 
-  setUnsubscribe(unsubscribe);
+    setUnsubscribe(unsubscribe);
+  } catch (error) {
+    // If listener setup fails, ensure we clean up and mark as initialized
+    console.error("[AuthListener] Failed to setup auth listener:", error);
+    completeInitialization();
+    store.setLoading(false);
+    store.setInitialized(true);
+    store.setError("Failed to initialize authentication listener");
+    throw error;
+  }
 }
 
 /**
@@ -91,42 +101,47 @@ function handleAuthStateChange(
   autoAnonymousSignIn: boolean,
   onAuthStateChange?: (user: User | null) => void
 ): void {
-  if (!user && autoAnonymousSignIn) {
-    handleAnonymousMode(store, auth);
-    store.setFirebaseUser(null);
-    completeInitialization();
-    return;
+  try {
+    if (!user && autoAnonymousSignIn) {
+      // Start anonymous sign-in without blocking
+      void handleAnonymousMode(store, auth);
+      store.setFirebaseUser(null);
+      completeInitialization();
+      return;
+    }
+
+    store.setFirebaseUser(user);
+    store.setInitialized(true);
+
+    // Handle conversion from anonymous
+    if (user && !user.isAnonymous && store.isAnonymous) {
+      store.setIsAnonymous(false);
+    }
+
+    onAuthStateChange?.(user);
+  } catch (error) {
+    console.error("[AuthListener] Error handling auth state change:", error);
+    // Ensure we don't leave the app in a bad state
+    store.setInitialized(true);
+    store.setLoading(false);
   }
-
-  store.setFirebaseUser(user);
-  store.setInitialized(true);
-
-  // Handle conversion from anonymous
-  if (user && !user.isAnonymous && store.isAnonymous) {
-    store.setIsAnonymous(false);
-  }
-
-  onAuthStateChange?.(user);
 }
 
 /**
  * Handle anonymous mode sign-in
  */
-function handleAnonymousMode(store: Store, auth: Auth): void {
+async function handleAnonymousMode(store: Store, auth: Auth): Promise<void> {
   if (!startAnonymousSignIn()) {
     return; // Already signing in
   }
 
   const handleAnonymousSignIn = createAnonymousSignInHandler(auth, store);
 
-  // Start sign-in without blocking
-  void (async () => {
-    try {
-      await handleAnonymousSignIn();
-    } finally {
-      completeAnonymousSignIn();
-    }
-  })();
+  try {
+    await handleAnonymousSignIn();
+  } finally {
+    completeAnonymousSignIn();
+  }
 }
 
 /**
