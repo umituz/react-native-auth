@@ -29,7 +29,11 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
   name: "auth-store",
   initialState: initialAuthState,
   persist: true,
-  storage: storageService,
+  storage: {
+    getItem: (name) => storageService.getItem(name),
+    setItem: (name, value) => storageService.setItem(name, value),
+    removeItem: (name) => storageService.removeItem(name),
+  },
   version: 2,
   partialize: (state) => ({
     isAnonymous: state.isAnonymous,
