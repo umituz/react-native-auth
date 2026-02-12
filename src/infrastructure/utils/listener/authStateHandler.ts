@@ -7,10 +7,6 @@ import type { Auth, User } from "firebase/auth";
 import type { AuthActions } from "../../../types/auth-store.types";
 import { completeInitialization } from "./listenerState.util";
 import { handleAnonymousMode } from "./anonymousHandler";
-import {
-  createOrUpdateUserDocument,
-  getFirestoreInstance,
-} from "../../repositories/UserDocumentRepository";
 
 type Store = AuthActions & { isAnonymous: boolean };
 
@@ -35,14 +31,6 @@ export function handleAuthStateChange(
 
     store.setFirebaseUser(user);
     store.setInitialized(true);
-
-    // Create or update Firestore user document (best practice)
-    if (user) {
-      createOrUpdateUserDocument(getFirestoreInstance(), user).catch((error) => {
-        console.error("[AuthListener] Failed to create/update user document:", error);
-        // Don't throw - Firestore failures shouldn't block auth state updates
-      });
-    }
 
     // Handle conversion from anonymous
     if (user && !user.isAnonymous && store.isAnonymous) {
