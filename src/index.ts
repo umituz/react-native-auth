@@ -51,7 +51,7 @@ export { useRequireAuth, useUserId } from './presentation/hooks/useRequireAuth';
 export { useUserProfile } from './presentation/hooks/useUserProfile';
 export type { UserProfileData, UseUserProfileParams } from './presentation/hooks/useUserProfile';
 export { useAccountManagement } from './presentation/hooks/useAccountManagement';
-export type { UseAccountManagementReturn } from './presentation/hooks/useAccountManagement';
+export type { UseAccountManagementReturn, UseAccountManagementOptions } from './presentation/hooks/useAccountManagement';
 export { useProfileUpdate } from './presentation/hooks/useProfileUpdate';
 export type { UseProfileUpdateReturn } from './presentation/hooks/useProfileUpdate';
 export { useProfileEdit } from './presentation/hooks/useProfileEdit';
