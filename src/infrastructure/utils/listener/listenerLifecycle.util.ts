@@ -18,6 +18,10 @@ import {
 } from "./listenerState.util";
 import { onIdTokenChanged } from "firebase/auth";
 import { getAuthService } from "../../../infrastructure/services/AuthService";
+import {
+  createOrUpdateUserDocument,
+  getFirestoreInstance
+} from "../../repositories/UserDocumentRepository";
 
 type Store = AuthActions & { isAnonymous: boolean };
 
@@ -112,6 +116,11 @@ function handleAuthStateChange(
 
     store.setFirebaseUser(user);
     store.setInitialized(true);
+
+    // Create or update Firestore user document (best practice)
+    if (user) {
+      void createOrUpdateUserDocument(getFirestoreInstance(), user);
+    }
 
     // Handle conversion from anonymous
     if (user && !user.isAnonymous && store.isAnonymous) {
