@@ -1,13 +1,12 @@
 /**
  * Unified Auth Initialization
- * Initializes Firebase auth with user document sync and conversion tracking
+ * Initializes auth with user document sync and conversion tracking
  */
 
-import type { Auth, User } from "firebase/auth";
-import { getFirebaseAuth } from "@umituz/react-native-firebase";
+import type { User } from "firebase/auth";
+import { getFirebaseAuth, configureUserDocumentService } from "@umituz/react-native-firebase";
+import type { UserDocumentExtras } from "@umituz/react-native-firebase";
 import { initializeAuthService } from "./AuthService";
-import { configureUserDocumentService } from "./UserDocumentService";
-import type { UserDocumentExtras } from "./UserDocumentService";
 import { collectDeviceExtras } from "@umituz/react-native-design-system";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
 import { createAuthStateHandler } from "../utils/authStateHandler";
@@ -27,7 +26,7 @@ export interface InitializeAuthOptions {
 }
 
 let isInitialized = false;
-let initializationPromise: Promise<{ success: boolean; auth: Auth | null }> | null = null;
+let initializationPromise: Promise<{ success: boolean }> | null = null;
 const conversionState: { current: ConversionState } = {
   current: { previousUserId: null, wasAnonymous: false },
 };
@@ -37,9 +36,9 @@ const conversionState: { current: ConversionState } = {
  */
 export async function initializeAuth(
   options: InitializeAuthOptions = {}
-): Promise<{ success: boolean; auth: Auth | null }> {
+): Promise<{ success: boolean }> {
   if (isInitialized) {
-    return { success: true, auth: getFirebaseAuth() };
+    return { success: true };
   }
   // Prevent race condition: return existing promise if initialization is in progress
   if (initializationPromise) {
@@ -55,7 +54,7 @@ export async function initializeAuth(
 
 async function doInitializeAuth(
   options: InitializeAuthOptions
-): Promise<{ success: boolean; auth: Auth | null }> {
+): Promise<{ success: boolean }> {
 
   const {
     userCollection = "users",
@@ -69,7 +68,7 @@ async function doInitializeAuth(
   } = options;
 
   const auth = getFirebaseAuth();
-  if (!auth) return { success: false, auth: null };
+  if (!auth) return { success: false };
 
   configureUserDocumentService({
     collectionName: userCollection,
@@ -79,7 +78,7 @@ async function doInitializeAuth(
 
   let authServiceInitFailed = false;
   try {
-    await initializeAuthService(auth, authConfig, storageProvider);
+    await initializeAuthService(authConfig, storageProvider);
   } catch {
     authServiceInitFailed = true;
   }
@@ -97,7 +96,7 @@ async function doInitializeAuth(
   });
 
   isInitialized = true;
-  return { success: !authServiceInitFailed, auth };
+  return { success: !authServiceInitFailed };
 }
 
 export function isAuthInitialized(): boolean {

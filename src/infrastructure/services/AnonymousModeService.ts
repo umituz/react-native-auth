@@ -3,7 +3,6 @@
  * Handles anonymous mode functionality
  */
 
-import type { IAuthProvider } from "../../application/ports/IAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import { emitAnonymousModeEnabled } from "./AuthEventService";
 import type { IStorageProvider } from "../types/Storage.types";
@@ -46,19 +45,7 @@ export class AnonymousModeService {
     }
   }
 
-  async enable(storageProvider: IStorageProvider, provider?: IAuthProvider): Promise<void> {
-    // Sign out from provider if logged in
-    if (provider?.getCurrentUser()) {
-      try {
-        await provider.signOut();
-      } catch (error) {
-        // Log error but don't throw - allow anonymous mode to be enabled
-        // even if sign-out fails (user might be in inconsistent state but
-        // subsequent auth operations will resolve it)
-        console.warn("[AnonymousModeService] Sign-out failed during anonymous mode enable:", error);
-      }
-    }
-
+  async enable(storageProvider: IStorageProvider): Promise<void> {
     this.isAnonymousMode = true;
     await this.save(storageProvider);
     emitAnonymousModeEnabled();

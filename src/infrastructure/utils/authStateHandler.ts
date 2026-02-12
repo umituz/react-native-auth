@@ -4,7 +4,7 @@
  */
 
 import type { User } from "firebase/auth";
-import { ensureUserDocument } from "../services/UserDocumentService";
+import { ensureUserDocument } from "@umituz/react-native-firebase";
 import { detectConversion, type ConversionState } from "./authConversionDetector";
 
 export interface AuthStateHandlerOptions {

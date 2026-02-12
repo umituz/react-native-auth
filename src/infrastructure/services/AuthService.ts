@@ -1,16 +1,12 @@
 /**
  * Auth Service
- * Orchestrates authentication operations using composition
+ * Orchestrates authentication operations
  */
 
-import type { Auth } from "firebase/auth";
-import type { AuthCredentials, SignUpCredentials } from "../../application/ports/IAuthProvider";
-import type { IAuthProvider } from "../../application/ports/IAuthProvider";
-import { FirebaseAuthProvider } from "../providers/FirebaseAuthProvider";
 import type { AuthUser } from "../../domain/entities/AuthUser";
 import type { AuthConfig } from "../../domain/value-objects/AuthConfig";
 import { sanitizeAuthConfig } from "../../domain/value-objects/AuthConfig";
-import { AuthRepository } from "../repositories/AuthRepository";
+import { AuthRepository, type SignUpCredentials, type AuthCredentials } from "../repositories/AuthRepository";
 import { AnonymousModeService } from "./AnonymousModeService";
 import { authEventService } from "./AuthEventService";
 import type { IStorageProvider } from "../types/Storage.types";
@@ -33,33 +29,10 @@ export class AuthService {
     return this.repository;
   }
 
-  private isFirebaseAuth(obj: IAuthProvider | Auth): obj is Auth {
-    return (
-      typeof obj === "object" &&
-      obj !== null &&
-      "currentUser" in obj &&
-      "onAuthStateChanged" in obj &&
-      "signInWithEmailAndPassword" in obj &&
-      "createUserWithEmailAndPassword" in obj &&
-      typeof obj.onAuthStateChanged === "function"
-    );
-  }
-
-  async initialize(providerOrAuth: IAuthProvider | Auth): Promise<void> {
+  async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    let provider: IAuthProvider;
-
-    if (this.isFirebaseAuth(providerOrAuth)) {
-      const firebaseProvider = new FirebaseAuthProvider(providerOrAuth);
-      await firebaseProvider.initialize();
-      provider = firebaseProvider;
-    } else {
-      provider = providerOrAuth;
-      await provider.initialize();
-    }
-
-    this.repository = new AuthRepository(provider, this.config);
+    this.repository = new AuthRepository(this.config);
 
     if (this.storageProvider) {
       await this.anonymousModeService.load(this.storageProvider);
@@ -122,14 +95,13 @@ export class AuthService {
 let authServiceInstance: AuthService | null = null;
 
 export async function initializeAuthService(
-  providerOrAuth: IAuthProvider | Auth,
   config?: Partial<AuthConfig>,
   storageProvider?: IStorageProvider
 ): Promise<AuthService> {
   if (!authServiceInstance) {
     authServiceInstance = new AuthService(config, storageProvider);
   }
-  await authServiceInstance.initialize(providerOrAuth);
+  await authServiceInstance.initialize();
   return authServiceInstance;
 }
 

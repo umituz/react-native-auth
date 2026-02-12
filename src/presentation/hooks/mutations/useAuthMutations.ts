@@ -5,7 +5,7 @@
 
 import { useMutation } from "@umituz/react-native-design-system";
 import { getAuthService } from "../../../infrastructure/services/AuthService";
-import type { AuthCredentials, SignUpCredentials } from "../../../application/ports/IAuthProvider";
+import type { AuthCredentials, SignUpCredentials } from "../../../infrastructure/repositories/AuthRepository";
 import type { AuthUser } from "../../../domain/entities/AuthUser";
 
 export const useSignUpMutation = () => {

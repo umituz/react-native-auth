@@ -19,13 +19,13 @@ export { DEFAULT_AUTH_CONFIG, DEFAULT_PASSWORD_CONFIG, DEFAULT_SOCIAL_CONFIG } f
 // APPLICATION LAYER
 // =============================================================================
 
-export type { IAuthProvider, AuthCredentials, SignUpCredentials, SocialSignInResult } from './application/ports/IAuthProvider';
+// AuthCredentials and SignUpCredentials moved to AuthRepository
+export type { AuthCredentials, SignUpCredentials } from './infrastructure/repositories/AuthRepository';
 
 // =============================================================================
 // INFRASTRUCTURE LAYER
 // =============================================================================
 
-export { FirebaseAuthProvider } from './infrastructure/providers/FirebaseAuthProvider';
 export { AuthService, initializeAuthService, getAuthService, resetAuthService } from './infrastructure/services/AuthService';
 export type { IStorageProvider } from './infrastructure/types/Storage.types';
 export { createStorageProvider, StorageProviderAdapter } from './infrastructure/adapters/StorageProviderAdapter';

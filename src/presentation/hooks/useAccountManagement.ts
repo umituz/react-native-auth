@@ -139,7 +139,7 @@ export const useAccountManagement = (
       }
 
       // Handle social auth reauthentication
-      if (result.error?.requiresReauth && onReauthRequired) {
+      if (result.requiresReauth && onReauthRequired) {
         const reauthSuccess = await onReauthRequired();
         if (!reauthSuccess) {
           throw new Error("Reauthentication required to delete account");
