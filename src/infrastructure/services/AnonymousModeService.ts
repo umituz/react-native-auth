@@ -51,8 +51,11 @@ export class AnonymousModeService {
     if (provider?.getCurrentUser()) {
       try {
         await provider.signOut();
-      } catch {
-        // Silently fail - sign out errors are handled elsewhere
+      } catch (error) {
+        // Log error but don't throw - allow anonymous mode to be enabled
+        // even if sign-out fails (user might be in inconsistent state but
+        // subsequent auth operations will resolve it)
+        console.warn("[AnonymousModeService] Sign-out failed during anonymous mode enable:", error);
       }
     }
 

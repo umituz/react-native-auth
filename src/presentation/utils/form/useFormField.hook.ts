@@ -43,11 +43,11 @@ export function useFormField(
   const handleChange = useCallback(
     (text: string) => {
       setValue(text);
-      if (error || options?.clearLocalError) {
+      if (error) {
         clearError();
       }
     },
-    [error, options, clearError]
+    [error, clearError]
   );
 
   return {

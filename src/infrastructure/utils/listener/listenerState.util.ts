@@ -8,6 +8,7 @@ export interface ListenerState {
   refCount: number;
   initializationInProgress: boolean;
   anonymousSignInInProgress: boolean;
+  cleanupInProgress: boolean;
   unsubscribe: (() => void) | null;
 }
 
@@ -16,6 +17,7 @@ const state: ListenerState = {
   refCount: 0,
   initializationInProgress: false,
   anonymousSignInInProgress: false,
+  cleanupInProgress: false,
   unsubscribe: null,
 };
 
@@ -60,11 +62,16 @@ export function startInitialization(): boolean {
 
 /**
  * Complete initialization
+ * If refCount is 0, set to 1 (first subscriber)
+ * Otherwise, keep existing refCount from concurrent subscribers
  */
 export function completeInitialization(): void {
   state.initializationInProgress = false;
   state.initialized = true;
-  state.refCount = 1;
+  // Only set refCount to 1 if it's still 0 (no concurrent subscribers)
+  if (state.refCount === 0) {
+    state.refCount = 1;
+  }
 }
 
 /**
@@ -85,10 +92,20 @@ export function incrementRefCount(): number {
 /**
  * Decrement reference count when a subscriber leaves
  * Returns true if cleanup should be performed
+ * Uses cleanupInProgress flag to prevent concurrent cleanup attempts
  */
 export function decrementRefCount(): { shouldCleanup: boolean; count: number } {
   state.refCount--;
-  const shouldCleanup = state.refCount <= 0 && state.unsubscribe !== null;
+  const shouldCleanup =
+    state.refCount <= 0 &&
+    state.unsubscribe !== null &&
+    !state.cleanupInProgress;
+
+  // If cleanup should happen, mark as in progress to prevent concurrent cleanup
+  if (shouldCleanup) {
+    state.cleanupInProgress = true;
+  }
+
   return { shouldCleanup, count: state.refCount };
 }
 
@@ -111,7 +128,7 @@ export function completeAnonymousSignIn(): void {
 }
 
 /**
- * Reset all state (for testing)
+ * Reset all state (for testing and cleanup)
  */
 export function resetListenerState(): void {
   if (state.unsubscribe) {
@@ -121,5 +138,6 @@ export function resetListenerState(): void {
   state.refCount = 0;
   state.initializationInProgress = false;
   state.anonymousSignInInProgress = false;
+  state.cleanupInProgress = false;
   state.unsubscribe = null;
 }

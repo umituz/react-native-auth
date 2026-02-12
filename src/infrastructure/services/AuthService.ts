@@ -33,12 +33,24 @@ export class AuthService {
     return this.repository;
   }
 
+  private isFirebaseAuth(obj: IAuthProvider | Auth): obj is Auth {
+    return (
+      typeof obj === "object" &&
+      obj !== null &&
+      "currentUser" in obj &&
+      "onAuthStateChanged" in obj &&
+      "signInWithEmailAndPassword" in obj &&
+      "createUserWithEmailAndPassword" in obj &&
+      typeof obj.onAuthStateChanged === "function"
+    );
+  }
+
   async initialize(providerOrAuth: IAuthProvider | Auth): Promise<void> {
     if (this.initialized) return;
 
     let provider: IAuthProvider;
 
-    if ("currentUser" in providerOrAuth) {
+    if (this.isFirebaseAuth(providerOrAuth)) {
       const firebaseProvider = new FirebaseAuthProvider(providerOrAuth);
       await firebaseProvider.initialize();
       provider = firebaseProvider;

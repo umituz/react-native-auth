@@ -16,7 +16,11 @@ export interface ValidationConfig {
 }
 
 export const DEFAULT_VAL_CONFIG: ValidationConfig = {
-  emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  // More robust email validation:
+  // - Local part: alphanumeric, dots (not consecutive), hyphens, underscores, plus
+  // - Domain: alphanumeric and hyphens
+  // - TLD: at least 2 characters
+  emailRegex: /^[a-zA-Z0-9]([a-zA-Z0-9._+-]*[a-zA-Z0-9])?@[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/,
   displayNameMinLength: 2,
 };
 
@@ -30,7 +34,7 @@ export function validateEmail(
 }
 
 export function validatePasswordForLogin(password: string): ValidationResult {
-  if (!password || password.length === 0) return { isValid: false, error: "auth.validation.passwordRequired" };
+  if (!password || password.trim().length === 0) return { isValid: false, error: "auth.validation.passwordRequired" };
   return { isValid: true };
 }
 
@@ -38,7 +42,7 @@ export function validatePasswordForRegister(
   password: string,
   config: PasswordConfig,
 ): PasswordStrengthResult {
-  if (!password) {
+  if (!password || password.trim().length === 0) {
     return { isValid: false, error: "auth.validation.passwordRequired", requirements: { hasMinLength: false } };
   }
 
@@ -52,7 +56,7 @@ export function validatePasswordForRegister(
 }
 
 export function validatePasswordConfirmation(password: string, confirm: string): ValidationResult {
-  if (!confirm) return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
+  if (!confirm || confirm.trim().length === 0) return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
   if (password !== confirm) return { isValid: false, error: "auth.validation.passwordsDoNotMatch" };
   return { isValid: true };
 }
