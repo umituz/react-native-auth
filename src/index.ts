@@ -19,7 +19,6 @@ export { DEFAULT_AUTH_CONFIG, DEFAULT_PASSWORD_CONFIG, DEFAULT_SOCIAL_CONFIG } f
 // APPLICATION LAYER
 // =============================================================================
 
-// AuthCredentials and SignUpCredentials moved to AuthRepository
 export type { AuthCredentials, SignUpCredentials } from './infrastructure/repositories/AuthRepository';
 
 // =============================================================================

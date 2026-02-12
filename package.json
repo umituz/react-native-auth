@@ -62,7 +62,6 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "@umituz/react-native-design-system": "latest",
-    "@umituz/react-native-firebase": "^1.13.152",
     "@umituz/react-native-localization": "latest",
     "eslint": "^8.57.0",
     "expo-apple-authentication": "^6.0.0",
@@ -104,5 +103,8 @@
     "src",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "dependencies": {
+    "@umituz/react-native-firebase": "^1.13.154"
+  }
 }

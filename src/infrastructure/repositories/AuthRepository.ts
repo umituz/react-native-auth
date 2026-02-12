@@ -11,6 +11,7 @@ import {
     signUpWithEmail,
     signOut as firebaseSignOut,
     getCurrentUserFromGlobal,
+    setupAuthListener,
     type EmailCredentials,
 } from "@umituz/react-native-firebase";
 import {
@@ -120,7 +121,12 @@ export class AuthRepository implements IAuthRepository {
     }
 
     onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
-        // TODO: Implement using setupAuthListener from Firebase
-        return () => {};
+        const result = setupAuthListener({
+            onAuthStateChange: (user) => {
+                const authUser = user ? mapToAuthUser(user) : null;
+                callback(authUser);
+            },
+        });
+        return result.success && result.unsubscribe ? result.unsubscribe : () => {};
     }
 }
