@@ -6,7 +6,7 @@
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 import { useAuth } from "./useAuth";
-import { handleAccountDeletion } from "../utils/accountDeleteHandler.util";
+import { deleteCurrentUser } from "@umituz/react-native-firebase";
 
 export interface UseAccountManagementOptions {
   /**
@@ -111,14 +111,56 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
-      await handleAccountDeletion({
-        onReauthRequired,
-        onPasswordRequired: passwordHandler,
-      });
+      // First attempt - Firebase will check if reauthentication is needed
+      const result = await deleteCurrentUser({ autoReauthenticate: true });
+
+      if (result.success) {
+        return;
+      }
+
+      // Handle password reauthentication
+      if (result.error?.code === "auth/password-reauth") {
+        const password = await passwordHandler();
+        if (!password) {
+          throw new Error("Password required to delete account");
+        }
+
+        // Retry with password
+        const retryResult = await deleteCurrentUser({
+          autoReauthenticate: true,
+          password,
+        });
+
+        if (!retryResult.success) {
+          throw new Error(retryResult.error?.message || "Failed to delete account");
+        }
+
+        return;
+      }
+
+      // Handle social auth reauthentication
+      if (result.error?.requiresReauth && onReauthRequired) {
+        const reauthSuccess = await onReauthRequired();
+        if (!reauthSuccess) {
+          throw new Error("Reauthentication required to delete account");
+        }
+
+        // Retry after social reauth
+        const retryResult = await deleteCurrentUser({ autoReauthenticate: true });
+
+        if (!retryResult.success) {
+          throw new Error(retryResult.error?.message || "Failed to delete account");
+        }
+
+        return;
+      }
+
+      // Other errors
+      throw new Error(result.error?.message || "Failed to delete account");
     } finally {
       setIsDeletingAccount(false);
     }
-  }, [user, onReauthRequired, passwordHandler]);
+  }, [user, passwordHandler, onReauthRequired]);
 
   return {
     logout,
