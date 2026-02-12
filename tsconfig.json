@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "module": "esnext",
     "allowJs": true,
     "skipLibCheck": true,
@@ -22,6 +22,7 @@
     "lib",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "**/node_modules/**"
+    "**/node_modules/**",
+    "node_modules/expo-file-system/**/*"
   ]
 }

@@ -4,6 +4,7 @@
  */
 
 import type { User } from "firebase/auth";
+import { ensureUserDocument } from "../services/UserDocumentService";
 import { detectConversion, type ConversionState } from "./authConversionDetector";
 
 export interface AuthStateHandlerOptions {
@@ -39,6 +40,12 @@ export function createAuthStateHandler(
         // Silently fail - conversion callback errors are handled elsewhere
       }
     }
+
+    const extras = conversion.isConversion && state.current.previousUserId
+      ? { previousAnonymousUserId: state.current.previousUserId }
+      : undefined;
+
+    await ensureUserDocument(user, extras);
 
     state.current = {
       previousUserId: currentUserId,

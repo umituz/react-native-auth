@@ -58,10 +58,13 @@ export const useProfileEdit = (
     isValid: boolean;
     errors: string[];
   } => {
-    const result = validateProfileForm({
-      displayName: formState.displayName,
-      email: formState.email,
-    });
+    const result = validateProfileForm(
+      {
+        displayName: formState.displayName,
+        email: formState.email,
+      },
+      (key) => key // Pass-through function - returns key as-is since caller handles translation
+    );
 
     return {
       isValid: result.isValid,
