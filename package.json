@@ -103,6 +103,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@umituz/react-native-firebase": "*"
+    "@umituz/react-native-firebase": "^2.1.0"
   }
 }

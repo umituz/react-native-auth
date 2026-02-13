@@ -4,9 +4,8 @@
  */
 
 import { useCallback, useState } from "react";
-import { Alert } from "react-native";
 import { useAuth } from "./useAuth";
-import { deleteCurrentUser } from "@umituz/react-native-firebase";
+import { deleteCurrentUser, usePasswordPrompt } from "@umituz/react-native-firebase";
 
 export interface UseAccountManagementOptions {
   /**
@@ -33,6 +32,7 @@ export interface UseAccountManagementReturn {
   deleteAccount: () => Promise<void>;
   isLoading: boolean;
   isDeletingAccount: boolean;
+  PasswordPromptComponent: React.ReactNode;
 }
 
 export const useAccountManagement = (
@@ -50,51 +50,14 @@ export const useAccountManagement = (
     passwordPromptConfirm = "Confirm",
   } = options;
 
-  const PASSWORD_PROMPT_TIMEOUT_MS = 300000; // 5 minutes
+  const { showPasswordPrompt, PasswordPromptComponent } = usePasswordPrompt({
+    title: passwordPromptTitle,
+    message: passwordPromptMessage,
+    cancelText: passwordPromptCancel,
+    confirmText: passwordPromptConfirm,
+  });
 
-  const defaultPasswordPrompt = useCallback((): Promise<string | null> => {
-    return new Promise((resolve) => {
-      let resolved = false;
-
-      const timeoutId = setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          resolve(null); // Treat timeout as cancellation
-        }
-      }, PASSWORD_PROMPT_TIMEOUT_MS);
-
-      Alert.prompt(
-        passwordPromptTitle,
-        passwordPromptMessage,
-        [
-          {
-            text: passwordPromptCancel,
-            style: "cancel",
-            onPress: () => {
-              if (!resolved) {
-                resolved = true;
-                clearTimeout(timeoutId);
-                resolve(null);
-              }
-            }
-          },
-          {
-            text: passwordPromptConfirm,
-            onPress: (pwd?: string) => {
-              if (!resolved) {
-                resolved = true;
-                clearTimeout(timeoutId);
-                resolve(pwd || null);
-              }
-            }
-          },
-        ],
-        "secure-text"
-      );
-    });
-  }, [passwordPromptTitle, passwordPromptMessage, passwordPromptCancel, passwordPromptConfirm]);
-
-  const passwordHandler = onPasswordRequired || defaultPasswordPrompt;
+  const passwordHandler = onPasswordRequired || showPasswordPrompt;
 
   const logout = useCallback(async () => {
     await signOut();
@@ -131,5 +94,6 @@ export const useAccountManagement = (
     deleteAccount,
     isLoading: loading,
     isDeletingAccount,
+    PasswordPromptComponent,
   };
 };
