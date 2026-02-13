@@ -5,14 +5,12 @@
 
 import type { IAuthRepository } from "../../application/ports/IAuthRepository";
 import type { AuthUser } from "../../domain/entities/AuthUser";
-import type { User } from "firebase/auth";
 import {
     signInWithEmail,
     signUpWithEmail,
     signOut as firebaseSignOut,
     getCurrentUserFromGlobal,
     setupAuthListener,
-    type EmailCredentials,
 } from "@umituz/react-native-firebase";
 import {
     AuthValidationError,

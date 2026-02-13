@@ -57,8 +57,6 @@ export { useProfileEdit } from './presentation/hooks/useProfileEdit';
 export type { ProfileEditFormState, UseProfileEditReturn } from './presentation/hooks/useProfileEdit';
 export { useSocialLogin } from './presentation/hooks/useSocialLogin';
 export type { UseSocialLoginConfig, UseSocialLoginResult } from './presentation/hooks/useSocialLogin';
-export { useGoogleAuth } from './presentation/hooks/useGoogleAuth';
-export type { UseGoogleAuthResult } from './presentation/hooks/useGoogleAuth';
 export { useAppleAuth } from './presentation/hooks/useAppleAuth';
 export type { UseAppleAuthResult } from './presentation/hooks/useAppleAuth';
 export { useAuthBottomSheet } from './presentation/hooks/useAuthBottomSheet';
