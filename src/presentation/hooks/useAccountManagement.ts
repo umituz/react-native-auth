@@ -64,6 +64,7 @@ export const useAccountManagement = (
   }, [signOut]);
 
   const deleteAccount = useCallback(async () => {
+    console.log("[useAccountManagement] deleteAccount called", { user: user?.uid });
     if (!user) {
       throw new Error("No user logged in");
     }
@@ -75,11 +76,14 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
+      console.log("[useAccountManagement] Calling deleteCurrentUser...");
       const result = await deleteCurrentUser({
         autoReauthenticate: true,
         onPasswordRequired: passwordHandler,
         onGoogleReauthRequired: onReauthRequired,
       });
+
+      console.log("[useAccountManagement] deleteCurrentUser result:", result);
 
       if (!result.success) {
         throw new Error(result.error?.message || "Failed to delete account");
