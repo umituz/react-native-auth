@@ -11,8 +11,9 @@ import { deleteCurrentUser } from "@umituz/react-native-firebase";
 export interface UseAccountManagementOptions {
   /**
    * Callback invoked when reauthentication is required (for Google/Apple)
+   * Should return Google ID token or null if cancelled
    */
-  onReauthRequired?: () => Promise<boolean>;
+  onReauthRequired?: () => Promise<string | null>;
   /**
    * Callback invoked when password reauthentication is required
    * If not provided, built-in Alert.prompt will be used
@@ -111,52 +112,15 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
-      // First attempt - Firebase will check if reauthentication is needed
-      const result = await deleteCurrentUser({ autoReauthenticate: true });
+      const result = await deleteCurrentUser({
+        autoReauthenticate: true,
+        onPasswordRequired: passwordHandler,
+        onGoogleReauthRequired: onReauthRequired,
+      });
 
-      if (result.success) {
-        return;
+      if (!result.success) {
+        throw new Error(result.error?.message || "Failed to delete account");
       }
-
-      // Handle password reauthentication
-      if (result.error?.code === "auth/password-reauth") {
-        const password = await passwordHandler();
-        if (!password) {
-          throw new Error("Password required to delete account");
-        }
-
-        // Retry with password
-        const retryResult = await deleteCurrentUser({
-          autoReauthenticate: true,
-          password,
-        });
-
-        if (!retryResult.success) {
-          throw new Error(retryResult.error?.message || "Failed to delete account");
-        }
-
-        return;
-      }
-
-      // Handle social auth reauthentication
-      if (result.requiresReauth && onReauthRequired) {
-        const reauthSuccess = await onReauthRequired();
-        if (!reauthSuccess) {
-          throw new Error("Reauthentication required to delete account");
-        }
-
-        // Retry after social reauth
-        const retryResult = await deleteCurrentUser({ autoReauthenticate: true });
-
-        if (!retryResult.success) {
-          throw new Error(retryResult.error?.message || "Failed to delete account");
-        }
-
-        return;
-      }
-
-      // Other errors
-      throw new Error(result.error?.message || "Failed to delete account");
     } finally {
       setIsDeletingAccount(false);
     }
