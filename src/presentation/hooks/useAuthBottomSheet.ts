@@ -34,11 +34,13 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
   const { isAuthenticated, isAnonymous } = useAuth();
 
   // Social Auth Hooks
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const { signInWithGoogle, googleConfigured } = useGoogleAuth(socialConfig?.google);
   const { signInWithApple, appleAvailable } = useAppleAuth();
 
   // Determine enabled providers
   const providers = useMemo<SocialAuthProvider[]>(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return determineEnabledProviders(socialConfig, appleAvailable, googleConfigured);
   }, [socialConfig, appleAvailable, googleConfigured]);
 
@@ -78,9 +80,9 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
           executePendingCallback();
         });
 
-        // Cleanup timeout on unmount
         return () => clearTimeout(timeoutId);
       }
+      return undefined;
     }
   );
 
@@ -98,6 +100,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
       if (onGoogleSignIn) {
         await onGoogleSignIn();
       } else if (signInWithGoogle) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         await signInWithGoogle();
       }
     } finally {

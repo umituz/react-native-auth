@@ -69,7 +69,7 @@ export function useFormField(
  */
 export function useFormFields<T extends Record<string, string>>(
   initialFields: T,
-  setFieldErrors: ((errors: Partial<Record<string, string>> | ((prev: Partial<Record<string, string>>) => Partial<Record<string, string>>)) => void) | null,
+  _setFieldErrors: ((errors: Partial<Record<string, string>> | ((prev: Partial<Record<string, string>>) => Partial<Record<string, string>>)) => void) | null,
   options?: UseFormFieldOptions
 ) {
   type FieldKey = keyof T;
