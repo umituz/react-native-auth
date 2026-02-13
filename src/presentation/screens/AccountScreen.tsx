@@ -20,6 +20,7 @@ export interface AccountScreenConfig {
     onEditProfile?: () => void;
     onSignIn?: () => void;
     title?: string;
+    PasswordPromptComponent?: React.ReactNode;
 }
 
 export interface AccountScreenProps {
@@ -30,43 +31,46 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
     const tokens = useAppDesignTokens();
 
     return (
-        <ScreenLayout
-            scrollable={true}
-            edges={['top', 'bottom']}
-            backgroundColor={tokens.colors.backgroundPrimary}
-            contentContainerStyle={styles.content}
-        >
-            <ProfileSection
-                profile={config.profile}
-                onSignIn={config.isAnonymous ? config.onSignIn : undefined}
-                signInText="Sign In"
-            />
+        <>
+            <ScreenLayout
+                scrollable={true}
+                edges={['top', 'bottom']}
+                backgroundColor={tokens.colors.backgroundPrimary}
+                contentContainerStyle={styles.content}
+            >
+                <ProfileSection
+                    profile={config.profile}
+                    onSignIn={config.isAnonymous ? config.onSignIn : undefined}
+                    signInText="Sign In"
+                />
 
-            {/* Edit Profile Option */}
-            {!config.isAnonymous && config.onEditProfile && config.editProfileText && (
-                <>
-                    <View style={styles.divider} />
-                    <TouchableOpacity
-                        style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
-                        onPress={config.onEditProfile}
-                        activeOpacity={0.7}
-                    >
-                        <AtomicIcon name="person-outline" size="md" customColor={tokens.colors.textPrimary} />
-                        <AtomicText style={[actionButtonStyle.text, { color: tokens.colors.textPrimary }]}>
-                            {config.editProfileText}
-                        </AtomicText>
-                        <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
-                    </TouchableOpacity>
-                </>
-            )}
+                {/* Edit Profile Option */}
+                {!config.isAnonymous && config.onEditProfile && config.editProfileText && (
+                    <>
+                        <View style={styles.divider} />
+                        <TouchableOpacity
+                            style={[actionButtonStyle.container, { borderColor: tokens.colors.border }]}
+                            onPress={config.onEditProfile}
+                            activeOpacity={0.7}
+                        >
+                            <AtomicIcon name="person-outline" size="md" customColor={tokens.colors.textPrimary} />
+                            <AtomicText style={[actionButtonStyle.text, { color: tokens.colors.textPrimary }]}>
+                                {config.editProfileText}
+                            </AtomicText>
+                            <AtomicIcon name="chevron-forward" size="sm" color="secondary" />
+                        </TouchableOpacity>
+                    </>
+                )}
 
-            {!config.isAnonymous && config.accountActions && (
-                <>
-                    <View style={styles.divider} />
-                    <AccountActions config={config.accountActions} />
-                </>
-            )}
-        </ScreenLayout>
+                {!config.isAnonymous && config.accountActions && (
+                    <>
+                        <View style={styles.divider} />
+                        <AccountActions config={config.accountActions} />
+                    </>
+                )}
+            </ScreenLayout>
+            {config.PasswordPromptComponent}
+        </>
     );
 };
 
