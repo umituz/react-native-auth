@@ -46,7 +46,7 @@ export function useAuthTransitions(
     cleanupRef.current?.();
 
     const cleanup = onTransition?.(result);
-    cleanupRef.current = cleanup ?? null;
+    cleanupRef.current = (typeof cleanup === 'function' ? cleanup : null);
 
     prevIsAuthenticatedRef.current = state.isAuthenticated;
     prevIsVisibleRef.current = state.isVisible;
