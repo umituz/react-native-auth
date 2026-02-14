@@ -85,6 +85,7 @@ export type { PasswordPromptScreenProps } from './presentation/screens/PasswordP
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type { AuthStackParamList } from './presentation/navigation/AuthNavigator';
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
+export type { AuthBottomSheetProps, AuthBottomSheetTranslations } from './presentation/components/AuthBottomSheet';
 export { ProfileSection } from './presentation/components/ProfileSection';
 export type { ProfileSectionProps, ProfileSectionConfig } from './presentation/components/ProfileSection';
 
