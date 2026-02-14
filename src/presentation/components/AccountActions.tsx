@@ -3,6 +3,8 @@ import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { useAppDesignTokens, AtomicIcon, AtomicText, useAlert, AlertType, AlertMode } from "@umituz/react-native-design-system";
 import { actionButtonStyle } from "../utils/commonStyles";
 
+declare const __DEV__: boolean;
+
 export interface AccountActionsConfig {
   logoutText: string;
   deleteAccountText: string;
@@ -65,17 +67,33 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
   };
 
   const handleDeleteAccount = () => {
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
+      console.log("[AccountActions] handleDeleteAccount called, showing confirmation modal");
+    }
     alert.show(AlertType.ERROR, AlertMode.MODAL, deleteConfirmTitle, deleteConfirmMessage, {
       actions: [
-        { id: "cancel", label: cancelText, style: "secondary", onPress: () => {} },
+        { id: "cancel", label: cancelText, style: "secondary", onPress: () => {
+          if (typeof __DEV__ !== "undefined" && __DEV__) {
+            console.log("[AccountActions] Delete account cancelled");
+          }
+        } },
         {
           id: "confirm",
           label: deleteAccountText,
           style: "destructive",
           onPress: async () => {
+            if (typeof __DEV__ !== "undefined" && __DEV__) {
+              console.log("[AccountActions] Delete account confirmed, modal should be closed now, calling onDeleteAccount");
+            }
             try {
               await onDeleteAccount();
-            } catch {
+              if (typeof __DEV__ !== "undefined" && __DEV__) {
+                console.log("[AccountActions] onDeleteAccount completed successfully");
+              }
+            } catch (error) {
+              if (typeof __DEV__ !== "undefined" && __DEV__) {
+                console.error("[AccountActions] onDeleteAccount failed:", error);
+              }
               alert.showError(deleteErrorTitle, deleteErrorMessage, { mode: AlertMode.MODAL });
             }
           },

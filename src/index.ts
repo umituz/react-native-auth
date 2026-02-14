@@ -61,6 +61,10 @@ export { useAppleAuth } from './presentation/hooks/useAppleAuth';
 export type { UseAppleAuthResult } from './presentation/hooks/useAppleAuth';
 export { useAuthBottomSheet } from './presentation/hooks/useAuthBottomSheet';
 export type { SocialAuthConfiguration } from './presentation/hooks/useAuthBottomSheet';
+export { useAuthHandlers } from './presentation/hooks/useAuthHandlers';
+export type { AuthHandlersAppInfo, AuthHandlersTranslations } from './presentation/hooks/useAuthHandlers';
+export { usePasswordPromptNavigation } from './presentation/hooks/usePasswordPromptNavigation';
+export type { UsePasswordPromptNavigationOptions, UsePasswordPromptNavigationReturn } from './presentation/hooks/usePasswordPromptNavigation';
 
 // =============================================================================
 // PRESENTATION LAYER - Components
@@ -76,6 +80,8 @@ export { AccountScreen } from './presentation/screens/AccountScreen';
 export type { AccountScreenProps, AccountScreenConfig } from './presentation/screens/AccountScreen';
 export { EditProfileScreen } from './presentation/screens/EditProfileScreen';
 export type { EditProfileScreenProps } from './presentation/screens/EditProfileScreen';
+export { PasswordPromptScreen } from './presentation/screens/PasswordPromptScreen';
+export type { PasswordPromptScreenProps } from './presentation/screens/PasswordPromptScreen';
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
 export type { AuthStackParamList } from './presentation/navigation/AuthNavigator';
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';

@@ -29,6 +29,16 @@ export function getAuthErrorLocalizationKey(error: unknown): string {
     AUTH_USER_DISABLED: "auth.errors.userDisabled",
     AUTH_NOT_INITIALIZED: "auth.errors.authNotInitialized",
     AUTH_INVALID_CREDENTIAL: "auth.errors.invalidCredential",
+    "auth/invalid-email": "auth.errors.invalidEmail",
+    "auth/weak-password": "auth.errors.weakPassword",
+    "auth/user-not-found": "auth.errors.invalidCredential",
+    "auth/wrong-password": "auth.errors.invalidCredential",
+    "auth/email-already-in-use": "auth.errors.emailAlreadyInUse",
+    "auth/network-request-failed": "auth.errors.networkError",
+    "auth/too-many-requests": "auth.errors.tooManyRequests",
+    "auth/user-disabled": "auth.errors.userDisabled",
+    "auth/invalid-credential": "auth.errors.invalidCredential",
+    "auth/invalid-login-credentials": "auth.errors.invalidCredential",
   };
 
   // Check error name for specific error types

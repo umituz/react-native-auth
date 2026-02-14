@@ -5,7 +5,9 @@
 
 import { useCallback, useState } from "react";
 import { useAuth } from "./useAuth";
-import { deleteCurrentUser, usePasswordPrompt } from "@umituz/react-native-firebase";
+import { deleteCurrentUser } from "@umituz/react-native-firebase";
+
+declare const __DEV__: boolean;
 
 export interface UseAccountManagementOptions {
   /**
@@ -15,16 +17,9 @@ export interface UseAccountManagementOptions {
   onReauthRequired?: () => Promise<string | null>;
   /**
    * Callback invoked when password reauthentication is required
-   * If not provided, built-in Alert.prompt will be used
+   * Required for password-based accounts
    */
   onPasswordRequired?: () => Promise<string | null>;
-  /**
-   * Translations for built-in password prompt
-   */
-  passwordPromptTitle?: string;
-  passwordPromptMessage?: string;
-  passwordPromptCancel?: string;
-  passwordPromptConfirm?: string;
 }
 
 export interface UseAccountManagementReturn {
@@ -32,7 +27,6 @@ export interface UseAccountManagementReturn {
   deleteAccount: () => Promise<void>;
   isLoading: boolean;
   isDeletingAccount: boolean;
-  PasswordPromptComponent: React.ReactNode;
 }
 
 export const useAccountManagement = (
@@ -41,30 +35,17 @@ export const useAccountManagement = (
   const { user, loading, signOut } = useAuth();
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
-  const {
-    onReauthRequired,
-    onPasswordRequired,
-    passwordPromptTitle = "Password Required",
-    passwordPromptMessage = "Enter your password to delete account",
-    passwordPromptCancel = "Cancel",
-    passwordPromptConfirm = "Confirm",
-  } = options;
-
-  const { showPasswordPrompt, PasswordPromptComponent } = usePasswordPrompt({
-    title: passwordPromptTitle,
-    message: passwordPromptMessage,
-    cancelText: passwordPromptCancel,
-    confirmText: passwordPromptConfirm,
-  });
-
-  const passwordHandler = onPasswordRequired || showPasswordPrompt;
+  const { onReauthRequired, onPasswordRequired } = options;
 
   const logout = useCallback(async () => {
     await signOut();
   }, [signOut]);
 
   const deleteAccount = useCallback(async () => {
-    console.log("[useAccountManagement] deleteAccount called", { user: user?.uid });
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
+      console.log("[useAccountManagement] deleteAccount called, user:", user);
+    }
+
     if (!user) {
       throw new Error("No user logged in");
     }
@@ -76,14 +57,23 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
-      console.log("[useAccountManagement] Calling deleteCurrentUser...");
+      if (typeof __DEV__ !== "undefined" && __DEV__) {
+        console.log("[useAccountManagement] Calling deleteCurrentUser with options:", {
+          autoReauthenticate: true,
+          hasOnPasswordRequired: !!onPasswordRequired,
+          hasOnReauthRequired: !!onReauthRequired,
+        });
+      }
+
       const result = await deleteCurrentUser({
         autoReauthenticate: true,
-        onPasswordRequired: passwordHandler,
+        onPasswordRequired,
         onGoogleReauthRequired: onReauthRequired,
       });
 
-      console.log("[useAccountManagement] deleteCurrentUser result:", result);
+      if (typeof __DEV__ !== "undefined" && __DEV__) {
+        console.log("[useAccountManagement] deleteCurrentUser result:", result);
+      }
 
       if (!result.success) {
         throw new Error(result.error?.message || "Failed to delete account");
@@ -91,13 +81,12 @@ export const useAccountManagement = (
     } finally {
       setIsDeletingAccount(false);
     }
-  }, [user, passwordHandler, onReauthRequired]);
+  }, [user, onPasswordRequired, onReauthRequired]);
 
   return {
     logout,
     deleteAccount,
     isLoading: loading,
     isDeletingAccount,
-    PasswordPromptComponent,
   };
 };
