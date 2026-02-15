@@ -34,14 +34,16 @@ export function initializeAuthListener(
   if (!startInitialization()) {
     // Either already initializing or initialized - handle accordingly
     if (isListenerInitialized()) {
-      return handleExistingInitialization()!;
+      const unsubscribe = handleExistingInitialization();
+      return unsubscribe || handleInitializationInProgress();
     }
     return handleInitializationInProgress();
   }
 
   // If already initialized, increment ref count and return unsubscribe
   if (isListenerInitialized()) {
-    return handleExistingInitialization()!;
+    const unsubscribe = handleExistingInitialization();
+    return unsubscribe || (() => {});
   }
 
   const auth = getFirebaseAuth();

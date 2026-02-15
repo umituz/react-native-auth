@@ -49,7 +49,8 @@ export const PasswordPromptScreen: React.FC<PasswordPromptScreenProps> = ({
     if (typeof __DEV__ !== "undefined" && __DEV__) {
       console.log("[PasswordPromptScreen] handleConfirm called, password length:", password.length);
     }
-    if (!password.trim()) {
+    // Don't trim password - whitespace may be intentional
+    if (!password) {
       setError('Password is required');
       return;
     }

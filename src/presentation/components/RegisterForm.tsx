@@ -128,7 +128,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <AtomicButton
         variant="primary"
         onPress={() => { void handleSignUp(); }}
-        disabled={loading || !email.trim() || !password.trim() || !confirmPassword.trim()}
+        disabled={loading || !email.trim() || !password || !confirmPassword}
         fullWidth
         style={styles.signUpButton}
       >

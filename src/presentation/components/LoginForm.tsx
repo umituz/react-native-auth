@@ -68,7 +68,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <AtomicButton
         variant="primary"
         onPress={() => { void handleSignIn(); }}
-        disabled={loading || !email.trim() || !password.trim()}
+        disabled={loading || !email.trim() || !password}
         fullWidth
         style={styles.signInButton}
       >

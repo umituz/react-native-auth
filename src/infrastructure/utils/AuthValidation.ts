@@ -34,7 +34,8 @@ export function validateEmail(
 }
 
 export function validatePasswordForLogin(password: string): ValidationResult {
-  if (!password || password.trim().length === 0) return { isValid: false, error: "auth.validation.passwordRequired" };
+  // Don't trim passwords - whitespace may be intentional
+  if (!password || password.length === 0) return { isValid: false, error: "auth.validation.passwordRequired" };
   return { isValid: true };
 }
 
@@ -42,7 +43,8 @@ export function validatePasswordForRegister(
   password: string,
   config: PasswordConfig,
 ): PasswordStrengthResult {
-  if (!password || password.trim().length === 0) {
+  // Don't trim passwords - whitespace may be intentional
+  if (!password || password.length === 0) {
     return { isValid: false, error: "auth.validation.passwordRequired", requirements: { hasMinLength: false } };
   }
 
@@ -56,7 +58,8 @@ export function validatePasswordForRegister(
 }
 
 export function validatePasswordConfirmation(password: string, confirm: string): ValidationResult {
-  if (!confirm || confirm.trim().length === 0) return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
+  // Don't trim passwords - whitespace may be intentional
+  if (!confirm || confirm.length === 0) return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
   if (password !== confirm) return { isValid: false, error: "auth.validation.passwordsDoNotMatch" };
   return { isValid: true };
 }
