@@ -6,6 +6,7 @@
 import type { User } from "firebase/auth";
 import { ensureUserDocument } from "@umituz/react-native-firebase";
 import { detectConversion, type ConversionState } from "./authConversionDetector";
+import { safeCallback } from "./safeCallback";
 
 export interface AuthStateHandlerOptions {
   onUserConverted?: (anonymousId: string, authenticatedId: string) => void | Promise<void>;
@@ -24,7 +25,7 @@ export function createAuthStateHandler(
 
     if (!user) {
       state.current = { previousUserId: null, wasAnonymous: false };
-      await onAuthStateChange?.(null);
+      await safeCallback(onAuthStateChange, [null], '[AuthStateHandler]');
       return;
     }
 
@@ -34,11 +35,11 @@ export function createAuthStateHandler(
     const conversion = detectConversion(state.current, currentUserId, isCurrentlyAnonymous);
 
     if (conversion.isConversion && onUserConverted && state.current.previousUserId) {
-      try {
-        await onUserConverted(state.current.previousUserId, currentUserId);
-      } catch {
-        // Silently fail - conversion callback errors are handled elsewhere
-      }
+      await safeCallback(
+        onUserConverted,
+        [state.current.previousUserId, currentUserId],
+        '[AuthStateHandler]'
+      );
     }
 
     const extras = conversion.isConversion && state.current.previousUserId
@@ -58,13 +59,6 @@ export function createAuthStateHandler(
     };
 
     // Call user callback with error handling
-    if (onAuthStateChange) {
-      try {
-        await onAuthStateChange(user);
-      } catch (error) {
-        console.error('[AuthStateHandler] User callback error:', error);
-        // Don't propagate user callback errors
-      }
-    }
+    await safeCallback(onAuthStateChange, [user], '[AuthStateHandler]');
   };
 }

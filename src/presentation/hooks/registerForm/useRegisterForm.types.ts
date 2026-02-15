@@ -3,12 +3,10 @@
  * Type definitions for register form hook
  */
 
-export type FieldErrors = {
-  displayName?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-};
+import type { FieldErrors as GenericFieldErrors } from "../../utils/form/formErrorUtils";
+
+export type RegisterFieldKey = "displayName" | "email" | "password" | "confirmPassword";
+export type FieldErrors = GenericFieldErrors<RegisterFieldKey>;
 
 export interface RegisterFormTranslations {
   successTitle: string;

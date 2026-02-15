@@ -9,7 +9,7 @@ import {
   validatePasswordConfirmation,
   type PasswordRequirements,
   type ValidationResult,
-} from "../../../infrastructure/utils/AuthValidation";
+} from "../../../application/services/ValidationService";
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
 
 export interface UsePasswordValidationResult {

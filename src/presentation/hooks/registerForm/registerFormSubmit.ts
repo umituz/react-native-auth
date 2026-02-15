@@ -10,8 +10,8 @@ import {
   validateRegisterForm,
   errorsToFieldErrors,
 } from "../../utils/form/formValidation.util";
-import { getAuthErrorLocalizationKey } from "../../utils/getAuthErrorMessage";
 import type { FieldErrors, RegisterFormTranslations } from "./useRegisterForm.types";
+import { sanitizeEmail, sanitizeName } from "../../../infrastructure/utils/validation/sanitization";
 
 interface RegisterFormFields {
   displayName: string;
@@ -27,6 +27,7 @@ export function useRegisterFormSubmit(
   setLocalError: React.Dispatch<React.SetStateAction<string | null>>,
   clearFormErrors: () => void,
   getErrorMessage: (key: string) => string,
+  handleAuthError: (error: unknown) => string,
   translations?: RegisterFormTranslations
 ) {
   const handleSignUp = useCallback(async () => {
@@ -34,8 +35,8 @@ export function useRegisterFormSubmit(
 
     const validation = validateRegisterForm(
       {
-        displayName: fields.displayName.trim() || undefined,
-        email: fields.email.trim(),
+        displayName: sanitizeName(fields.displayName) || undefined,
+        email: sanitizeEmail(fields.email),
         password: fields.password,
         confirmPassword: fields.confirmPassword,
       },
@@ -49,16 +50,15 @@ export function useRegisterFormSubmit(
     }
 
     try {
-      await signUp(fields.email.trim(), fields.password, fields.displayName.trim() || undefined);
+      await signUp(sanitizeEmail(fields.email), fields.password, sanitizeName(fields.displayName) || undefined);
 
       if (translations) {
         alertService.success(translations.successTitle, translations.signUpSuccess);
       }
     } catch (err: unknown) {
-      const localizationKey = getAuthErrorLocalizationKey(err);
-      setLocalError(getErrorMessage(localizationKey));
+      setLocalError(handleAuthError(err));
     }
-  }, [fields, signUp, translations, getErrorMessage, clearFormErrors, setFieldErrors, setLocalError]);
+  }, [fields, signUp, translations, handleAuthError, getErrorMessage, clearFormErrors, setFieldErrors, setLocalError]);
 
   return { handleSignUp };
 }

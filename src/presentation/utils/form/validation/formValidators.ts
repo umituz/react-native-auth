@@ -8,7 +8,7 @@ import {
   validatePasswordForLogin,
   validatePasswordForRegister,
   validatePasswordConfirmation,
-} from "../../../../infrastructure/utils/AuthValidation";
+} from "../../../../application/services/ValidationService";
 import type { PasswordConfig } from "../../../../domain/value-objects/AuthConfig";
 import type {
   FormValidationResult,
@@ -17,6 +17,7 @@ import type {
   ProfileFormValues,
   FormValidationError,
 } from "./formValidation.types";
+import { sanitizeEmail, sanitizeName } from "../../../../infrastructure/utils/validation/sanitization";
 
 export function validateLoginForm(
   values: LoginFormValues,
@@ -24,7 +25,7 @@ export function validateLoginForm(
 ): FormValidationResult {
   const errors: FormValidationError[] = [];
 
-  const emailResult = validateEmail(values.email.trim());
+  const emailResult = validateEmail(sanitizeEmail(values.email));
   if (!emailResult.isValid && emailResult.error) {
     errors.push({ field: "email", message: getErrorMessage(emailResult.error) });
   }
@@ -44,7 +45,7 @@ export function validateRegisterForm(
 ): FormValidationResult {
   const errors: FormValidationError[] = [];
 
-  const emailResult = validateEmail(values.email.trim());
+  const emailResult = validateEmail(sanitizeEmail(values.email));
   if (!emailResult.isValid && emailResult.error) {
     errors.push({ field: "email", message: getErrorMessage(emailResult.error) });
   }
@@ -68,7 +69,7 @@ export function validateProfileForm(
 ): FormValidationResult {
   const errors: FormValidationError[] = [];
 
-  if (!values.displayName || !values.displayName.trim()) {
+  if (!values.displayName || !sanitizeName(values.displayName)) {
     errors.push({
       field: "displayName",
       message: getErrorMessage("auth.validation.displayNameRequired"),
@@ -76,7 +77,7 @@ export function validateProfileForm(
   }
 
   if (values.email) {
-    const emailResult = validateEmail(values.email.trim());
+    const emailResult = validateEmail(sanitizeEmail(values.email));
     if (!emailResult.isValid && emailResult.error) {
       errors.push({ field: "email", message: getErrorMessage(emailResult.error) });
     }

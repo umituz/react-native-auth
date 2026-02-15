@@ -7,6 +7,7 @@ import type { Auth, User } from "firebase/auth";
 import type { AuthActions } from "../../../types/auth-store.types";
 import { completeInitialization } from "./listenerState.util";
 import { handleAnonymousMode } from "./anonymousHandler";
+import { safeCallbackSync } from "../safeCallback";
 
 type Store = AuthActions & { isAnonymous: boolean };
 
@@ -38,19 +39,7 @@ export function handleAuthStateChange(
     }
 
     // Call user callback with proper error handling for async callbacks
-    if (onAuthStateChange) {
-      try {
-        const result = onAuthStateChange(user);
-        // If callback returns a promise, catch rejections
-        if (result && typeof result.then === 'function') {
-          result.catch((error) => {
-            console.error("[AuthListener] User callback promise rejected:", error);
-          });
-        }
-      } catch (error) {
-        console.error("[AuthListener] User callback error:", error);
-      }
-    }
+    safeCallbackSync(onAuthStateChange, [user], '[AuthListener]');
   } catch (error) {
     console.error("[AuthListener] Error handling auth state change:", error);
     // Ensure we don't leave the app in a bad state

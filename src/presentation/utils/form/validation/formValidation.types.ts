@@ -3,15 +3,11 @@
  * Type definitions for form validation
  */
 
-export interface FormValidationError {
-  field: string;
-  message: string;
-}
-
-export interface FormValidationResult {
-  isValid: boolean;
-  errors: FormValidationError[];
-}
+// Export shared validation types
+export type {
+  FormValidationError,
+  FormValidationResult,
+} from "../../../../infrastructure/utils/validation/types";
 
 export interface LoginFormValues {
   email: string;

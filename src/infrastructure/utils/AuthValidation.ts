@@ -1,14 +1,17 @@
 import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
+import { isEmptyEmail, isEmptyPassword, isEmptyName } from "./validation/validationHelpers";
+import type {
+  ValidationResult,
+  PasswordStrengthResult,
+  PasswordRequirements,
+} from "./validation/types";
 
-export interface ValidationResult {
-  isValid: boolean;
-  error?: string;
-}
-
-export interface PasswordStrengthResult extends ValidationResult { requirements: PasswordRequirements; }
-export interface PasswordRequirements {
-  hasMinLength: boolean;
-}
+// Export validation types
+export type {
+  ValidationResult,
+  PasswordStrengthResult,
+  PasswordRequirements,
+};
 
 export interface ValidationConfig {
   emailRegex: RegExp;
@@ -28,14 +31,14 @@ export function validateEmail(
   email: string,
   config: ValidationConfig = DEFAULT_VAL_CONFIG
 ): ValidationResult {
-  if (!email || email.trim() === "") return { isValid: false, error: "auth.validation.emailRequired" };
+  if (isEmptyEmail(email)) return { isValid: false, error: "auth.validation.emailRequired" };
   if (!config.emailRegex.test(email.trim())) return { isValid: false, error: "auth.validation.invalidEmail" };
   return { isValid: true };
 }
 
 export function validatePasswordForLogin(password: string): ValidationResult {
   // Don't trim passwords - whitespace may be intentional
-  if (!password || password.length === 0) return { isValid: false, error: "auth.validation.passwordRequired" };
+  if (isEmptyPassword(password)) return { isValid: false, error: "auth.validation.passwordRequired" };
   return { isValid: true };
 }
 
@@ -44,7 +47,7 @@ export function validatePasswordForRegister(
   config: PasswordConfig,
 ): PasswordStrengthResult {
   // Don't trim passwords - whitespace may be intentional
-  if (!password || password.length === 0) {
+  if (isEmptyPassword(password)) {
     return { isValid: false, error: "auth.validation.passwordRequired", requirements: { hasMinLength: false } };
   }
 
@@ -59,7 +62,7 @@ export function validatePasswordForRegister(
 
 export function validatePasswordConfirmation(password: string, confirm: string): ValidationResult {
   // Don't trim passwords - whitespace may be intentional
-  if (!confirm || confirm.length === 0) return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
+  if (isEmptyPassword(confirm)) return { isValid: false, error: "auth.validation.confirmPasswordRequired" };
   if (password !== confirm) return { isValid: false, error: "auth.validation.passwordsDoNotMatch" };
   return { isValid: true };
 }
@@ -68,7 +71,7 @@ export function validateDisplayName(
   name: string,
   minLength: number = DEFAULT_VAL_CONFIG.displayNameMinLength
 ): ValidationResult {
-  if (!name || name.trim() === "") return { isValid: false, error: "auth.validation.nameRequired" };
+  if (isEmptyName(name)) return { isValid: false, error: "auth.validation.nameRequired" };
   if (name.trim().length < minLength) return { isValid: false, error: "auth.validation.nameTooShort" };
   return { isValid: true };
 }

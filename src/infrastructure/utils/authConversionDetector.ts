@@ -29,7 +29,7 @@ export function detectConversion(
   const isSameUser =
     previousUserId === currentUserId && wasAnonymous && !isCurrentlyAnonymous;
 
-  // Different UID after anonymous (legacy flow)
+  // Different UID after anonymous (account creation with new credentials)
   const isNewUser =
     !!previousUserId &&
     previousUserId !== currentUserId &&

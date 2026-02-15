@@ -4,10 +4,8 @@
  */
 
 import { useCallback } from "react";
-import type { FieldErrors } from "./useRegisterForm.types";
+import type { FieldErrors, RegisterFieldKey } from "./useRegisterForm.types";
 import { clearFieldError, clearFieldErrors } from "../../utils/form/formErrorUtils";
-
-type RegisterFieldKey = "displayName" | "email" | "password" | "confirmPassword";
 
 export function useRegisterFormHandlers(
   updateField: (field: RegisterFieldKey, value: string) => void,

@@ -8,7 +8,7 @@ import { onIdTokenChanged } from "firebase/auth";
 import type { AuthActions } from "../../../types/auth-store.types";
 import { getAuthService } from "../../services/AuthService";
 import { completeInitialization, setUnsubscribe } from "./listenerState.util";
-import { handleAuthStateChange } from "./authStateHandler";
+import { handleAuthStateChange } from "./authListenerStateHandler";
 
 type Store = AuthActions & { isAnonymous: boolean };
 

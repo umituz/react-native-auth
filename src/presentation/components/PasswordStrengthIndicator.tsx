@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens, AtomicText, type ColorVariant } from "@umituz/react-native-design-system";
-import type { PasswordRequirements } from "../../infrastructure/utils/AuthValidation";
+import type { PasswordRequirements } from "../../application/services/ValidationService";
 
 export interface PasswordStrengthTranslations {
   minLength: string;

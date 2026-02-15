@@ -32,8 +32,11 @@ export { initializeAuth, isAuthInitialized, resetAuthInitialization } from './in
 export type { InitializeAuthOptions } from './infrastructure/services/initializeAuth';
 export { validateEmail, validatePasswordForLogin, validatePasswordForRegister, validatePasswordConfirmation, validateDisplayName } from './infrastructure/utils/AuthValidation';
 export type { ValidationResult, PasswordStrengthResult, PasswordRequirements } from './infrastructure/utils/AuthValidation';
-export { SECURITY_LIMITS, sanitizeWhitespace, sanitizeEmail, sanitizePassword, sanitizeName, sanitizeText, containsDangerousChars, isWithinLengthLimit } from './infrastructure/utils/validation/sanitization';
+export type { BaseValidationResult, FormValidationError, FormValidationResult } from './infrastructure/utils/validation/types';
+export { SECURITY_LIMITS, sanitizeEmail, sanitizePassword, sanitizeName } from './infrastructure/utils/validation/sanitization';
 export type { SecurityLimitKey } from './infrastructure/utils/validation/sanitization';
+export { isEmpty, isEmptyEmail, isEmptyPassword, isEmptyName, isNotEmpty, hasContent } from './infrastructure/utils/validation/validationHelpers';
+export { safeCallback, safeCallbackSync } from './infrastructure/utils/safeCallback';
 export { getEffectiveUserId } from './infrastructure/utils/getEffectiveUserId';
 
 // =============================================================================
@@ -66,6 +69,10 @@ export { useAuthHandlers } from './presentation/hooks/useAuthHandlers';
 export type { AuthHandlersAppInfo, AuthHandlersTranslations } from './presentation/hooks/useAuthHandlers';
 export { usePasswordPromptNavigation } from './presentation/hooks/usePasswordPromptNavigation';
 export type { UsePasswordPromptNavigationOptions, UsePasswordPromptNavigationReturn } from './presentation/hooks/usePasswordPromptNavigation';
+export { useAuthErrorHandler } from './presentation/hooks/useAuthErrorHandler';
+export type { UseAuthErrorHandlerConfig, UseAuthErrorHandlerResult } from './presentation/hooks/useAuthErrorHandler';
+export { useLocalError } from './presentation/hooks/useLocalError';
+export type { UseLocalErrorResult } from './presentation/hooks/useLocalError';
 
 // =============================================================================
 // PRESENTATION LAYER - Components

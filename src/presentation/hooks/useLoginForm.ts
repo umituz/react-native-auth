@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "./useAuth";
-import { getAuthErrorLocalizationKey, resolveErrorMessage } from "../utils/getAuthErrorMessage";
 import { validateLoginForm } from "../utils/form/formValidation.util";
 import { alertService } from "@umituz/react-native-design-system";
 import { useFormFields } from "../utils/form/useFormField.hook";
+import { sanitizeEmail } from "../../infrastructure/utils/validation/sanitization";
+import { useAuthErrorHandler } from "./useAuthErrorHandler";
+import { useLocalError } from "./useLocalError";
 
 export interface LoginFormTranslations {
   successTitle: string;
@@ -32,14 +34,11 @@ export interface UseLoginFormResult {
 export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const { signIn, loading, error, continueAnonymously } = useAuth();
   const translations = config?.translations;
+  const { handleAuthError, getErrorMessage } = useAuthErrorHandler({ translations: translations?.errors });
+  const { localError, setLocalError, clearLocalError } = useLocalError();
 
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  const clearLocalError = useCallback(() => {
-    setLocalError(null);
-  }, []);
 
   const clearFieldErrorsState = useCallback(() => {
     setEmailError(null);
@@ -52,10 +51,6 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     null,
     { clearLocalError }
   );
-
-  const getErrorMessage = useCallback((key: string) => {
-    return resolveErrorMessage(key, translations?.errors);
-  }, [translations]);
 
   const clearErrors = useCallback(() => {
     clearFieldErrorsState();
@@ -81,7 +76,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     clearErrors();
 
     const validation = validateLoginForm(
-      { email: fields.email.trim(), password: fields.password },
+      { email: sanitizeEmail(fields.email), password: fields.password },
       getErrorMessage
     );
 
@@ -94,7 +89,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     }
 
     try {
-      await signIn(fields.email.trim(), fields.password);
+      await signIn(sanitizeEmail(fields.email), fields.password);
 
       if (translations) {
         alertService.success(
@@ -103,10 +98,9 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
         );
       }
     } catch (err: unknown) {
-      const localizationKey = getAuthErrorLocalizationKey(err);
-      setLocalError(getErrorMessage(localizationKey));
+      setLocalError(handleAuthError(err));
     }
-  }, [fields, signIn, translations, getErrorMessage, clearErrors]);
+  }, [fields, signIn, translations, handleAuthError, getErrorMessage, clearErrors]);
 
   const handleContinueAnonymously = useCallback(async () => {
     try {

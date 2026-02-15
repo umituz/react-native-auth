@@ -13,7 +13,11 @@ export const SECURITY_LIMITS = {
 
 export type SecurityLimitKey = keyof typeof SECURITY_LIMITS;
 
-export const sanitizeWhitespace = (input: string): string => {
+/**
+ * Internal helper to sanitize whitespace
+ * Used by sanitizeName
+ */
+const sanitizeWhitespace = (input: string): string => {
   if (!input) return '';
   return input.trim().replace(/\s+/g, ' ');
 };
@@ -36,33 +40,4 @@ export const sanitizeName = (name: string): string => {
   const trimmed = sanitizeWhitespace(name);
   const noTags = trimmed.replace(/<[^>]*>/g, '');
   return noTags.substring(0, SECURITY_LIMITS.NAME_MAX_LENGTH);
-};
-
-export const sanitizeText = (text: string): string => {
-  if (!text) return '';
-  const trimmed = sanitizeWhitespace(text);
-  const noTags = trimmed.replace(/<[^>]*>/g, '');
-  return noTags.substring(0, SECURITY_LIMITS.GENERAL_TEXT_MAX_LENGTH);
-};
-
-export const containsDangerousChars = (input: string): boolean => {
-  if (!input) return false;
-  const dangerousPatterns = [
-    /<script/i,
-    /javascript:/i,
-    /on\w+\s*=/i,
-    /<iframe/i,
-    /eval\(/i,
-  ];
-  return dangerousPatterns.some(pattern => pattern.test(input));
-};
-
-export const isWithinLengthLimit = (
-  input: string,
-  maxLength: number,
-  minLength = 0
-): boolean => {
-  if (!input) return minLength === 0;
-  const length = input.trim().length;
-  return length >= minLength && length <= maxLength;
 };

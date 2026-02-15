@@ -1,6 +1,6 @@
 /**
  * Auth Listener Lifecycle - Main Export
- * Re-exports all listener lifecycle utilities from modular files
+ * Exports all listener lifecycle utilities from modular files
  */
 
 // Cleanup handlers
@@ -14,7 +14,7 @@ export {
 export { setupAuthListener } from "./setupListener";
 
 // Auth state handler
-export { handleAuthStateChange } from "./authStateHandler";
+export { handleAuthStateChange } from "./authListenerStateHandler";
 
 // Anonymous mode handler
 export { handleAnonymousMode } from "./anonymousHandler";

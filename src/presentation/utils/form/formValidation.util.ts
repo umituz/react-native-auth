@@ -1,6 +1,6 @@
 /**
  * Form Validation - Main Export
- * Re-exports all form validation utilities
+ * Exports all form validation utilities
  */
 
 // Types

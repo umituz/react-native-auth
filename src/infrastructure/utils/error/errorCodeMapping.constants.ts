@@ -9,8 +9,8 @@ import { CONFIG_ERROR_MAPPINGS } from "./mappings/configErrorMappings";
 import { NETWORK_ERROR_MAPPINGS } from "./mappings/networkErrorMappings";
 import { ACTION_CODE_ERROR_MAPPINGS } from "./mappings/actionCodeErrorMappings";
 
-// Re-export types for backward compatibility
-export type { ErrorConstructor, ErrorFactory, ErrorMapping } from "./mappings/errorMapping.types";
+// Export types needed by AuthErrorMapper
+export type { ErrorConstructor, ErrorFactory } from "./mappings/errorMapping.types";
 
 /**
  * Combined Firebase error code to domain error mapping
