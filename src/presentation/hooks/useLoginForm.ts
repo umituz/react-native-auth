@@ -106,7 +106,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
       const localizationKey = getAuthErrorLocalizationKey(err);
       setLocalError(getErrorMessage(localizationKey));
     }
-  }, [fields, signIn, translations, getErrorMessage, clearErrors, updateField]);
+  }, [fields, signIn, translations, getErrorMessage, clearErrors]);
 
   const handleContinueAnonymously = useCallback(async () => {
     try {

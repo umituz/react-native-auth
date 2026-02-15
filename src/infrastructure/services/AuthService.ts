@@ -16,6 +16,7 @@ export class AuthService {
   private anonymousModeService: AnonymousModeService;
   private storageProvider?: IStorageProvider;
   private initialized: boolean = false;
+  private initializationPromise: Promise<void> | null = null;
   private config: AuthConfig;
 
   constructor(config: Partial<AuthConfig> = {}, storageProvider?: IStorageProvider) {
@@ -30,14 +31,28 @@ export class AuthService {
   }
 
   async initialize(): Promise<void> {
+    // Return existing promise if initialization is in progress
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
     if (this.initialized) return;
 
-    this.repository = new AuthRepository(this.config);
+    // Create and store initialization promise to prevent concurrent initialization
+    this.initializationPromise = (async () => {
+      this.repository = new AuthRepository(this.config);
 
-    if (this.storageProvider) {
-      await this.anonymousModeService.load(this.storageProvider);
+      if (this.storageProvider) {
+        await this.anonymousModeService.load(this.storageProvider);
+      }
+      this.initialized = true;
+    })();
+
+    try {
+      await this.initializationPromise;
+    } finally {
+      this.initializationPromise = null;
     }
-    this.initialized = true;
   }
 
   isInitialized(): boolean {
@@ -65,7 +80,12 @@ export class AuthService {
 
   private async clearAnonymousModeIfNeeded(): Promise<void> {
     if (this.anonymousModeService.getIsAnonymousMode() && this.storageProvider) {
-      await this.anonymousModeService.clear(this.storageProvider);
+      const success = await this.anonymousModeService.clear(this.storageProvider);
+      if (!success) {
+        console.warn('[AuthService] Failed to clear anonymous mode from storage');
+        // Force clear in memory to maintain consistency
+        this.anonymousModeService.setAnonymousMode(false);
+      }
     }
   }
 

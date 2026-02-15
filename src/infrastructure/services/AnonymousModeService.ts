@@ -21,6 +21,8 @@ export class AnonymousModeService {
       this.isAnonymousMode = value === "true";
       return this.isAnonymousMode;
     } catch {
+      // On error, reset to false to maintain consistency
+      this.isAnonymousMode = false;
       return false;
     }
   }
@@ -40,14 +42,24 @@ export class AnonymousModeService {
       this.isAnonymousMode = false;
       return true;
     } catch {
-      this.isAnonymousMode = false;
+      // Don't update memory state if storage operation failed
+      // This maintains consistency between storage and memory
       return false;
     }
   }
 
   async enable(storageProvider: IStorageProvider): Promise<void> {
+    // Save to storage first, then update memory to maintain consistency
+    const previousState = this.isAnonymousMode;
     this.isAnonymousMode = true;
-    await this.save(storageProvider);
+    const saveSuccess = await this.save(storageProvider);
+
+    if (!saveSuccess) {
+      // Rollback on failure
+      this.isAnonymousMode = previousState;
+      throw new Error('Failed to save anonymous mode state');
+    }
+
     emitAnonymousModeEnabled();
   }
 

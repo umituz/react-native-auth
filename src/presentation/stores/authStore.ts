@@ -48,7 +48,13 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
         initialized: state.initialized ?? false,
       };
     }
-    return { ...initialAuthState, ...state };
+    // Only restore persisted fields (isAnonymous, initialized)
+    // Never restore runtime state (user, firebaseUser, loading, error)
+    return {
+      ...initialAuthState,
+      isAnonymous: state.isAnonymous ?? false,
+      initialized: state.initialized ?? false,
+    };
   },
   actions: (set, get) => ({
     setFirebaseUser: (firebaseUser) => {

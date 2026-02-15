@@ -65,6 +65,6 @@ export const initialAuthState: AuthState = {
 export interface AuthListenerOptions {
   /** Enable auto anonymous sign-in when no user is logged in */
   autoAnonymousSignIn?: boolean;
-  /** Callback when auth state changes */
-  onAuthStateChange?: (user: User | null) => void;
+  /** Callback when auth state changes (can be async) */
+  onAuthStateChange?: (user: User | null) => void | Promise<void>;
 }

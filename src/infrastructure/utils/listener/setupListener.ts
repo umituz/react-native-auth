@@ -19,7 +19,7 @@ export function setupAuthListener(
   auth: Auth,
   store: Store,
   autoAnonymousSignIn: boolean,
-  onAuthStateChange?: (user: User | null) => void
+  onAuthStateChange?: (user: User | null) => void | Promise<void>
 ): void {
   const service = getAuthService();
 
@@ -58,6 +58,6 @@ export function setupAuthListener(
     store.setLoading(false);
     store.setInitialized(true);
     store.setError("Failed to initialize authentication listener");
-    throw error;
+    // Don't re-throw - app state is already cleaned up and consistent
   }
 }

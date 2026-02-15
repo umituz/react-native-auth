@@ -45,13 +45,26 @@ export function createAuthStateHandler(
       ? { previousAnonymousUserId: state.current.previousUserId }
       : undefined;
 
-    await ensureUserDocument(user, extras);
+    try {
+      await ensureUserDocument(user, extras);
+    } catch (error) {
+      console.error('[AuthStateHandler] Failed to ensure user document:', error);
+      // Continue execution - don't let user document creation failure block auth flow
+    }
 
     state.current = {
       previousUserId: currentUserId,
       wasAnonymous: isCurrentlyAnonymous,
     };
 
-    await onAuthStateChange?.(user);
+    // Call user callback with error handling
+    if (onAuthStateChange) {
+      try {
+        await onAuthStateChange(user);
+      } catch (error) {
+        console.error('[AuthStateHandler] User callback error:', error);
+        // Don't propagate user callback errors
+      }
+    }
   };
 }

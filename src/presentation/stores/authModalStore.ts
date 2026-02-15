@@ -61,7 +61,8 @@ export const useAuthModalStore = createStore<AuthModalState, AuthModalActions>({
     },
 
     hideAuthModal: () => {
-      set({ isVisible: false });
+      // Clear pending callback to prevent memory leaks
+      set({ isVisible: false, pendingCallback: null });
     },
 
     setMode: (mode: AuthModalMode) => {
@@ -71,7 +72,18 @@ export const useAuthModalStore = createStore<AuthModalState, AuthModalActions>({
     executePendingCallback: () => {
       const state = get();
       if (state.pendingCallback) {
-        void state.pendingCallback();
+        // Wrap in try-catch to handle promise rejections
+        try {
+          const result = state.pendingCallback();
+          // If it's a promise, catch rejections
+          if (result && typeof result.then === 'function') {
+            result.catch((error) => {
+              console.error('[AuthModalStore] Pending callback error:', error);
+            });
+          }
+        } catch (error) {
+          console.error('[AuthModalStore] Pending callback error:', error);
+        }
         set({ pendingCallback: null });
       }
     },

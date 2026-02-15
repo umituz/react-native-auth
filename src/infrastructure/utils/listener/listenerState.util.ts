@@ -95,7 +95,11 @@ export function incrementRefCount(): number {
  * Uses cleanupInProgress flag to prevent concurrent cleanup attempts
  */
 export function decrementRefCount(): { shouldCleanup: boolean; count: number } {
-  state.refCount--;
+  // Prevent refCount from going negative
+  if (state.refCount > 0) {
+    state.refCount--;
+  }
+
   const shouldCleanup =
     state.refCount <= 0 &&
     state.unsubscribe !== null &&
@@ -132,7 +136,11 @@ export function completeAnonymousSignIn(): void {
  */
 export function resetListenerState(): void {
   if (state.unsubscribe) {
-    state.unsubscribe();
+    try {
+      state.unsubscribe();
+    } catch (error) {
+      console.error('[ListenerState] Error during unsubscribe:', error);
+    }
   }
   state.initialized = false;
   state.refCount = 0;
