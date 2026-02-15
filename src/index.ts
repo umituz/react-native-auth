@@ -34,6 +34,7 @@ export { validateEmail, validatePasswordForLogin, validatePasswordForRegister, v
 export type { ValidationResult, PasswordStrengthResult, PasswordRequirements } from './infrastructure/utils/AuthValidation';
 export { SECURITY_LIMITS, sanitizeWhitespace, sanitizeEmail, sanitizePassword, sanitizeName, sanitizeText, containsDangerousChars, isWithinLengthLimit } from './infrastructure/utils/validation/sanitization';
 export type { SecurityLimitKey } from './infrastructure/utils/validation/sanitization';
+export { getEffectiveUserId } from './infrastructure/utils/getEffectiveUserId';
 
 // =============================================================================
 // PRESENTATION LAYER - Hooks
