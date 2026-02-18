@@ -5,59 +5,9 @@
 
 import { useCallback, useState } from "react";
 
-export interface UseFormFieldOptions {
+interface UseFormFieldOptions {
   clearLocalError?: () => void;
   fieldsToClear?: string[];
-}
-
-export interface UseFormFieldResult {
-  value: string;
-  error: string | null;
-  setValue: (value: string) => void;
-  setError: (error: string | null) => void;
-  clearError: () => void;
-  handleChange: (text: string) => void;
-}
-
-/**
- * Hook for managing a single form field with automatic error clearing
- * @param initialValue - Initial field value
- * @param setError - Function to set field error in parent state
- * @param options - Additional options
- * @returns Field state and handlers
- */
-export function useFormField(
-  initialValue: string,
-  setError: (error: string | null) => void,
-  options?: UseFormFieldOptions
-): UseFormFieldResult {
-  const [value, setValue] = useState(initialValue);
-  const [error, setLocalError] = useState<string | null>(null);
-
-  const clearError = useCallback(() => {
-    setLocalError(null);
-    setError(null);
-    options?.clearLocalError?.();
-  }, [setError, options]);
-
-  const handleChange = useCallback(
-    (text: string) => {
-      setValue(text);
-      if (error) {
-        clearError();
-      }
-    },
-    [error, clearError]
-  );
-
-  return {
-    value,
-    error,
-    setValue,
-    setError: setLocalError,
-    clearError,
-    handleChange,
-  };
 }
 
 /**

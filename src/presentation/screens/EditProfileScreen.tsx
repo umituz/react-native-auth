@@ -10,7 +10,7 @@ import { EditProfileAvatar } from "../components/EditProfileAvatar";
 import { EditProfileForm } from "../components/EditProfileForm";
 import { EditProfileActions } from "../components/EditProfileActions";
 
-export interface EditProfileLabels {
+interface EditProfileLabels {
     title: string;
     displayNameLabel: string;
     displayNamePlaceholder: string;
@@ -22,7 +22,7 @@ export interface EditProfileLabels {
     cancelButton: string;
 }
 
-export interface EditProfileConfig {
+interface EditProfileConfig {
     displayName: string;
     email: string;
     photoURL: string | null;

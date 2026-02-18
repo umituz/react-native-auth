@@ -7,7 +7,7 @@ export interface PasswordStrengthTranslations {
   minLength: string;
 }
 
-export interface PasswordStrengthIndicatorProps {
+interface PasswordStrengthIndicatorProps {
   translations: PasswordStrengthTranslations;
   requirements: PasswordRequirements;
   showLabels?: boolean;

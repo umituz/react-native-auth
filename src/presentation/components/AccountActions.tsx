@@ -22,7 +22,7 @@ export interface AccountActionsConfig {
   showChangePassword?: boolean;
 }
 
-export interface AccountActionsProps {
+interface AccountActionsProps {
   config: AccountActionsConfig;
 }
 

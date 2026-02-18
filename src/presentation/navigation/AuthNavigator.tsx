@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StackNavigator,
   useAppDesignTokens,
@@ -17,12 +17,12 @@ export type AuthStackParamList = {
 
 const SHOW_REGISTER_KEY = "auth_show_register";
 
-export interface AuthNavigatorTranslations {
+interface AuthNavigatorTranslations {
   login: LoginScreenTranslations;
   register: RegisterScreenTranslations;
 }
 
-export interface AuthNavigatorProps {
+interface AuthNavigatorProps {
   translations: AuthNavigatorTranslations;
   termsUrl?: string;
   privacyUrl?: string;
@@ -57,31 +57,33 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     void checkInitialRoute();
   }, []);
 
+  const LoginScreenWrapper = useCallback(
+    (props: StackScreenProps<AuthStackParamList, "Login">) => (
+      <LoginScreen
+        {...props}
+        translations={translations.login}
+      />
+    ),
+    [translations.login]
+  );
+
+  const RegisterScreenWrapper = useCallback(
+    (props: StackScreenProps<AuthStackParamList, "Register">) => (
+      <RegisterScreen
+        {...props}
+        translations={translations.register}
+        termsUrl={termsUrl}
+        privacyUrl={privacyUrl}
+        onTermsPress={onTermsPress}
+        onPrivacyPress={onPrivacyPress}
+      />
+    ),
+    [translations.register, termsUrl, privacyUrl, onTermsPress, onPrivacyPress]
+  );
+
   if (initialRouteName === undefined) {
     return null;
   }
-
-  const LoginScreenWrapper = (
-    props: StackScreenProps<AuthStackParamList, "Login">
-  ) => (
-    <LoginScreen
-      {...props}
-      translations={translations.login}
-    />
-  );
-
-  const RegisterScreenWrapper = (
-    props: StackScreenProps<AuthStackParamList, "Register">
-  ) => (
-    <RegisterScreen
-      {...props}
-      translations={translations.register}
-      termsUrl={termsUrl}
-      privacyUrl={privacyUrl}
-      onTermsPress={onTermsPress}
-      onPrivacyPress={onPrivacyPress}
-    />
-  );
 
   const stackConfig: StackNavigatorConfig<AuthStackParamList> = {
     initialRouteName,

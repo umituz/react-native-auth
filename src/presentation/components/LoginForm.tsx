@@ -16,7 +16,7 @@ export interface LoginFormTranslations {
   createAccount: string;
 }
 
-export interface LoginFormProps {
+interface LoginFormProps {
   translations: LoginFormTranslations;
   onNavigateToRegister: () => void;
 }

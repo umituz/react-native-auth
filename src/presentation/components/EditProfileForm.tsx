@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { AtomicInput } from "@umituz/react-native-design-system";
 
-export interface EditProfileFormProps {
+interface EditProfileFormProps {
     displayName: string;
     email: string;
     onChangeDisplayName: (value: string) => void;

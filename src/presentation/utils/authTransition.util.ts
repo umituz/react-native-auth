@@ -5,13 +5,13 @@
 
 import { useRef, useEffect } from "react";
 
-export interface AuthTransitionState {
+interface AuthTransitionState {
   isAuthenticated: boolean;
   isAnonymous: boolean;
   isVisible: boolean;
 }
 
-export interface AuthTransitionResult {
+interface AuthTransitionResult {
   justAuthenticated: boolean;
   justConvertedFromAnonymous: boolean;
   shouldClose: boolean;
@@ -61,23 +61,11 @@ export function useAuthTransitions(
 }
 
 /**
- * Check if should close modal after auth transition
- */
-export function shouldCloseAfterAuth(
-  justAuthenticated: boolean,
-  justConvertedFromAnonymous: boolean,
-  isVisible: boolean,
-  isAnonymous: boolean
-): boolean {
-  return (justAuthenticated || justConvertedFromAnonymous) && isVisible && !isAnonymous;
-}
-
-/**
  * Execute callback with delay after auth
  */
 export function executeAfterAuth(
   callback: () => void,
   delay: number = 100
-): NodeJS.Timeout {
+): ReturnType<typeof setTimeout> {
   return setTimeout(callback, delay);
 }

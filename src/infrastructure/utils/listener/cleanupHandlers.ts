@@ -13,7 +13,7 @@ import {
 /**
  * Create unsubscribe function that decrements ref count
  */
-export function createUnsubscribeHandler(): () => void {
+function createUnsubscribeHandler(): () => void {
   return () => {
     const { shouldCleanup } = decrementRefCount();
 

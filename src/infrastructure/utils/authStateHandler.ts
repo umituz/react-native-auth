@@ -8,7 +8,7 @@ import { ensureUserDocument } from "@umituz/react-native-firebase";
 import { detectConversion, type ConversionState } from "./authConversionDetector";
 import { safeCallback } from "./safeCallback";
 
-export interface AuthStateHandlerOptions {
+interface AuthStateHandlerOptions {
   onUserConverted?: (anonymousId: string, authenticatedId: string) => void | Promise<void>;
   onAuthStateChange?: (user: User | null) => void | Promise<void>;
 }

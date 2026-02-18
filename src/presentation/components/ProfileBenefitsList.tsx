@@ -7,7 +7,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system";
 
-export interface ProfileBenefitsListProps {
+interface ProfileBenefitsListProps {
     benefits: string[];
 }
 
@@ -15,8 +15,8 @@ export const ProfileBenefitsList: React.FC<ProfileBenefitsListProps> = ({ benefi
 
     return (
         <View style={styles.benefitsContainer}>
-            {benefits.map((benefit, index) => (
-                <View key={index} style={styles.benefitItem}>
+            {benefits.map((benefit) => (
+                <View key={benefit} style={styles.benefitItem}>
                     <AtomicIcon name="checkmark-circle" size="sm" color="primary" />
                     <AtomicText
                         type="bodyMedium"

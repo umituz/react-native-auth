@@ -27,7 +27,7 @@ export interface RegisterFormTranslations {
   passwordMatch: PasswordMatchTranslations;
 }
 
-export interface RegisterFormProps {
+interface RegisterFormProps {
   translations: RegisterFormTranslations;
   onNavigateToLogin: () => void;
   termsUrl?: string;

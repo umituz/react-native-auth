@@ -41,14 +41,14 @@ export const DEFAULT_AUTH_CONFIG: AuthConfig = {
   social: DEFAULT_SOCIAL_CONFIG,
 };
 
-export class AuthConfigValidationError extends Error {
+class AuthConfigValidationError extends Error {
   constructor(message: string, public readonly field: string) {
     super(message);
     this.name = "AuthConfigValidationError";
   }
 }
 
-export function validateAuthConfig(config: Partial<AuthConfig>): void {
+function validateAuthConfig(config: Partial<AuthConfig>): void {
   if (config.password) {
     if (typeof config.password.minLength !== "number") {
       throw new AuthConfigValidationError("Password minLength must be a number", "password.minLength");

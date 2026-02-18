@@ -7,7 +7,7 @@ export interface AuthLegalLinksTranslations {
   privacyPolicy: string;
 }
 
-export interface AuthLegalLinksProps {
+interface AuthLegalLinksProps {
   translations: AuthLegalLinksTranslations;
   termsUrl?: string;
   privacyUrl?: string;

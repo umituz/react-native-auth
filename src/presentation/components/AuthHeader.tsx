@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
 
-export interface AuthHeaderProps {
+interface AuthHeaderProps {
   title: string;
   subtitle?: string;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { AtomicButton } from "@umituz/react-native-design-system";
 
-export interface EditProfileActionsProps {
+interface EditProfileActionsProps {
     isSaving?: boolean;
     onSave: () => void;
     onCancel?: () => void;

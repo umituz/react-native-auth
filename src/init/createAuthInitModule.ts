@@ -73,7 +73,7 @@ export function createAuthInitModule(
     storageProvider,
     onRestorePurchases,
     onUserConverted,
-    critical = true,
+    critical = false,
     dependsOn = ['firebase'],
   } = config;
 

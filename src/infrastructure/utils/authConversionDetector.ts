@@ -8,7 +8,7 @@ export interface ConversionState {
   wasAnonymous: boolean;
 }
 
-export interface ConversionResult {
+interface ConversionResult {
   isConversion: boolean;
   isSameUser: boolean;
   isNewUser: boolean;

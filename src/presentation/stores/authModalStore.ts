@@ -19,7 +19,7 @@
 
 import { createStore } from "@umituz/react-native-design-system";
 
-export type AuthModalMode = "login" | "register";
+type AuthModalMode = "login" | "register";
 
 interface AuthModalState {
   isVisible: boolean;

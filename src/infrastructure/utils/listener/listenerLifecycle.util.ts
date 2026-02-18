@@ -5,19 +5,12 @@
 
 // Cleanup handlers
 export {
-  createUnsubscribeHandler,
   handleExistingInitialization,
   handleInitializationInProgress,
 } from "./cleanupHandlers";
 
 // Setup listener
 export { setupAuthListener } from "./setupListener";
-
-// Auth state handler
-export { handleAuthStateChange } from "./authListenerStateHandler";
-
-// Anonymous mode handler
-export { handleAnonymousMode } from "./anonymousHandler";
 
 // Initialization handlers
 export {

@@ -3,7 +3,7 @@
  * Manages the state of Firebase auth listener initialization and lifecycle
  */
 
-export interface ListenerState {
+interface ListenerState {
   initialized: boolean;
   refCount: number;
   initializationInProgress: boolean;
@@ -26,27 +26,6 @@ const state: ListenerState = {
  */
 export function isListenerInitialized(): boolean {
   return state.initialized;
-}
-
-/**
- * Check if initialization is in progress
- */
-export function isInitializationInProgress(): boolean {
-  return state.initializationInProgress;
-}
-
-/**
- * Check if anonymous sign-in is in progress
- */
-export function isAnonymousSignInInProgress(): boolean {
-  return state.anonymousSignInInProgress;
-}
-
-/**
- * Get current reference count
- */
-export function getRefCount(): number {
-  return state.refCount;
 }
 
 /**

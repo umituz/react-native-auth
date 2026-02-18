@@ -8,18 +8,17 @@ import {
   validatePasswordForRegister,
   validatePasswordConfirmation,
   type PasswordRequirements,
-  type ValidationResult,
 } from "../../../application/services/ValidationService";
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
 
-export interface UsePasswordValidationResult {
+interface UsePasswordValidationResult {
   passwordRequirements: PasswordRequirements;
   passwordsMatch: boolean;
   isValid: boolean;
   confirmationError: string | null;
 }
 
-export interface UsePasswordValidationOptions {
+interface UsePasswordValidationOptions {
   passwordConfig?: PasswordConfig;
 }
 
@@ -72,16 +71,3 @@ export function usePasswordValidation(
   };
 }
 
-/**
- * Hook for login password validation (simpler, no requirements)
- * @param password - Password value
- * @returns Validation result
- */
-export function useLoginPasswordValidation(password: string): ValidationResult {
-  return useMemo(() => {
-    if (!password || password.length === 0) {
-      return { isValid: false, error: "auth.validation.passwordRequired" };
-    }
-    return { isValid: true };
-  }, [password]);
-}

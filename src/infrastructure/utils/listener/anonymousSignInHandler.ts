@@ -11,13 +11,13 @@ const MAX_ANONYMOUS_RETRIES = 2;
 const ANONYMOUS_RETRY_DELAY_MS = 1000;
 const ANONYMOUS_SIGNIN_TIMEOUT_MS = 10000;
 
-export interface AnonymousSignInCallbacks {
+interface AnonymousSignInCallbacks {
     onSignInStart: () => void;
     onSignInSuccess: () => void;
     onSignInFailure: (error: Error) => void;
 }
 
-export interface AnonymousSignInOptions {
+interface AnonymousSignInOptions {
     maxRetries?: number;
     retryDelay?: number;
     timeout?: number;
@@ -29,7 +29,7 @@ export interface AnonymousSignInOptions {
  * @param callbacks - Callback functions for sign-in events
  * @param options - Configuration options
  */
-export async function attemptAnonymousSignIn(
+async function attemptAnonymousSignIn(
     auth: Auth,
     callbacks: AnonymousSignInCallbacks,
     options: AnonymousSignInOptions = {}
@@ -76,7 +76,7 @@ async function performAnonymousSignIn(
         } catch (error) {
             // If not last attempt, wait and retry
             if (attempt < maxRetries - 1) {
-                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                await new Promise(resolve => setTimeout(() => resolve(undefined), retryDelay));
                 continue;
             }
 
@@ -119,7 +119,10 @@ export function createAnonymousSignInHandler(
                     // Listener will be triggered again with the new user
                     store.setFirebaseUser(null);
                 },
-                onSignInFailure: () => {
+                onSignInFailure: (error: Error) => {
+                    if (__DEV__) {
+                        console.error("[AnonymousSignIn] Failed:", error.message);
+                    }
                     store.setFirebaseUser(null);
                     store.setLoading(false);
                     store.setInitialized(true);

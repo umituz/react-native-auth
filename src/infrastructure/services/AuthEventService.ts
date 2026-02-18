@@ -5,17 +5,17 @@
 
 import { DeviceEventEmitter } from "react-native";
 
-export interface AuthEventPayload {
+interface AuthEventPayload {
   userId?: string;
   error?: string;
   timestamp: number;
 }
 
-export interface AuthEventListener {
+interface AuthEventListener {
   (payload: AuthEventPayload): void;
 }
 
-export class AuthEventService {
+class AuthEventService {
   private static instance: AuthEventService;
   private listeners: Map<string, AuthEventListener[]> = new Map();
 
@@ -102,14 +102,7 @@ export class AuthEventService {
 
 export const authEventService = AuthEventService.getInstance();
 
-export function emitUserAuthenticated(userId: string): void {
-  authEventService.emitUserAuthenticated(userId);
-}
-
 export function emitAnonymousModeEnabled(): void {
   authEventService.emitAnonymousModeEnabled();
 }
 
-export function emitAuthError(error: string): void {
-  authEventService.emitAuthError(error);
-}

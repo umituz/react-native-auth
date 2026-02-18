@@ -101,7 +101,6 @@ export const PasswordPromptScreen: React.FC<PasswordPromptScreenProps> = ({
               }}
               placeholder="Password"
               secureTextEntry
-              autoFocus
               state={error ? 'error' : 'default'}
               helperText={error}
               style={{ marginBottom: tokens.spacing.md }}

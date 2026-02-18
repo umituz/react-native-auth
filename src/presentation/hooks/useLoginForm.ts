@@ -7,7 +7,7 @@ import { sanitizeEmail } from "../../infrastructure/utils/validation/sanitizatio
 import { useAuthErrorHandler } from "./useAuthErrorHandler";
 import { useLocalError } from "./useLocalError";
 
-export interface LoginFormTranslations {
+interface LoginFormTranslations {
   successTitle: string;
   signInSuccess: string;
   errors: Record<string, string>;

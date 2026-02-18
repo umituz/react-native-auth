@@ -67,8 +67,22 @@ async function doInitializeAuth(
     authConfig,
   } = options;
 
-  const auth = getFirebaseAuth();
-  if (!auth) return { success: false };
+  let auth;
+  try {
+    auth = getFirebaseAuth();
+  } catch {
+    if (__DEV__) {
+      console.warn('[Auth] Firebase Auth not available — skipping auth initialization.');
+    }
+    return { success: false };
+  }
+
+  if (!auth) {
+    if (__DEV__) {
+      console.warn('[Auth] Firebase Auth not initialized — skipping auth initialization.');
+    }
+    return { success: false };
+  }
 
   configureUserDocumentService({
     collectionName: userCollection,

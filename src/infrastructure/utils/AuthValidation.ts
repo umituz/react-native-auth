@@ -13,12 +13,12 @@ export type {
   PasswordRequirements,
 };
 
-export interface ValidationConfig {
+interface ValidationConfig {
   emailRegex: RegExp;
   displayNameMinLength: number;
 }
 
-export const DEFAULT_VAL_CONFIG: ValidationConfig = {
+const DEFAULT_VAL_CONFIG: ValidationConfig = {
   // More robust email validation:
   // - Local part: alphanumeric, dots (not consecutive), hyphens, underscores, plus
   // - Domain: alphanumeric and hyphens

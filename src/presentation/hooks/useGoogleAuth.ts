@@ -7,8 +7,6 @@ import { useGoogleOAuth } from "@umituz/react-native-firebase";
 
 export type {
   GoogleOAuthConfig as GoogleAuthConfig,
-  UseGoogleOAuthResult as UseGoogleAuthResult,
-  SocialAuthResult,
 } from "@umituz/react-native-firebase";
 
 /**

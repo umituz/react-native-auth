@@ -9,7 +9,7 @@ export interface SocialLoginButtonsTranslations {
   apple: string;
 }
 
-export interface SocialLoginButtonsProps {
+interface SocialLoginButtonsProps {
   translations: SocialLoginButtonsTranslations;
   enabledProviders: SocialAuthProvider[];
   onGooglePress?: () => void;

@@ -93,4 +93,3 @@ export function useSocialLogin(config?: UseSocialLoginConfig): UseSocialLoginRes
   };
 }
 
-export { type SocialAuthConfig, type SocialAuthResult };

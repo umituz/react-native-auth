@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { AtomicAvatar } from "@umituz/react-native-design-system";
 
-export interface EditProfileAvatarProps {
+interface EditProfileAvatarProps {
     photoURL: string | null;
     displayName: string;
     onPress?: () => void;

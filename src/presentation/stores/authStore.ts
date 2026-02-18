@@ -11,15 +11,8 @@
 
 import { createStore, storageService } from "@umituz/react-native-design-system";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
-import type { AuthState, AuthActions, UserType } from "../../types/auth-store.types";
+import type { AuthState, AuthActions } from "../../types/auth-store.types";
 import { initialAuthState } from "../../types/auth-store.types";
-import {
-  selectUserId,
-  selectIsAuthenticated,
-  selectIsAnonymous,
-  selectUserType,
-  selectIsRegisteredUser,
-} from "./auth.selectors";
 
 // =============================================================================
 // STORE
@@ -96,42 +89,3 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
   }),
 });
 
-// =============================================================================
-// NON-HOOK GETTERS
-// =============================================================================
-
-/**
- * Get user ID without hook
- */
-export function getUserId(): string | null {
-  return selectUserId(useAuthStore.getState());
-}
-
-/**
- * Get user type without hook
- */
-export function getUserType(): UserType {
-  return selectUserType(useAuthStore.getState());
-}
-
-/**
- * Check if authenticated without hook
- */
-export function getIsAuthenticated(): boolean {
-  return selectIsAuthenticated(useAuthStore.getState());
-}
-
-/**
- * Check if anonymous without hook
- */
-export function getIsAnonymous(): boolean {
-  return selectIsAnonymous(useAuthStore.getState());
-}
-
-/**
- * Check if registered user without hook
- * Returns true only if user is authenticated AND not anonymous
- */
-export function getIsRegisteredUser(): boolean {
-  return selectIsRegisteredUser(useAuthStore.getState());
-}

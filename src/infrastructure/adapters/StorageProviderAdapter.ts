@@ -9,15 +9,15 @@ import type { IStorageProvider } from "../types/Storage.types";
  * Interface that describes the shape of common storage implementations
  * to avoid using 'any' and resolve lint errors.
  */
-export interface StorageLike {
+interface StorageLike {
   getString?: (
     key: string,
     defaultValue?: string | null
-  ) => Promise<{ value: string | null } | null>;
-  getItem?: (key: string) => Promise<string | null>;
-  setString?: (key: string, value: string) => Promise<void>;
-  setItem?: (key: string, value: string) => Promise<void>;
-  removeItem?: (key: string) => Promise<void>;
+  ) => Promise<{ value?: string | null; data?: string | null; success?: boolean } | null>;
+  getItem?: (key: string, defaultValue?: unknown) => Promise<string | { data?: unknown; success?: boolean } | null>;
+  setString?: (key: string, value: string) => Promise<unknown>;
+  setItem?: (key: string, value: unknown) => Promise<unknown>;
+  removeItem?: (key: string) => Promise<unknown>;
 }
 
 export class StorageProviderAdapter implements IStorageProvider {
@@ -31,9 +31,14 @@ export class StorageProviderAdapter implements IStorageProvider {
     try {
       if (typeof this.storage.getString === "function") {
         const result = await this.storage.getString(key, null);
-        return result?.value ?? null;
+        if (!result) return null;
+        return result.value ?? result.data ?? null;
       } else if (typeof this.storage.getItem === "function") {
-        return await this.storage.getItem(key);
+        const result = await this.storage.getItem(key);
+        if (!result) return null;
+        if (typeof result === "string") return result;
+        if (result.data != null) return String(result.data);
+        return null;
       } else {
         throw new Error("Unsupported storage implementation");
       }

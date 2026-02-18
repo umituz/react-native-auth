@@ -14,7 +14,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { View, Text } from "react-native";
 import { initializeAuthListener } from "../stores/initializeAuthListener";
 
-export interface AuthProviderProps {
+interface AuthProviderProps {
   children: ReactNode;
   /**
    * Custom error component to display when auth initialization fails

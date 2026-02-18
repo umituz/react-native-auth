@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import { TextInput, StyleSheet, ViewStyle } from "react-native";
 import { AtomicInput } from "@umituz/react-native-design-system";
 
-export interface FormPasswordInputProps {
+interface FormPasswordInputProps {
   value: string;
   onChangeText: (text: string) => void;
   label: string;

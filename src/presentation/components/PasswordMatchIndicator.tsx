@@ -7,7 +7,7 @@ export interface PasswordMatchTranslations {
   noMatch: string;
 }
 
-export interface PasswordMatchIndicatorProps {
+interface PasswordMatchIndicatorProps {
   translations: PasswordMatchTranslations;
   isMatch: boolean;
 }
