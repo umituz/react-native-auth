@@ -84,7 +84,8 @@ export function decrementRefCount(): { shouldCleanup: boolean; count: number } {
     state.unsubscribe !== null &&
     !state.cleanupInProgress;
 
-  // If cleanup should happen, mark as in progress to prevent concurrent cleanup
+  // If cleanup should happen, mark as in progress to prevent concurrent cleanup.
+  // This flag is reset in resetListenerState() which MUST be called after cleanup.
   if (shouldCleanup) {
     state.cleanupInProgress = true;
   }
