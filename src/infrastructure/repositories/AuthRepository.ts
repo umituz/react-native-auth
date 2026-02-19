@@ -11,6 +11,7 @@ import {
     signOut as firebaseSignOut,
     getCurrentUserFromGlobal,
     setupAuthListener,
+    ensureUserDocument,
 } from "@umituz/react-native-firebase";
 import {
     AuthValidationError,
@@ -77,6 +78,10 @@ export class AuthRepository implements IAuthRepository {
         if (!authUser) {
             throw new AuthError("Failed to map user");
         }
+
+        // Create Firestore user document for new users
+        await ensureUserDocument(result.data, { signUpMethod: "email" });
+
         return authUser;
     }
 
@@ -103,6 +108,10 @@ export class AuthRepository implements IAuthRepository {
         if (!authUser) {
             throw new AuthError("Failed to map user");
         }
+
+        // Ensure Firestore user document exists for existing users too
+        await ensureUserDocument(result.data, { signUpMethod: "email" });
+
         return authUser;
     }
 
