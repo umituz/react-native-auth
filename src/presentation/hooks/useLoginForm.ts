@@ -48,7 +48,6 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
 
   const { fields, updateField } = useFormFields(
     { email: "", password: "" },
-    null,
     { clearLocalError }
   );
 
@@ -105,10 +104,10 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   const handleContinueAnonymously = useCallback(async () => {
     try {
       await continueAnonymously();
-    } catch {
-      // Silently fail - anonymous mode is optional
+    } catch (err: unknown) {
+      setLocalError(handleAuthError(err));
     }
-  }, [continueAnonymously]);
+  }, [continueAnonymously, handleAuthError]);
 
   const displayError = localError || error;
 

@@ -13,13 +13,11 @@ interface UseFormFieldOptions {
 /**
  * Hook for managing multiple form fields
  * @param initialFields - Initial field values
- * @param setFieldErrors - Function to set field errors in parent state
  * @param options - Additional options
  * @returns Field states and handlers
  */
 export function useFormFields<T extends Record<string, string>>(
   initialFields: T,
-  _setFieldErrors: ((errors: Partial<Record<string, string>> | ((prev: Partial<Record<string, string>>) => Partial<Record<string, string>>)) => void) | null,
   options?: UseFormFieldOptions
 ) {
   type FieldKey = keyof T;

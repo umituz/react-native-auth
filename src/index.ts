@@ -55,8 +55,6 @@ export { useUserProfile } from './presentation/hooks/useUserProfile';
 export type { UserProfileData, UseUserProfileParams } from './presentation/hooks/useUserProfile';
 export { useAccountManagement } from './presentation/hooks/useAccountManagement';
 export type { UseAccountManagementReturn, UseAccountManagementOptions } from './presentation/hooks/useAccountManagement';
-export { useProfileUpdate } from './presentation/hooks/useProfileUpdate';
-export type { UseProfileUpdateReturn } from './presentation/hooks/useProfileUpdate';
 export { useProfileEdit } from './presentation/hooks/useProfileEdit';
 export type { ProfileEditFormState, UseProfileEditReturn } from './presentation/hooks/useProfileEdit';
 export { useSocialLogin } from './presentation/hooks/useSocialLogin';

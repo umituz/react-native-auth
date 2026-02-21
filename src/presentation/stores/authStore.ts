@@ -53,17 +53,11 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
 
     setIsAnonymous: (isAnonymous) => {
       const currentState = get();
-      // Only update isAnonymous if it's consistent with the firebaseUser state
-      // If we have a firebaseUser, isAnonymous should match it
-      const currentUserIsAnonymous = currentState.firebaseUser?.isAnonymous ?? false;
-
-      if (currentState.firebaseUser) {
-        // We have a firebase user - sync isAnonymous with it
-        set({ isAnonymous: currentUserIsAnonymous });
-      } else {
-        // No firebase user yet, allow setting isAnonymous for anonymous mode preference
-        set({ isAnonymous });
-      }
+      // When firebaseUser exists, always derive from it to stay consistent
+      const resolved = currentState.firebaseUser
+        ? currentState.firebaseUser.isAnonymous
+        : isAnonymous;
+      set({ isAnonymous: resolved });
     },
 
     setError: (error) => {

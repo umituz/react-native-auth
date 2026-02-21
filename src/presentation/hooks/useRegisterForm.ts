@@ -41,7 +41,6 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
       password: "",
       confirmPassword: "",
     },
-    setFieldErrors,
     { clearLocalError }
   );
 
