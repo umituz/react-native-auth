@@ -32,17 +32,8 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     isAnonymous: state.isAnonymous,
     initialized: state.initialized,
   }),
-  migrate: (persistedState: unknown, version: number) => {
+  migrate: (persistedState: unknown) => {
     const state = (persistedState && typeof persistedState === "object" ? persistedState : {}) as Partial<AuthState>;
-    if (version < 2) {
-      return {
-        ...initialAuthState,
-        isAnonymous: state.isAnonymous ?? false,
-        initialized: state.initialized ?? false,
-      };
-    }
-    // Only restore persisted fields (isAnonymous, initialized)
-    // Never restore runtime state (user, firebaseUser, loading, error)
     return {
       ...initialAuthState,
       isAnonymous: state.isAnonymous ?? false,

@@ -7,8 +7,6 @@ import { useCallback, useState } from "react";
 import { useAuth } from "./useAuth";
 import { deleteCurrentUser } from "@umituz/react-native-firebase";
 
-declare const __DEV__: boolean;
-
 export interface UseAccountManagementOptions {
   /**
    * Callback invoked when reauthentication is required (for Google/Apple)
@@ -42,10 +40,6 @@ export const useAccountManagement = (
   }, [signOut]);
 
   const deleteAccount = useCallback(async () => {
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      console.log("[useAccountManagement] deleteAccount called, user:", user);
-    }
-
     if (!user) {
       throw new Error("No user logged in");
     }
@@ -57,23 +51,11 @@ export const useAccountManagement = (
     setIsDeletingAccount(true);
 
     try {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.log("[useAccountManagement] Calling deleteCurrentUser with options:", {
-          autoReauthenticate: true,
-          hasOnPasswordRequired: !!onPasswordRequired,
-          hasOnReauthRequired: !!onReauthRequired,
-        });
-      }
-
       const result = await deleteCurrentUser({
         autoReauthenticate: true,
         onPasswordRequired,
         onGoogleReauthRequired: onReauthRequired,
       });
-
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.log("[useAccountManagement] deleteCurrentUser result:", result);
-      }
 
       if (!result.success) {
         throw new Error(result.error?.message || "Failed to delete account");

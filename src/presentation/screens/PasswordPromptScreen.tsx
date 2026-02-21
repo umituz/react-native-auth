@@ -10,8 +10,6 @@ import {
 } from '@umituz/react-native-design-system';
 import { resolvePasswordPrompt } from '../utils/passwordPromptCallback';
 
-declare const __DEV__: boolean;
-
 export interface PasswordPromptScreenProps {
   route: {
     params: {
@@ -34,10 +32,6 @@ export const PasswordPromptScreen: React.FC<PasswordPromptScreenProps> = ({
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  if (typeof __DEV__ !== "undefined" && __DEV__) {
-    console.log("[PasswordPromptScreen] Rendered");
-  }
-
   const {
     title = 'Password Required',
     message = 'Enter your password to continue',
@@ -46,25 +40,15 @@ export const PasswordPromptScreen: React.FC<PasswordPromptScreenProps> = ({
   } = route.params;
 
   const handleConfirm = () => {
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      console.log("[PasswordPromptScreen] handleConfirm called, password length:", password.length);
-    }
-    // Don't trim password - whitespace may be intentional
     if (!password) {
       setError('Password is required');
       return;
-    }
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      console.log("[PasswordPromptScreen] Resolving password prompt and going back");
     }
     resolvePasswordPrompt(password);
     navigation.goBack();
   };
 
   const handleCancel = () => {
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      console.log("[PasswordPromptScreen] handleCancel called");
-    }
     resolvePasswordPrompt(null);
     navigation.goBack();
   };

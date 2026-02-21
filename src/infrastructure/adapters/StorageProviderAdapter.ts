@@ -5,6 +5,8 @@
 
 import type { IStorageProvider } from "../types/Storage.types";
 
+declare const __DEV__: boolean;
+
 /**
  * Interface that describes the shape of common storage implementations
  * to avoid using 'any' and resolve lint errors.
@@ -42,7 +44,10 @@ export class StorageProviderAdapter implements IStorageProvider {
       } else {
         throw new Error("Unsupported storage implementation");
       }
-    } catch {
+    } catch (error) {
+      if (typeof __DEV__ !== "undefined" && __DEV__) {
+        console.warn("[StorageProviderAdapter] get failed for key:", key, error);
+      }
       return null;
     }
   }

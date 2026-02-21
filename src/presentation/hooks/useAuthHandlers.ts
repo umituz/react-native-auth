@@ -6,8 +6,6 @@ import { useAccountManagement } from "./useAccountManagement";
 import { AlertService } from "@umituz/react-native-design-system";
 import { usePasswordPromptNavigation } from "./usePasswordPromptNavigation";
 
-declare const __DEV__: boolean;
-
 export interface AuthHandlersAppInfo {
   appStoreUrl?: string;
 }
@@ -80,21 +78,9 @@ export const useAuthHandlers = (appInfo: AuthHandlersAppInfo, translations?: Aut
   }, [signOut, translations]);
 
   const handleDeleteAccount = useCallback(async () => {
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      console.log("[useAuthHandlers] handleDeleteAccount called");
-    }
     try {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.log("[useAuthHandlers] Calling deleteAccountFromAuth...");
-      }
       await deleteAccountFromAuth();
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.log("[useAuthHandlers] deleteAccountFromAuth completed successfully");
-      }
     } catch (error) {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.error("[useAuthHandlers] deleteAccountFromAuth failed:", error);
-      }
       const errorMessage = error instanceof Error ? error.message : String(error);
       AlertService.createErrorAlert(
         translations?.common || "Error",
