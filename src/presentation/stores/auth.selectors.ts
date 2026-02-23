@@ -87,6 +87,10 @@ export const selectIsAuthenticated = (state: AuthStore): boolean => {
   return hasFirebaseUser && isNotAnonymous;
 };
 
+export const selectHasFirebaseUser = (state: AuthStore): boolean => {
+  return !!state.firebaseUser;
+};
+
 /**
  * Check if user is anonymous
  * Uses firebaseUser as single source of truth

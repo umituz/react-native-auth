@@ -44,23 +44,10 @@ describe('AnonymousModeService', () => {
   });
 
   describe('auth integration', () => {
-    it('should enable and sign out if user is logged in', async () => {
-      const mockAuth = { getCurrentUser: jest.fn().mockReturnValue({ uid: 'u' }), signOut: jest.fn() };
-      await anonymousModeService.enable(mockStorageProvider, mockAuth as any);
-      expect(mockAuth.signOut).toHaveBeenCalled();
+    it('should enable anonymous mode', async () => {
+      mockStorageProvider.set.mockResolvedValue(undefined);
+      await anonymousModeService.enable(mockStorageProvider);
       expect(anonymousModeService.getIsAnonymousMode()).toBe(true);
-    });
-
-    it('should wrap auth state callback correctly', () => {
-      const callback = jest.fn();
-      const wrapped = anonymousModeService.wrapAuthStateCallback(callback);
-      
-      wrapped({ uid: 'u' } as any);
-      expect(callback).toHaveBeenCalledWith({ uid: 'u' });
-
-      anonymousModeService.setAnonymousMode(true);
-      wrapped({ uid: 'u' } as any);
-      expect(callback).toHaveBeenCalledWith(null);
     });
   });
 });

@@ -23,9 +23,7 @@ export function handleAuthStateChange(
 ): void {
   try {
     if (!user && autoAnonymousSignIn) {
-      // Start anonymous sign-in without blocking
       void handleAnonymousMode(store, auth);
-      store.setFirebaseUser(null);
       completeInitialization();
       return;
     }

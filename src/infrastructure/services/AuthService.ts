@@ -104,8 +104,7 @@ export class AuthService {
   }
 
   onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
-    const wrappedCallback = this.anonymousModeService.wrapAuthStateCallback(callback);
-    return this.repositoryInstance.onAuthStateChange(wrappedCallback);
+    return this.repositoryInstance.onAuthStateChange(callback);
   }
 
   getConfig(): AuthConfig { return this.config; }

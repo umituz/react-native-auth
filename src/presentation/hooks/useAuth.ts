@@ -13,6 +13,7 @@ import {
   selectSetError,
   selectSetIsAnonymous,
   selectIsAuthenticated,
+  selectHasFirebaseUser,
   selectUserId,
   selectUserType,
   selectIsAnonymous,
@@ -36,6 +37,7 @@ export interface UseAuthResult {
   isAuthReady: boolean;
   isAnonymous: boolean;
   isAuthenticated: boolean;
+  hasFirebaseUser: boolean;
   isRegisteredUser: boolean;
   error: string | null;
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
@@ -50,6 +52,7 @@ export function useAuth(): UseAuthResult {
   const loading = useAuthStore(selectLoading);
   const error = useAuthStore(selectError);
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const hasFirebaseUser = useAuthStore(selectHasFirebaseUser);
   const userId = useAuthStore(selectUserId);
   const userType = useAuthStore(selectUserType);
   const isAnonymous = useAuthStore(selectIsAnonymous);
@@ -130,7 +133,7 @@ export function useAuth(): UseAuthResult {
   }, [setIsAnonymous, setLoading, setError, anonymousModeMutation]);
 
   return {
-    user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, isRegisteredUser, error,
+    user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, hasFirebaseUser, isRegisteredUser, error,
     signUp, signIn, signOut, continueAnonymously, setError,
   };
 }

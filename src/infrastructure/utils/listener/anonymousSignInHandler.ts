@@ -117,7 +117,6 @@ export function createAnonymousSignInHandler(
                 },
                 onSignInSuccess: () => {
                     // Listener will be triggered again with the new user
-                    store.setFirebaseUser(null);
                 },
                 onSignInFailure: (error: Error) => {
                     if (__DEV__) {

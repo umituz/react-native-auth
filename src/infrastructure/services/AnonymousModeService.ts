@@ -3,7 +3,6 @@
  * Handles anonymous mode functionality
  */
 
-import type { AuthUser } from "../../domain/entities/AuthUser";
 import { emitAnonymousModeEnabled } from "./AuthEventService";
 import type { IStorageProvider } from "../types/Storage.types";
 
@@ -69,14 +68,4 @@ export class AnonymousModeService {
     this.isAnonymousMode = enabled;
   }
 
-  wrapAuthStateCallback(
-    callback: (user: AuthUser | null) => void
-  ): (user: AuthUser | null) => void {
-    return (user: AuthUser | null) => {
-      // In anonymous mode, still pass the actual Firebase user
-      // The store will handle setting the isAnonymous flag appropriately
-      // This allows proper anonymous to registered user conversion
-      callback(user);
-    };
-  }
 }
