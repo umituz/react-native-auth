@@ -7,7 +7,7 @@ import type { User } from "firebase/auth";
 import { getFirebaseAuth, configureUserDocumentService } from "@umituz/react-native-firebase";
 import type { UserDocumentExtras } from "@umituz/react-native-firebase";
 import { initializeAuthService } from "./AuthService";
-import { collectDeviceExtras } from "@umituz/react-native-design-system";
+import { collectDeviceExtras } from "@umituz/react-native-design-system/device";
 import { initializeAuthListener } from "../../presentation/stores/initializeAuthListener";
 import { createAuthStateHandler } from "../utils/authStateHandler";
 import type { ConversionState } from "../utils/authConversionDetector";

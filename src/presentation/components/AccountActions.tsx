@@ -1,6 +1,8 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { useAppDesignTokens, AtomicIcon, AtomicText, useAlert, AlertType, AlertMode } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicIcon, AtomicText } from "@umituz/react-native-design-system/atoms";
+import { useAlert, AlertType, AlertMode } from "@umituz/react-native-design-system/molecules";
 import { actionButtonStyle } from "../utils/commonStyles";
 
 export interface AccountActionsConfig {

@@ -6,7 +6,9 @@
 
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { useAppDesignTokens, ScreenLayout, AtomicIcon, AtomicText } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicIcon, AtomicText } from "@umituz/react-native-design-system/atoms";
+import { ScreenLayout } from "@umituz/react-native-design-system/layouts";
 import { actionButtonStyle } from "../utils/commonStyles";
 
 import { ProfileSection, type ProfileSectionConfig } from "../components/ProfileSection";

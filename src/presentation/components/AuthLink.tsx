@@ -5,7 +5,8 @@
 
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { AtomicText, AtomicButton, useAppDesignTokens } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicText, AtomicButton } from "@umituz/react-native-design-system/atoms";
 
 interface AuthLinkProps {
   text: string;

@@ -4,11 +4,7 @@
  */
 
 import React from "react";
-import {
-  AlertInline,
-  AlertService,
-  AlertMode,
-} from "@umituz/react-native-design-system";
+import { AlertInline, AlertService, AlertMode } from "@umituz/react-native-design-system/molecules";
 
 interface AuthErrorDisplayProps {
   error: string | null;

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { useAppDesignTokens, AtomicText } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicText } from "@umituz/react-native-design-system/atoms";
 
 export interface PasswordMatchTranslations {
   match: string;

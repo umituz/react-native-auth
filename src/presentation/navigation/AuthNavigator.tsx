@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  StackNavigator,
-  useAppDesignTokens,
-  storageRepository,
-  unwrap,
-  type StackNavigatorConfig,
-  type StackScreenProps,
-} from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { StackNavigator, type StackNavigatorConfig, type StackScreenProps } from "@umituz/react-native-design-system/molecules";
+import { storageRepository, unwrap } from "@umituz/react-native-design-system/storage";
 import { LoginScreen, type LoginScreenTranslations } from "../screens/LoginScreen";
 import { RegisterScreen, type RegisterScreenTranslations } from "../screens/RegisterScreen";
 

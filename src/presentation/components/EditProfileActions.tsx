@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicButton } from "@umituz/react-native-design-system/atoms";
 
 interface EditProfileActionsProps {
     isSaving?: boolean;

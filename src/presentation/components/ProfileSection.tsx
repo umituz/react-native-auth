@@ -5,7 +5,8 @@
 
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { useAppDesignTokens, AtomicText, AtomicIcon, AtomicAvatar } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicText, AtomicIcon, AtomicAvatar } from "@umituz/react-native-design-system/atoms";
 import { ProfileBenefitsList } from "./ProfileBenefitsList";
 
 export interface ProfileSectionConfig {

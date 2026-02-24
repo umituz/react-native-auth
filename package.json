@@ -1,13 +1,21 @@
 {
   "name": "@umituz/react-native-auth",
-  "version": "4.3.36",
+  "version": "4.3.39",
   "description": "Authentication service for React Native apps - Secure, type-safe, and production-ready. Provider-agnostic design with dependency injection, configurable validation, and comprehensive error handling.",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "sideEffects": false,
   "exports": {
-    ".": "./src/index.ts",
-    "./init": "./src/init/index.ts",
+    ".": {
+      "react-native": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./init": {
+      "react-native": "./src/init/index.ts",
+      "types": "./src/init/index.ts",
+      "default": "./src/init/index.ts"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -42,6 +50,7 @@
     "@react-navigation/stack": ">=6.0.0",
     "@tanstack/react-query": ">=5.0.0",
     "@umituz/react-native-design-system": ">=4.0.0",
+    "@umituz/react-native-firebase": "^2.4.55",
     "expo": ">=54.0.0",
     "firebase": ">=11.0.0",
     "react": ">=19.0.0",
@@ -49,7 +58,6 @@
     "react-native-gesture-handler": ">=2.0.0",
     "react-native-safe-area-context": ">=5.0.0",
     "react-native-svg": ">=13.0.0",
-    "@umituz/react-native-firebase": "*",
     "zustand": ">=5.0.0"
   },
   "devDependencies": {
@@ -66,7 +74,7 @@
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@umituz/react-native-design-system": "latest",
+    "@umituz/react-native-design-system": "^4.25.34",
     "@umituz/react-native-settings": "latest",
     "eslint": "^8.57.0",
     "expo-apple-authentication": "^6.0.0",

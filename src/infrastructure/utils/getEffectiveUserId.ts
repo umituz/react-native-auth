@@ -1,4 +1,4 @@
-import { PersistentDeviceIdService } from '@umituz/react-native-design-system';
+import { PersistentDeviceIdService } from '@umituz/react-native-design-system/device';
 import { getFirebaseAuth } from '@umituz/react-native-firebase';
 
 /**

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { CommonActions } from '@react-navigation/native';
-import { AppNavigation } from '@umituz/react-native-design-system';
+import { AppNavigation } from '@umituz/react-native-design-system/molecules';
 import { setPasswordPromptCallback } from '../utils/passwordPromptCallback';
 
 export interface UsePasswordPromptNavigationOptions {

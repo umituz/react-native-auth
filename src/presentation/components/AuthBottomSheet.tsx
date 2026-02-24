@@ -1,12 +1,8 @@
 import React from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
-import {
-  useAppDesignTokens,
-  AtomicText,
-  AtomicIcon,
-  AtomicKeyboardAvoidingView,
-  BottomSheetModal,
-} from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicText, AtomicIcon, AtomicKeyboardAvoidingView } from "@umituz/react-native-design-system/atoms";
+import { BottomSheetModal } from "@umituz/react-native-design-system/molecules";
 import { useAuthBottomSheet, type SocialAuthConfiguration } from "../hooks/useAuthBottomSheet";
 import { LoginForm, type LoginFormTranslations } from "./LoginForm";
 import { RegisterForm, type RegisterFormTranslations } from "./RegisterForm";

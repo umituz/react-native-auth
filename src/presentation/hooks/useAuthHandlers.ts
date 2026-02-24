@@ -3,7 +3,7 @@ import { Linking, Alert } from "react-native";
 import { useAuth } from "./useAuth";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAccountManagement } from "./useAccountManagement";
-import { AlertService } from "@umituz/react-native-design-system";
+import { AlertService } from "@umituz/react-native-design-system/molecules";
 import { usePasswordPromptNavigation } from "./usePasswordPromptNavigation";
 
 export interface AuthHandlersAppInfo {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { BottomSheetModalRef } from "@umituz/react-native-design-system";
+import type { BottomSheetModalRef } from "@umituz/react-native-design-system/molecules";
 import { useAuthModalStore } from "../stores/authModalStore";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleAuth, type GoogleAuthConfig } from "./useGoogleAuth";

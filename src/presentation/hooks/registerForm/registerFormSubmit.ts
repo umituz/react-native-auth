@@ -4,7 +4,7 @@
  */
 
 import { useCallback } from "react";
-import { alertService } from "@umituz/react-native-design-system";
+import { alertService } from "@umituz/react-native-design-system/molecules";
 import { DEFAULT_PASSWORD_CONFIG } from "../../../domain/value-objects/AuthConfig";
 import {
   validateRegisterForm,

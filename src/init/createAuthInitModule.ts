@@ -3,7 +3,7 @@
  * Creates a ready-to-use InitModule for app initialization
  */
 
-import type { InitModule } from '@umituz/react-native-design-system';
+import type { InitModule } from '@umituz/react-native-design-system/init';
 import { initializeAuth } from '../infrastructure/services/initializeAuth';
 import type { InitializeAuthOptions } from '../infrastructure/services/initializeAuth';
 

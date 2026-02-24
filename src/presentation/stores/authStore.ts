@@ -9,7 +9,7 @@
  * The isAnonymous flag indicates the user type, not whether user is null.
  */
 
-import { createStore, storageService } from "@umituz/react-native-design-system";
+import { createStore, storageService } from "@umituz/react-native-design-system/storage";
 import { mapToAuthUser } from "../../infrastructure/utils/UserMapper";
 import type { AuthState, AuthActions } from "../../types/auth-store.types";
 import { initialAuthState } from "../../types/auth-store.types";

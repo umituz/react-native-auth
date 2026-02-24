@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import {
-  AtomicInput,
-  AtomicButton,
-  AtomicText,
-  AtomicIcon,
-  SafeAreaView,
-  useAppDesignTokens
-} from '@umituz/react-native-design-system';
+import { useAppDesignTokens } from '@umituz/react-native-design-system/theme';
+import { AtomicInput, AtomicButton, AtomicText, AtomicIcon } from '@umituz/react-native-design-system/atoms';
+import { SafeAreaView } from '@umituz/react-native-design-system/safe-area';
 import { resolvePasswordPrompt } from '../utils/passwordPromptCallback';
 
 export interface PasswordPromptScreenProps {

@@ -1,5 +1,8 @@
 import React from "react";
-import { useAppNavigation, AtomicCard, ScreenLayout, useAppDesignTokens } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicCard } from "@umituz/react-native-design-system/atoms";
+import { useAppNavigation } from "@umituz/react-native-design-system/molecules";
+import { ScreenLayout } from "@umituz/react-native-design-system/layouts";
 import { AuthHeader } from "../components/AuthHeader";
 import { RegisterForm, type RegisterFormTranslations } from "../components/RegisterForm";
 

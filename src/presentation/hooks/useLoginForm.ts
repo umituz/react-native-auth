@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "./useAuth";
 import { validateLoginForm } from "../utils/form/formValidation.util";
-import { alertService } from "@umituz/react-native-design-system";
+import { alertService } from "@umituz/react-native-design-system/molecules";
 import { useFormFields } from "../utils/form/useFormField.hook";
 import { sanitizeEmail } from "../../infrastructure/utils/validation/sanitization";
 import { useAuthErrorHandler } from "./useAuthErrorHandler";

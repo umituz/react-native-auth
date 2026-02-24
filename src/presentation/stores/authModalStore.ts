@@ -17,7 +17,7 @@
  * ```
  */
 
-import { createStore } from "@umituz/react-native-design-system";
+import { createStore } from "@umituz/react-native-design-system/storage";
 
 type AuthModalMode = "login" | "register";
 

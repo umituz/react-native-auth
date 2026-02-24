@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { StyleSheet, TextInput } from "react-native";
-import { AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";

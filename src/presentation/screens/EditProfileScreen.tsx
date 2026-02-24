@@ -5,7 +5,9 @@
 
 import React from "react";
 import { StyleSheet } from "react-native";
-import { useAppDesignTokens, AtomicText, AtomicSpinner, ScreenLayout } from "@umituz/react-native-design-system";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicText, AtomicSpinner } from "@umituz/react-native-design-system/atoms";
+import { ScreenLayout } from "@umituz/react-native-design-system/layouts";
 import { EditProfileAvatar } from "../components/EditProfileAvatar";
 import { EditProfileForm } from "../components/EditProfileForm";
 import { EditProfileActions } from "../components/EditProfileActions";

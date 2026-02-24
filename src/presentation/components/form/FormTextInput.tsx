@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { TextInput, StyleSheet, ViewStyle } from "react-native";
-import { AtomicInput } from "@umituz/react-native-design-system";
+import { AtomicInput } from "@umituz/react-native-design-system/atoms";
 
 interface FormTextInputProps {
   value: string;
