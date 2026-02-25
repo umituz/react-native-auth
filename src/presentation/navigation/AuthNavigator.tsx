@@ -52,8 +52,9 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     void checkInitialRoute();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const LoginScreenWrapper = useCallback(
-    (props: StackScreenProps<AuthStackParamList, "Login">) => (
+    (props: any) => (
       <LoginScreen
         {...props}
         translations={translations.login}
@@ -62,8 +63,9 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     [translations.login]
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const RegisterScreenWrapper = useCallback(
-    (props: StackScreenProps<AuthStackParamList, "Register">) => (
+    (props: any) => (
       <RegisterScreen
         {...props}
         translations={translations.register}
