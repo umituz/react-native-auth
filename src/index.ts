@@ -37,7 +37,7 @@ export { SECURITY_LIMITS, sanitizeEmail, sanitizePassword, sanitizeName } from '
 export type { SecurityLimitKey } from './infrastructure/utils/validation/sanitization';
 export { isEmpty, isEmptyEmail, isEmptyPassword, isEmptyName, isNotEmpty, hasContent } from './infrastructure/utils/validation/validationHelpers';
 export { safeCallback, safeCallbackSync } from './infrastructure/utils/safeCallback';
-export { getEffectiveUserId } from './infrastructure/utils/getEffectiveUserId';
+
 
 // =============================================================================
 // PRESENTATION LAYER - Hooks

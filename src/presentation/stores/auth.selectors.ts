@@ -24,11 +24,6 @@ export const selectUser = (state: AuthStore): AuthUser | null => state.user;
 export const selectLoading = (state: AuthStore): boolean => state.loading;
 
 /**
- * Select anonymous mode (state flag)
- */
-export const selectIsAnonymousState = (state: AuthStore): boolean => state.isAnonymous;
-
-/**
  * Select error
  */
 export const selectError = (state: AuthStore): string | null => state.error;
@@ -118,11 +113,3 @@ export const selectIsAuthReady = (state: AuthStore): boolean => {
   return state.initialized && !state.loading;
 };
 
-/**
- * Check if user is a registered user (authenticated AND not anonymous)
- * Use this for feature gating - only registered users can access premium features
- */
-export const selectIsRegisteredUser = (state: AuthStore): boolean => {
-  if (!state.initialized) return false;
-  return selectIsAuthenticated(state);
-};

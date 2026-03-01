@@ -18,7 +18,6 @@ import {
   selectUserType,
   selectIsAnonymous,
   selectIsAuthReady,
-  selectIsRegisteredUser,
 } from "../stores/auth.selectors";
 import type { UserType } from "../../types/auth-store.types";
 import {
@@ -38,7 +37,6 @@ export interface UseAuthResult {
   isAnonymous: boolean;
   isAuthenticated: boolean;
   hasFirebaseUser: boolean;
-  isRegisteredUser: boolean;
   error: string | null;
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -57,7 +55,6 @@ export function useAuth(): UseAuthResult {
   const userType = useAuthStore(selectUserType);
   const isAnonymous = useAuthStore(selectIsAnonymous);
   const isAuthReady = useAuthStore(selectIsAuthReady);
-  const isRegisteredUser = useAuthStore(selectIsRegisteredUser);
   const setLoading = useAuthStore(selectSetLoading);
   const setError = useAuthStore(selectSetError);
   const setIsAnonymous = useAuthStore(selectSetIsAnonymous);
@@ -133,7 +130,7 @@ export function useAuth(): UseAuthResult {
   }, [setIsAnonymous, setLoading, setError, anonymousModeMutation]);
 
   return {
-    user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, hasFirebaseUser, isRegisteredUser, error,
+    user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, hasFirebaseUser, error,
     signUp, signIn, signOut, continueAnonymously, setError,
   };
 }
