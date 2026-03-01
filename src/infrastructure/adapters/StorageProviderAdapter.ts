@@ -5,8 +5,6 @@
 
 import type { IStorageProvider } from "../types/Storage.types";
 
-declare const __DEV__: boolean;
-
 /**
  * Interface that describes the shape of common storage implementations
  * to avoid using 'any' and resolve lint errors.
@@ -30,25 +28,18 @@ export class StorageProviderAdapter implements IStorageProvider {
   }
 
   async get(key: string): Promise<string | null> {
-    try {
-      if (typeof this.storage.getString === "function") {
-        const result = await this.storage.getString(key, null);
-        if (!result) return null;
-        return result.value ?? result.data ?? null;
-      } else if (typeof this.storage.getItem === "function") {
-        const result = await this.storage.getItem(key);
-        if (!result) return null;
-        if (typeof result === "string") return result;
-        if (result.data != null) return String(result.data);
-        return null;
-      } else {
-        throw new Error("Unsupported storage implementation");
-      }
-    } catch (error) {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.warn("[StorageProviderAdapter] get failed for key:", key, error);
-      }
+    if (typeof this.storage.getString === "function") {
+      const result = await this.storage.getString(key, null);
+      if (!result) return null;
+      return result.value ?? result.data ?? null;
+    } else if (typeof this.storage.getItem === "function") {
+      const result = await this.storage.getItem(key);
+      if (!result) return null;
+      if (typeof result === "string") return result;
+      if (result.data != null) return String(result.data);
       return null;
+    } else {
+      throw new Error("Unsupported storage implementation");
     }
   }
 

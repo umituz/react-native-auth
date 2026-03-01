@@ -28,6 +28,10 @@ export function useAuthTransitions(
   const prevIsAnonymousRef = useRef(state.isAnonymous);
   const prevIsVisibleRef = useRef(state.isVisible);
   const cleanupRef = useRef<(() => void) | null>(null);
+  const onTransitionRef = useRef(onTransition);
+
+  // Keep ref in sync without adding to effect deps
+  onTransitionRef.current = onTransition;
 
   useEffect(() => {
     const justAuthenticated = !prevIsAuthenticatedRef.current && state.isAuthenticated;
@@ -45,7 +49,7 @@ export function useAuthTransitions(
     // Call previous cleanup before running new transition
     cleanupRef.current?.();
 
-    const cleanup = onTransition?.(result);
+    const cleanup = onTransitionRef.current?.(result);
     cleanupRef.current = (typeof cleanup === 'function' ? cleanup : null);
 
     prevIsAuthenticatedRef.current = state.isAuthenticated;
@@ -57,7 +61,7 @@ export function useAuthTransitions(
       cleanupRef.current?.();
       cleanupRef.current = null;
     };
-  }, [state.isAuthenticated, state.isVisible, state.isAnonymous, onTransition]);
+  }, [state.isAuthenticated, state.isVisible, state.isAnonymous]);
 }
 
 /**

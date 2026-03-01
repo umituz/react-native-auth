@@ -32,18 +32,11 @@ export function initializeAuthListener(
 
   // Atomic check-and-set to prevent race conditions
   if (!startInitialization()) {
-    // Either already initializing or initialized - handle accordingly
     if (isListenerInitialized()) {
       const unsubscribe = handleExistingInitialization();
       return unsubscribe || handleInitializationInProgress();
     }
     return handleInitializationInProgress();
-  }
-
-  // If already initialized, increment ref count and return unsubscribe
-  if (isListenerInitialized()) {
-    const unsubscribe = handleExistingInitialization();
-    return unsubscribe || (() => {});
   }
 
   const auth = getFirebaseAuth();

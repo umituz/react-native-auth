@@ -18,7 +18,7 @@ export function useRegisterFormHandlers(
       clearFieldError(setFieldErrors, "displayName");
       clearLocalError();
     },
-    [updateField, clearLocalError]
+    [updateField, clearLocalError, setFieldErrors]
   );
 
   const handleEmailChange = useCallback(
@@ -27,7 +27,7 @@ export function useRegisterFormHandlers(
       clearFieldError(setFieldErrors, "email");
       clearLocalError();
     },
-    [updateField, clearLocalError]
+    [updateField, clearLocalError, setFieldErrors]
   );
 
   const handlePasswordChange = useCallback(
@@ -36,7 +36,7 @@ export function useRegisterFormHandlers(
       clearFieldErrors(setFieldErrors, ["password", "confirmPassword"]);
       clearLocalError();
     },
-    [updateField, clearLocalError]
+    [updateField, clearLocalError, setFieldErrors]
   );
 
   const handleConfirmPasswordChange = useCallback(
@@ -45,7 +45,7 @@ export function useRegisterFormHandlers(
       clearFieldError(setFieldErrors, "confirmPassword");
       clearLocalError();
     },
-    [updateField, clearLocalError]
+    [updateField, clearLocalError, setFieldErrors]
   );
 
   return {

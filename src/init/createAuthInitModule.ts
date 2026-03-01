@@ -91,8 +91,8 @@ export function createAuthInitModule(
             if (onRestorePurchases) {
               try {
                 await onRestorePurchases();
-              } catch {
-                // Silently fail - purchase restoration errors are handled elsewhere
+              } catch (error) {
+                console.error('[AuthInitModule] Purchase restoration failed:', error instanceof Error ? error.message : String(error));
               }
             }
 
@@ -104,8 +104,9 @@ export function createAuthInitModule(
         });
 
         return true;
-      } catch {
-        return false;
+      } catch (error) {
+        console.error('[AuthInitModule] Auth initialization failed:', error instanceof Error ? error.message : String(error));
+        throw error;
       }
     },
   };

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { StackNavigator, type StackNavigatorConfig, type StackScreenProps } from "@umituz/react-native-design-system/molecules";
 import { storageRepository, unwrap } from "@umituz/react-native-design-system/storage";
@@ -52,30 +52,32 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
     void checkInitialRoute();
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Memoize nested translation objects to prevent screen wrapper recreation
+  const loginTranslations = useMemo(() => translations.login, [translations.login]);
+  const registerTranslations = useMemo(() => translations.register, [translations.register]);
+
   const LoginScreenWrapper = useCallback(
-    (props: any) => (
+    (props: StackScreenProps<AuthStackParamList, 'Login'>) => (
       <LoginScreen
         {...props}
-        translations={translations.login}
+        translations={loginTranslations}
       />
     ),
-    [translations.login]
+    [loginTranslations]
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const RegisterScreenWrapper = useCallback(
-    (props: any) => (
+    (props: StackScreenProps<AuthStackParamList, 'Register'>) => (
       <RegisterScreen
         {...props}
-        translations={translations.register}
+        translations={registerTranslations}
         termsUrl={termsUrl}
         privacyUrl={privacyUrl}
         onTermsPress={onTermsPress}
         onPrivacyPress={onPrivacyPress}
       />
     ),
-    [translations.register, termsUrl, privacyUrl, onTermsPress, onPrivacyPress]
+    [registerTranslations, termsUrl, privacyUrl, onTermsPress, onPrivacyPress]
   );
 
   if (initialRouteName === undefined) {

@@ -19,8 +19,8 @@ export class AnonymousModeService {
       const value = await storageProvider.get(this.storageKey);
       this.isAnonymousMode = value === "true";
       return this.isAnonymousMode;
-    } catch {
-      // On error, reset to false to maintain consistency
+    } catch (error) {
+      console.error('[AnonymousModeService] Failed to load state:', error instanceof Error ? error.message : String(error));
       this.isAnonymousMode = false;
       return false;
     }
@@ -30,7 +30,8 @@ export class AnonymousModeService {
     try {
       await storageProvider.set(this.storageKey, value.toString());
       return true;
-    } catch {
+    } catch (error) {
+      console.error('[AnonymousModeService] Failed to save state:', error instanceof Error ? error.message : String(error));
       return false;
     }
   }
@@ -40,9 +41,8 @@ export class AnonymousModeService {
       await storageProvider.remove(this.storageKey);
       this.isAnonymousMode = false;
       return true;
-    } catch {
-      // Don't update memory state if storage operation failed
-      // This maintains consistency between storage and memory
+    } catch (error) {
+      console.error('[AnonymousModeService] Failed to clear state:', error instanceof Error ? error.message : String(error));
       return false;
     }
   }
