@@ -33,10 +33,14 @@ export function useRegisterFormSubmit(
   const handleSignUp = useCallback(async () => {
     clearFormErrors();
 
+    // Sanitize once, use for both validation and sign-up
+    const sanitizedEmail = sanitizeEmail(fields.email);
+    const sanitizedName = sanitizeName(fields.displayName) || undefined;
+
     const validation = validateRegisterForm(
       {
-        displayName: sanitizeName(fields.displayName) || undefined,
-        email: sanitizeEmail(fields.email),
+        displayName: sanitizedName,
+        email: sanitizedEmail,
         password: fields.password,
         confirmPassword: fields.confirmPassword,
       },
@@ -50,7 +54,7 @@ export function useRegisterFormSubmit(
     }
 
     try {
-      await signUp(sanitizeEmail(fields.email), fields.password, sanitizeName(fields.displayName) || undefined);
+      await signUp(sanitizedEmail, fields.password, sanitizedName);
 
       if (translations) {
         alertService.success(translations.successTitle, translations.signUpSuccess);

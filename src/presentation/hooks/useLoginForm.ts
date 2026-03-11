@@ -44,16 +44,12 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     setEmailError(null);
     setPasswordError(null);
     setLocalError(null);
-  }, []);
+  }, [setLocalError]);
 
   const { fields, updateField } = useFormFields(
     { email: "", password: "" },
     { clearLocalError }
   );
-
-  const clearErrors = useCallback(() => {
-    clearFieldErrorsState();
-  }, [clearFieldErrorsState]);
 
   const handleEmailChange = useCallback(
     (text: string) => {
@@ -72,10 +68,13 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
   );
 
   const handleSignIn = useCallback(async () => {
-    clearErrors();
+    clearFieldErrorsState();
+
+    // Sanitize once, use for both validation and sign-in
+    const sanitizedEmail = sanitizeEmail(fields.email);
 
     const validation = validateLoginForm(
-      { email: sanitizeEmail(fields.email), password: fields.password },
+      { email: sanitizedEmail, password: fields.password },
       getErrorMessage
     );
 
@@ -88,7 +87,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     }
 
     try {
-      await signIn(sanitizeEmail(fields.email), fields.password);
+      await signIn(sanitizedEmail, fields.password);
 
       if (translations) {
         alertService.success(
@@ -99,7 +98,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     } catch (err: unknown) {
       setLocalError(handleAuthError(err));
     }
-  }, [fields, signIn, translations, handleAuthError, getErrorMessage, clearErrors]);
+  }, [fields, signIn, translations, handleAuthError, getErrorMessage, clearFieldErrorsState, setLocalError]);
 
   const handleContinueAnonymously = useCallback(async () => {
     try {

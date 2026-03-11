@@ -98,7 +98,11 @@ export function createAuthInitModule(
 
             // Call custom callback if provided
             if (onUserConverted) {
-              await onUserConverted(anonymousId, authenticatedId);
+              try {
+                await onUserConverted(anonymousId, authenticatedId);
+              } catch (error) {
+                console.error('[AuthInitModule] onUserConverted callback failed:', error instanceof Error ? error.message : String(error));
+              }
             }
           },
         });

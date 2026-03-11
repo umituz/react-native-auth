@@ -6,12 +6,10 @@
 import type { AuthActions } from "../../../types/auth-store.types";
 import { completeInitialization } from "./listenerState.util";
 
-type Store = AuthActions & { isAnonymous: boolean };
-
 /**
  * Handle case where Firebase auth is not available
  */
-export function handleNoFirebaseAuth(store: Store): () => void {
+export function handleNoFirebaseAuth(store: AuthActions): () => void {
   completeInitialization();
   store.setLoading(false);
   store.setInitialized(true);

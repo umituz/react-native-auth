@@ -5,34 +5,37 @@
 
 import type { Auth, User } from "firebase/auth";
 import type { AuthActions } from "../../../types/auth-store.types";
-import { completeInitialization } from "./listenerState.util";
 import { handleAnonymousMode } from "./anonymousHandler";
 import { safeCallbackSync } from "../safeCallback";
 
-type Store = AuthActions & { isAnonymous: boolean };
+type StoreActions = AuthActions;
+type GetIsAnonymous = () => boolean;
 
 /**
  * Handle auth state change from Firebase
  */
 export function handleAuthStateChange(
   user: User | null,
-  store: Store,
+  store: StoreActions,
   auth: Auth,
   autoAnonymousSignIn: boolean,
-  onAuthStateChange?: (user: User | null) => void | Promise<void>
+  onAuthStateChange?: (user: User | null) => void | Promise<void>,
+  getIsAnonymous?: GetIsAnonymous
 ): void {
   try {
     if (!user && autoAnonymousSignIn) {
+      // Don't call completeInitialization here - handleAnonymousMode
+      // will set initialized/loading when anonymous sign-in completes or fails.
       void handleAnonymousMode(store, auth);
-      completeInitialization();
       return;
     }
 
     store.setFirebaseUser(user);
     store.setInitialized(true);
 
-    // Handle conversion from anonymous
-    if (user && !user.isAnonymous && store.isAnonymous) {
+    // Handle conversion from anonymous - read fresh state, not stale snapshot
+    const currentIsAnonymous = getIsAnonymous ? getIsAnonymous() : false;
+    if (user && !user.isAnonymous && currentIsAnonymous) {
       store.setIsAnonymous(false);
     }
 

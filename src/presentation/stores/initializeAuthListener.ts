@@ -48,8 +48,12 @@ export function initializeAuthListener(
     return handleNoFirebaseAuth(store);
   }
 
+  // Pass a getter function for isAnonymous to avoid stale snapshot reads.
+  // store.getState() returns a snapshot, but isAnonymous can change over time.
+  const getIsAnonymous = () => useAuthStore.getState().isAnonymous;
+
   // Setup the listener
-  setupAuthListener(auth, store, autoAnonymousSignIn, onAuthStateChange);
+  setupAuthListener(auth, store, autoAnonymousSignIn, onAuthStateChange, getIsAnonymous);
   completeListenerSetup();
 
   // Return cleanup function

@@ -11,12 +11,10 @@ import {
   completeAnonymousSignIn,
 } from "./listenerState.util";
 
-type Store = AuthActions & { isAnonymous: boolean };
-
 /**
  * Handle anonymous mode sign-in
  */
-export async function handleAnonymousMode(store: Store, auth: Auth): Promise<void> {
+export async function handleAnonymousMode(store: AuthActions, auth: Auth): Promise<void> {
   if (!startAnonymousSignIn()) {
     return; // Already signing in
   }

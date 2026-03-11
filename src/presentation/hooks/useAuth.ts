@@ -3,7 +3,7 @@
  * React hook for authentication state management
  */
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useAuthStore } from "../stores/authStore";
 import {
   selectUser,
@@ -11,7 +11,6 @@ import {
   selectError,
   selectSetLoading,
   selectSetError,
-  selectSetIsAnonymous,
   selectIsAuthenticated,
   selectHasFirebaseUser,
   selectUserId,
@@ -57,21 +56,30 @@ export function useAuth(): UseAuthResult {
   const isAuthReady = useAuthStore(selectIsAuthReady);
   const setLoading = useAuthStore(selectSetLoading);
   const setError = useAuthStore(selectSetError);
-  const setIsAnonymous = useAuthStore(selectSetIsAnonymous);
 
   const signInMutation = useSignInMutation();
   const signUpMutation = useSignUpMutation();
   const signOutMutation = useSignOutMutation();
   const anonymousModeMutation = useAnonymousModeMutation();
 
+  // Store mutateAsync in refs to avoid recreating callbacks on every render.
+  // useMutation returns a new object each render, but mutateAsync is stable.
+  const signUpMutateRef = useRef(signUpMutation.mutateAsync);
+  signUpMutateRef.current = signUpMutation.mutateAsync;
+  const signInMutateRef = useRef(signInMutation.mutateAsync);
+  signInMutateRef.current = signInMutation.mutateAsync;
+  const signOutMutateRef = useRef(signOutMutation.mutateAsync);
+  signOutMutateRef.current = signOutMutation.mutateAsync;
+  const anonymousMutateRef = useRef(anonymousModeMutation.mutateAsync);
+  anonymousMutateRef.current = anonymousModeMutation.mutateAsync;
+
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {
       try {
         setLoading(true);
         setError(null);
-        await signUpMutation.mutateAsync({ email, password, displayName });
-        // Only clear anonymous flag after successful signup
-        setIsAnonymous(false);
+        await signUpMutateRef.current({ email, password, displayName });
+        // isAnonymous is automatically derived from firebaseUser by the auth listener
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Sign up failed");
         throw err;
@@ -79,7 +87,7 @@ export function useAuth(): UseAuthResult {
         setLoading(false);
       }
     },
-    [setIsAnonymous, setLoading, setError, signUpMutation]
+    [setLoading, setError]
   );
 
   const signIn = useCallback(
@@ -87,9 +95,8 @@ export function useAuth(): UseAuthResult {
       try {
         setLoading(true);
         setError(null);
-        await signInMutation.mutateAsync({ email, password });
-        // Only clear anonymous flag after successful signin
-        setIsAnonymous(false);
+        await signInMutateRef.current({ email, password });
+        // isAnonymous is automatically derived from firebaseUser by the auth listener
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Sign in failed");
         throw err;
@@ -97,37 +104,35 @@ export function useAuth(): UseAuthResult {
         setLoading(false);
       }
     },
-    [setIsAnonymous, setLoading, setError, signInMutation]
+    [setLoading, setError]
   );
 
   const signOut = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      await signOutMutation.mutateAsync();
+      await signOutMutateRef.current();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Sign out failed");
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError, signOutMutation]);
+  }, [setLoading, setError]);
 
   const continueAnonymously = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      await anonymousModeMutation.mutateAsync();
-      // Only set anonymous flag after successful mutation
-      setIsAnonymous(true);
+      await anonymousMutateRef.current();
+      // isAnonymous is automatically derived from firebaseUser by the auth listener
     } catch (err: unknown) {
-      // Don't set anonymous flag on error - let user try again or choose another option
       setError(err instanceof Error ? err.message : "Failed to continue anonymously");
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [setIsAnonymous, setLoading, setError, anonymousModeMutation]);
+  }, [setLoading, setError]);
 
   return {
     user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, hasFirebaseUser, error,

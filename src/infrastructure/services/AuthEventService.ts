@@ -89,13 +89,16 @@ class AuthEventService {
   private notifyListeners(event: string, payload: AuthEventPayload): void {
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
-      eventListeners.forEach((listener) => {
+      // Copy array before iterating to prevent issues if a listener
+      // removes itself or other listeners during notification
+      const snapshot = [...eventListeners];
+      for (const listener of snapshot) {
         try {
           listener(payload);
         } catch (error) {
           console.error(`[AuthEventService] Listener error for "${event}":`, error);
         }
-      });
+      }
     }
   }
 }

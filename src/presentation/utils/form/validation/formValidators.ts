@@ -17,15 +17,19 @@ import type {
   ProfileFormValues,
   FormValidationError,
 } from "./formValidation.types";
-import { sanitizeEmail, sanitizeName } from "../../../../infrastructure/utils/validation/sanitization";
+import { sanitizeName } from "../../../../infrastructure/utils/validation/sanitization";
 
+/**
+ * Validate login form values.
+ * IMPORTANT: Callers must sanitize email before passing to this function.
+ */
 export function validateLoginForm(
   values: LoginFormValues,
   getErrorMessage: (key: string) => string
 ): FormValidationResult {
   const errors: FormValidationError[] = [];
 
-  const emailResult = validateEmail(sanitizeEmail(values.email));
+  const emailResult = validateEmail(values.email);
   if (!emailResult.isValid && emailResult.error) {
     errors.push({ field: "email", message: getErrorMessage(emailResult.error) });
   }
@@ -38,6 +42,10 @@ export function validateLoginForm(
   return { isValid: errors.length === 0, errors };
 }
 
+/**
+ * Validate register form values.
+ * IMPORTANT: Callers must sanitize email before passing to this function.
+ */
 export function validateRegisterForm(
   values: RegisterFormValues,
   getErrorMessage: (key: string) => string,
@@ -45,7 +53,7 @@ export function validateRegisterForm(
 ): FormValidationResult {
   const errors: FormValidationError[] = [];
 
-  const emailResult = validateEmail(sanitizeEmail(values.email));
+  const emailResult = validateEmail(values.email);
   if (!emailResult.isValid && emailResult.error) {
     errors.push({ field: "email", message: getErrorMessage(emailResult.error) });
   }
@@ -63,6 +71,10 @@ export function validateRegisterForm(
   return { isValid: errors.length === 0, errors };
 }
 
+/**
+ * Validate profile form values.
+ * Email should be pre-sanitized by caller if provided.
+ */
 export function validateProfileForm(
   values: ProfileFormValues,
   getErrorMessage: (key: string) => string
@@ -77,7 +89,7 @@ export function validateProfileForm(
   }
 
   if (values.email) {
-    const emailResult = validateEmail(sanitizeEmail(values.email));
+    const emailResult = validateEmail(values.email);
     if (!emailResult.isValid && emailResult.error) {
       errors.push({ field: "email", message: getErrorMessage(emailResult.error) });
     }

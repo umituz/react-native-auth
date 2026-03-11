@@ -27,6 +27,7 @@ export interface InitializeAuthOptions {
 
 let isInitialized = false;
 let initializationPromise: Promise<{ success: boolean }> | null = null;
+let listenerUnsubscribe: (() => void) | null = null;
 const conversionState: { current: ConversionState } = {
   current: { previousUserId: null, wasAnonymous: false },
 };
@@ -102,7 +103,7 @@ async function doInitializeAuth(
     onAuthStateChange,
   });
 
-  initializeAuthListener({
+  listenerUnsubscribe = initializeAuthListener({
     autoAnonymousSignIn,
     onAuthStateChange: (user) => {
       void handleAuthStateChange(user);
@@ -118,6 +119,10 @@ export function isAuthInitialized(): boolean {
 }
 
 export function resetAuthInitialization(): void {
+  if (listenerUnsubscribe) {
+    listenerUnsubscribe();
+    listenerUnsubscribe = null;
+  }
   isInitialized = false;
   conversionState.current = { previousUserId: null, wasAnonymous: false };
 }

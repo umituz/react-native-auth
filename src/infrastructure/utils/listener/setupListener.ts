@@ -10,16 +10,18 @@ import { getAuthService } from "../../services/AuthService";
 import { completeInitialization, setUnsubscribe } from "./listenerState.util";
 import { handleAuthStateChange } from "./authListenerStateHandler";
 
-type Store = AuthActions & { isAnonymous: boolean };
+type StoreActions = AuthActions;
 
 /**
  * Setup Firebase auth listener with timeout protection
+ * @param getIsAnonymous - Function to read fresh isAnonymous state (avoids stale snapshots)
  */
 export function setupAuthListener(
   auth: Auth,
-  store: Store,
+  store: StoreActions,
   autoAnonymousSignIn: boolean,
-  onAuthStateChange?: (user: User | null) => void | Promise<void>
+  onAuthStateChange?: (user: User | null) => void | Promise<void>,
+  getIsAnonymous?: () => boolean
 ): void {
   const service = getAuthService();
 
@@ -46,7 +48,7 @@ export function setupAuthListener(
         hasTriggered = true;
         clearTimeout(timeout);
       }
-      handleAuthStateChange(user, store, auth, autoAnonymousSignIn, onAuthStateChange);
+      handleAuthStateChange(user, store, auth, autoAnonymousSignIn, onAuthStateChange, getIsAnonymous);
     });
 
     setUnsubscribe(unsubscribe);

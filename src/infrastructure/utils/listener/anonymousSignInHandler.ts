@@ -42,11 +42,13 @@ async function attemptAnonymousSignIn(
 
     callbacks.onSignInStart();
 
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
     try {
-        // Add timeout protection
-        const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("Anonymous sign-in timeout")), timeout)
-        );
+        // Add timeout protection with proper cleanup
+        const timeoutPromise = new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error("Anonymous sign-in timeout")), timeout);
+        });
 
         // Race between sign-in and timeout
         await Promise.race([
@@ -58,6 +60,11 @@ async function attemptAnonymousSignIn(
     } catch (error) {
         const signInError = error instanceof Error ? error : new Error("Unknown sign-in error");
         callbacks.onSignInFailure(signInError);
+    } finally {
+        // Always clear timeout to prevent timer leaks
+        if (timeoutId !== undefined) {
+            clearTimeout(timeoutId);
+        }
     }
 }
 
