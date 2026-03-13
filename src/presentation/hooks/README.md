@@ -127,7 +127,6 @@ import { useUserProfile } from '@umituz/react-native-auth';
 
 ---
 
-### useProfileUpdate & useProfileEdit
 
 **Purpose**: Profile update operations and form management
 
@@ -140,12 +139,10 @@ import { useUserProfile } from '@umituz/react-native-auth';
 **Import Path**:
 ```typescript
 import {
-  useProfileUpdate,
   useProfileEdit
 } from '@umituz/react-native-auth';
 ```
 
-**File**: `useProfileUpdate.ts`
 
 **Rules**:
 - MUST validate before update
@@ -153,7 +150,6 @@ import {
 - MUST show errors to user
 - MUST not allow anonymous updates
 
-**Documentation**: `useProfileUpdate.md`
 
 ---
 

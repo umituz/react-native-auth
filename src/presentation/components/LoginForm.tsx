@@ -4,7 +4,8 @@ import { AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
-import { FormEmailInput, FormPasswordInput } from "./form";
+import { FormEmailInput } from "./form/FormEmailInput";
+import { FormPasswordInput } from "./form/FormPasswordInput";
 
 export interface LoginFormTranslations {
   email: string;

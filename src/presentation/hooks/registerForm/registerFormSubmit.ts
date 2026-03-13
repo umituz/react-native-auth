@@ -8,8 +8,8 @@ import { alertService } from "@umituz/react-native-design-system/molecules";
 import { DEFAULT_PASSWORD_CONFIG } from "../../../domain/value-objects/AuthConfig";
 import {
   validateRegisterForm,
-  errorsToFieldErrors,
-} from "../../utils/form/formValidation.util";
+} from "../../utils/form/validation/formValidators";
+import { errorsToFieldErrors } from "../../utils/form/validation/formValidation.utils";
 import type { FieldErrors, RegisterFormTranslations } from "./useRegisterForm.types";
 import { sanitizeEmail, sanitizeName } from "../../../infrastructure/utils/validation/sanitization";
 

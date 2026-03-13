@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback } from "react";
-import { validateProfileForm } from "../utils/form/formValidation.util";
+import { validateProfileForm } from "../utils/form/validation/formValidators";
 
 export interface ProfileEditFormState {
   displayName: string;
@@ -63,7 +63,7 @@ export const useProfileEdit = (
         displayName: formState.displayName,
         email: formState.email,
       },
-      (key) => key // Pass-through function - returns key as-is since caller handles translation
+      key => key // Identity function for translation
     );
 
     return {

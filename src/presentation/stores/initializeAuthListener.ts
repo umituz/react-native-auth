@@ -10,10 +10,12 @@ import type { AuthListenerOptions } from "../../types/auth-store.types";
 import {
   handleExistingInitialization,
   handleInitializationInProgress,
+} from "../../infrastructure/utils/listener/cleanupHandlers";
+import { setupAuthListener } from "../../infrastructure/utils/listener/setupListener";
+import {
   handleNoFirebaseAuth,
-  setupAuthListener,
   completeListenerSetup,
-} from "../../infrastructure/utils/listener/listenerLifecycle.util";
+} from "../../infrastructure/utils/listener/initializationHandlers";
 import {
   startInitialization,
   isListenerInitialized,

@@ -103,13 +103,29 @@ export { useAuthStore } from './presentation/stores/authStore';
 export { useAuthModalStore } from './presentation/stores/authModalStore';
 export { initializeAuthListener, resetAuthListener, isAuthListenerInitialized } from './presentation/stores/initializeAuthListener';
 export type { AuthState, AuthActions, UserType, AuthListenerOptions } from './types/auth-store.types';
-export * from './presentation/stores/auth.selectors';
+export type { AuthModalMode } from './presentation/stores/auth.selectors';
+export {
+  selectUser,
+  selectLoading,
+  selectError,
+  selectSetLoading,
+  selectSetError,
+  selectSetIsAnonymous,
+  selectShowAuthModal,
+  selectUserId,
+  selectIsAuthenticated,
+  selectHasFirebaseUser,
+  selectIsAnonymous,
+  selectUserType,
+  selectIsAuthReady,
+  selectFirebaseUserId,
+} from './presentation/stores/auth.selectors';
 
 // =============================================================================
 // UTILITIES & INIT
 // =============================================================================
 
 export { getAuthErrorLocalizationKey, resolveErrorMessage } from './presentation/utils/getAuthErrorMessage';
-export { createAuthInitModule } from './init';
+export { createAuthInitModule } from './init/createAuthInitModule';
 export type { AuthInitModuleConfig } from './init/createAuthInitModule';
 

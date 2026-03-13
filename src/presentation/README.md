@@ -27,7 +27,6 @@ React components, hooks, providers, stores, and navigation for authentication UI
 **hooks/useAuth.ts** - Main auth hook
 **hooks/useAuthRequired.ts** - Auth requirement checking
 **hooks/useUserProfile.ts** - Profile data fetching
-**hooks/useProfileUpdate.ts** - Profile updates
 **hooks/useAccountManagement.ts** - Account operations
 **hooks/useSocialLogin.ts** - Social auth management
 **hooks/useAuthBottomSheet.ts** - Modal management
@@ -212,13 +211,11 @@ import { useUserProfile } from '@umituz/react-native-auth';
 
 ---
 
-#### useProfileUpdate
 
 **PURPOSE**: Profile update operations
 
 **IMPORT PATH**:
 ```typescript
-import { useProfileUpdate } from '@umituz/react-native-auth';
 ```
 
 **RETURNS**:
@@ -238,7 +235,6 @@ import { useProfileUpdate } from '@umituz/react-native-auth';
 - Ignore errors
 - Update without user action
 
-**Documentation**: `hooks/useProfileUpdate.md`
 
 ---
 

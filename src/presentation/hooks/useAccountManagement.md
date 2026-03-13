@@ -330,7 +330,7 @@ import { useAccountManagement } from '@umituz/react-native-auth';
 
 - **`useAuth`** (`src/presentation/hooks/useAuth.ts`) - Authentication state
 - **`useUserProfile`** (`src/presentation/hooks/useUserProfile.ts`) - Profile data
-- **`useProfileUpdate`** (`src/presentation/hooks/useProfileUpdate.md`) - Profile editing
+- **`useProfileEdit`** (`src/presentation/hooks/useProfileEdit.ts`) - Profile editing form
 
 ## Related Components
 

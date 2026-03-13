@@ -3,7 +3,7 @@
  * React hook for authentication state management
  */
 
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { useAuthStore } from "../stores/authStore";
 import {
   selectUser,
@@ -62,23 +62,12 @@ export function useAuth(): UseAuthResult {
   const signOutMutation = useSignOutMutation();
   const anonymousModeMutation = useAnonymousModeMutation();
 
-  // Store mutateAsync in refs to avoid recreating callbacks on every render.
-  // useMutation returns a new object each render, but mutateAsync is stable.
-  const signUpMutateRef = useRef(signUpMutation.mutateAsync);
-  signUpMutateRef.current = signUpMutation.mutateAsync;
-  const signInMutateRef = useRef(signInMutation.mutateAsync);
-  signInMutateRef.current = signInMutation.mutateAsync;
-  const signOutMutateRef = useRef(signOutMutation.mutateAsync);
-  signOutMutateRef.current = signOutMutation.mutateAsync;
-  const anonymousMutateRef = useRef(anonymousModeMutation.mutateAsync);
-  anonymousMutateRef.current = anonymousModeMutation.mutateAsync;
-
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {
       try {
         setLoading(true);
         setError(null);
-        await signUpMutateRef.current({ email, password, displayName });
+        await signUpMutation.mutateAsync({ email, password, displayName });
         // isAnonymous is automatically derived from firebaseUser by the auth listener
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Sign up failed");
@@ -87,7 +76,7 @@ export function useAuth(): UseAuthResult {
         setLoading(false);
       }
     },
-    [setLoading, setError]
+    [setLoading, setError, signUpMutation.mutateAsync]
   );
 
   const signIn = useCallback(
@@ -95,7 +84,7 @@ export function useAuth(): UseAuthResult {
       try {
         setLoading(true);
         setError(null);
-        await signInMutateRef.current({ email, password });
+        await signInMutation.mutateAsync({ email, password });
         // isAnonymous is automatically derived from firebaseUser by the auth listener
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Sign in failed");
@@ -104,27 +93,27 @@ export function useAuth(): UseAuthResult {
         setLoading(false);
       }
     },
-    [setLoading, setError]
+    [setLoading, setError, signInMutation.mutateAsync]
   );
 
   const signOut = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      await signOutMutateRef.current();
+      await signOutMutation.mutateAsync();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Sign out failed");
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError]);
+  }, [setLoading, setError, signOutMutation.mutateAsync]);
 
   const continueAnonymously = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      await anonymousMutateRef.current();
+      await anonymousModeMutation.mutateAsync();
       // isAnonymous is automatically derived from firebaseUser by the auth listener
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to continue anonymously");
@@ -132,7 +121,7 @@ export function useAuth(): UseAuthResult {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError]);
+  }, [setLoading, setError, anonymousModeMutation.mutateAsync]);
 
   return {
     user, userId, userType, loading, isAuthReady, isAnonymous, isAuthenticated, hasFirebaseUser, error,

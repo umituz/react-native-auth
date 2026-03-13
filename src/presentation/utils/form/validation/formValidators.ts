@@ -8,7 +8,7 @@ import {
   validatePasswordForLogin,
   validatePasswordForRegister,
   validatePasswordConfirmation,
-} from "../../../../application/services/ValidationService";
+} from "../../../../infrastructure/utils/AuthValidation";
 import type { PasswordConfig } from "../../../../domain/value-objects/AuthConfig";
 import type {
   FormValidationResult,

@@ -109,9 +109,6 @@ export class AuthRepository implements IAuthRepository {
             throw new AuthError("Failed to map user");
         }
 
-        // Ensure Firestore user document exists for existing users too
-        await ensureUserDocument(result.data, { signUpMethod: "email" });
-
         return authUser;
     }
 

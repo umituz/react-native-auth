@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "./useAuth";
-import { validateLoginForm } from "../utils/form/formValidation.util";
+import { validateLoginForm } from "../utils/form/validation/formValidators";
 import { alertService } from "@umituz/react-native-design-system/molecules";
 import { useFormFields } from "../utils/form/useFormField.hook";
 import { sanitizeEmail } from "../../infrastructure/utils/validation/sanitization";
@@ -79,10 +79,11 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     );
 
     if (!validation.isValid) {
-      for (const error of validation.errors) {
-        if (error.field === "email") setEmailError(error.message);
-        if (error.field === "password") setPasswordError(error.message);
-      }
+      // Collect errors first to avoid potential state update batching issues
+      const emailErrorMsg = validation.errors.find(e => e.field === "email")?.message || null;
+      const passwordErrorMsg = validation.errors.find(e => e.field === "password")?.message || null;
+      setEmailError(emailErrorMsg);
+      setPasswordError(passwordErrorMsg);
       return;
     }
 

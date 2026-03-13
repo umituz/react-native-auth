@@ -7,8 +7,8 @@ import { useMemo } from "react";
 import {
   validatePasswordForRegister,
   validatePasswordConfirmation,
-  type PasswordRequirements,
-} from "../../../application/services/ValidationService";
+} from "../../../infrastructure/utils/AuthValidation";
+import type { PasswordRequirements } from "../../../infrastructure/utils/validation/types";
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
 
 interface UsePasswordValidationResult {

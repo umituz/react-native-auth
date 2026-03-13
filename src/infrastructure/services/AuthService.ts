@@ -83,7 +83,8 @@ export class AuthService {
       const success = await this.anonymousModeService.clear(this.storageProvider);
       if (!success) {
         console.warn('[AuthService] Failed to clear anonymous mode from storage');
-        // Force clear in memory to maintain consistency
+        // Force clear in memory to maintain consistency and prevent stale state
+        // Storage clear failure shouldn't block auth flow, so we force update memory
         this.anonymousModeService.setAnonymousMode(false);
       }
     }

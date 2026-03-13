@@ -12,7 +12,6 @@ const ANONYMOUS_RETRY_DELAY_MS = 1000;
 const ANONYMOUS_SIGNIN_TIMEOUT_MS = 10000;
 
 interface AnonymousSignInCallbacks {
-    onSignInStart: () => void;
     onSignInSuccess: () => void;
     onSignInFailure: (error: Error) => void;
 }
@@ -31,7 +30,7 @@ interface AnonymousSignInOptions {
  */
 async function attemptAnonymousSignIn(
     auth: Auth,
-    callbacks: AnonymousSignInCallbacks,
+    callbacks: Omit<AnonymousSignInCallbacks, 'onSignInStart'>,
     options: AnonymousSignInOptions = {}
 ): Promise<void> {
     const {
@@ -39,8 +38,6 @@ async function attemptAnonymousSignIn(
         retryDelay = ANONYMOUS_RETRY_DELAY_MS,
         timeout = ANONYMOUS_SIGNIN_TIMEOUT_MS,
     } = options;
-
-    callbacks.onSignInStart();
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -83,7 +80,7 @@ async function performAnonymousSignIn(
         } catch (error) {
             // If not last attempt, wait and retry
             if (attempt < maxRetries - 1) {
-                await new Promise(resolve => setTimeout(() => resolve(undefined), retryDelay));
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
                 continue;
             }
 
@@ -119,9 +116,6 @@ export function createAnonymousSignInHandler(
         await attemptAnonymousSignIn(
             auth,
             {
-                onSignInStart: () => {
-                    // Sign-in starting
-                },
                 onSignInSuccess: () => {
                     // Listener will be triggered again with the new user
                 },

@@ -7,7 +7,9 @@ import { AuthLink } from "./AuthLink";
 import { AuthLegalLinks, type AuthLegalLinksTranslations } from "./AuthLegalLinks";
 import { PasswordStrengthIndicator, type PasswordStrengthTranslations } from "./PasswordStrengthIndicator";
 import { PasswordMatchIndicator, type PasswordMatchTranslations } from "./PasswordMatchIndicator";
-import { FormTextInput, FormEmailInput, FormPasswordInput } from "./form";
+import { FormTextInput } from "./form/FormTextInput";
+import { FormEmailInput } from "./form/FormEmailInput";
+import { FormPasswordInput } from "./form/FormPasswordInput";
 
 export interface RegisterFormTranslations {
   displayName: string;
