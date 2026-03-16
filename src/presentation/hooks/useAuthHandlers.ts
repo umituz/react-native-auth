@@ -56,7 +56,7 @@ export const useAuthHandlers = (appInfo: AuthHandlersAppInfo, translations?: Aut
       }
       await Linking.openURL(url);
     } catch (error) {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
+      if (__DEV__) {
         console.error("[useAuthHandlers] Failed to open app store:", error);
       }
       Alert.alert(translations?.common || "", translations?.failedToOpenAppStore || "");
@@ -67,7 +67,7 @@ export const useAuthHandlers = (appInfo: AuthHandlersAppInfo, translations?: Aut
     try {
       await signOut();
     } catch (error) {
-      if (typeof __DEV__ !== "undefined" && __DEV__) {
+      if (__DEV__) {
         console.error("[useAuthHandlers] Sign out failed:", error);
       }
       AlertService.createErrorAlert(

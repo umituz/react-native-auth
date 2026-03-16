@@ -32,7 +32,7 @@ export function useRegisterForm(config?: UseRegisterFormConfig): UseRegisterForm
   const clearFormErrors = useCallback(() => {
     setLocalError(null);
     setFieldErrors({});
-  }, []);
+  }, [setLocalError, setFieldErrors]);
 
   const { fields, updateField } = useFormFields(
     {

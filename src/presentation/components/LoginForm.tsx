@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, memo } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useLoginForm } from "../hooks/useLoginForm";
@@ -22,7 +22,7 @@ interface LoginFormProps {
   onNavigateToRegister: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const LoginForm = memo<LoginFormProps>(({
   translations,
   onNavigateToRegister,
 }) => {
@@ -84,7 +84,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       />
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   signInButton: {
@@ -92,3 +92,5 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 });
+
+LoginForm.displayName = 'LoginForm';

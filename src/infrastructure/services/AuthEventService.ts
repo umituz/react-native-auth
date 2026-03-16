@@ -58,11 +58,12 @@ class AuthEventService {
   }
 
   addEventListener(event: string, listener: AuthEventListener): () => void {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, []);
+    let eventListeners = this.listeners.get(event);
+    if (!eventListeners) {
+      eventListeners = [];
+      this.listeners.set(event, eventListeners);
     }
 
-    const eventListeners = this.listeners.get(event)!;
     eventListeners.push(listener);
 
     // Return cleanup function

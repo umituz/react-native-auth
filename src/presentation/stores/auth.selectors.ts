@@ -1,10 +1,20 @@
 /**
  * Auth Store Selectors
  * Pure functions for deriving state from auth store
+ * Uses authStateCalculator for derived state calculations
  */
 
 import type { AuthState, AuthActions, UserType } from "../../types/auth-store.types";
 import type { AuthUser } from "../../domain/entities/AuthUser";
+import {
+  calculateUserId,
+  calculateHasFirebaseUser,
+  calculateIsAnonymous,
+  calculateIsAuthenticated,
+  calculateUserType,
+  calculateIsAuthReady,
+  calculateDerivedAuthState,
+} from "../../infrastructure/utils/calculators/authStateCalculator";
 
 // Combined store type for selectors
 type AuthStore = AuthState & AuthActions;
@@ -63,13 +73,15 @@ export const selectShowAuthModal = (state: { showAuthModal: (callback?: () => vo
 // =============================================================================
 // DERIVED SELECTORS
 // =============================================================================
+// Note: These selectors delegate to authStateCalculator utilities
+// for better separation of concerns and testability
 
 /**
  * Get current user ID
  * Uses firebaseUser as single source of truth
  */
 export const selectUserId = (state: AuthStore): string | null => {
-  return state.firebaseUser?.uid ?? null;
+  return calculateUserId(state.firebaseUser);
 };
 
 /**
@@ -77,13 +89,11 @@ export const selectUserId = (state: AuthStore): string | null => {
  * Uses firebaseUser as single source of truth
  */
 export const selectIsAuthenticated = (state: AuthStore): boolean => {
-  const hasFirebaseUser = !!state.firebaseUser;
-  const isNotAnonymous = !state.firebaseUser?.isAnonymous;
-  return hasFirebaseUser && isNotAnonymous;
+  return calculateIsAuthenticated(state.firebaseUser);
 };
 
 export const selectHasFirebaseUser = (state: AuthStore): boolean => {
-  return !!state.firebaseUser;
+  return calculateHasFirebaseUser(state.firebaseUser);
 };
 
 /**
@@ -91,7 +101,7 @@ export const selectHasFirebaseUser = (state: AuthStore): boolean => {
  * Uses firebaseUser as single source of truth
  */
 export const selectIsAnonymous = (state: AuthStore): boolean => {
-  return state.firebaseUser?.isAnonymous ?? false;
+  return calculateIsAnonymous(state.firebaseUser);
 };
 
 /**
@@ -99,17 +109,45 @@ export const selectIsAnonymous = (state: AuthStore): boolean => {
  * Derived from firebaseUser state
  */
 export const selectUserType = (state: AuthStore): UserType => {
-  if (!state.firebaseUser) {
-    return "none";
-  }
-
-  return state.firebaseUser.isAnonymous ? "anonymous" : "authenticated";
+  return calculateUserType(state.firebaseUser);
 };
 
 /**
  * Check if auth is ready (initialized and not loading)
  */
 export const selectIsAuthReady = (state: AuthStore): boolean => {
-  return state.initialized && !state.loading;
+  return calculateIsAuthReady(state.initialized, state.loading);
+};
+
+/**
+ * Batch selector - get all auth state at once to minimize re-renders
+ * More efficient than calling selectors individually
+ */
+export const selectAuthState = (state: AuthStore): {
+  user: AuthUser | null;
+  userId: string | null;
+  userType: UserType;
+  loading: boolean;
+  isAuthReady: boolean;
+  isAnonymous: boolean;
+  isAuthenticated: boolean;
+  hasFirebaseUser: boolean;
+  error: string | null;
+} => {
+  // Use calculateDerivedAuthState for batch calculation efficiency
+  const derivedState = calculateDerivedAuthState({
+    firebaseUser: state.firebaseUser,
+    user: state.user,
+    loading: state.loading,
+    initialized: state.initialized,
+    error: state.error,
+  });
+
+  return {
+    user: selectUser(state),
+    loading: selectLoading(state),
+    error: selectError(state),
+    ...derivedState,
+  };
 };
 

@@ -1,15 +1,13 @@
 /**
  * Password Validation Hook
  * Provides reusable password validation logic with requirements tracking
+ * PERFORMANCE: Single useMemo using passwordStrengthCalculator utility
  */
 
 import { useMemo } from "react";
-import {
-  validatePasswordForRegister,
-  validatePasswordConfirmation,
-} from "../../../infrastructure/utils/AuthValidation";
 import type { PasswordRequirements } from "../../../infrastructure/utils/validation/types";
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
+import { calculatePasswordValidation } from "../../../infrastructure/utils/calculators/passwordStrengthCalculator";
 
 interface UsePasswordValidationResult {
   passwordRequirements: PasswordRequirements;
@@ -34,40 +32,23 @@ export function usePasswordValidation(
   confirmPassword: string,
   options?: UsePasswordValidationOptions
 ): UsePasswordValidationResult {
-  const config = options?.passwordConfig;
+  // PERFORMANCE: Use utility function for batch calculation
+  const result = useMemo(() => {
+    const validation = calculatePasswordValidation({
+      password,
+      confirmPassword,
+      config: options?.passwordConfig,
+    });
 
-  const passwordRequirements = useMemo((): PasswordRequirements => {
-    if (!password || !config) {
-      return { hasMinLength: false };
-    }
-    const result = validatePasswordForRegister(password, config);
-    return result.requirements;
-  }, [password, config]);
+    // Map to expected return type
+    return {
+      passwordRequirements: validation.requirements,
+      passwordsMatch: validation.passwordsMatch,
+      isValid: validation.isValid,
+      confirmationError: validation.confirmationError,
+    };
+  }, [password, confirmPassword, options?.passwordConfig]);
 
-  const passwordsMatch = useMemo(() => {
-    if (!password || !confirmPassword) {
-      return false;
-    }
-    return password === confirmPassword;
-  }, [password, confirmPassword]);
-
-  const confirmationError = useMemo(() => {
-    if (!confirmPassword) {
-      return null;
-    }
-    const result = validatePasswordConfirmation(password, confirmPassword);
-    return result.error ?? null;
-  }, [password, confirmPassword]);
-
-  const isValid = useMemo(() => {
-    return passwordRequirements.hasMinLength && passwordsMatch;
-  }, [passwordRequirements, passwordsMatch]);
-
-  return {
-    passwordRequirements,
-    passwordsMatch,
-    isValid,
-    confirmationError,
-  };
+  return result;
 }
 

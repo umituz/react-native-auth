@@ -40,6 +40,40 @@ export { safeCallback, safeCallbackSync } from './infrastructure/utils/safeCallb
 
 
 // =============================================================================
+// CALCULATOR UTILITIES
+// =============================================================================
+
+export {
+  // Auth State Calculator
+  calculateUserId,
+  calculateHasFirebaseUser,
+  calculateIsAnonymous,
+  calculateIsAuthenticated,
+  calculateUserType,
+  calculateIsAuthReady,
+  calculateDerivedAuthState,
+  // Form Error Collection
+  collectFieldErrors,
+  extractFieldError,
+  hasFieldErrors,
+  getFirstErrorMessage,
+  // User Profile Calculator
+  calculateUserProfileDisplay,
+  calculateDisplayName,
+  hasUserAvatar,
+  getAvatarUrl,
+  // Password Strength Calculator
+  calculatePasswordRequirements,
+  calculatePasswordsMatch,
+  calculateConfirmationError,
+  calculatePasswordValidity,
+  calculatePasswordValidation,
+  hasMinLength,
+  calculatePasswordStrength,
+} from './infrastructure/utils/calculators';
+
+
+// =============================================================================
 // PRESENTATION LAYER - Hooks
 // =============================================================================
 
@@ -119,6 +153,7 @@ export {
   selectUserType,
   selectIsAuthReady,
   selectFirebaseUserId,
+  selectAuthState,
 } from './presentation/stores/auth.selectors';
 
 // =============================================================================

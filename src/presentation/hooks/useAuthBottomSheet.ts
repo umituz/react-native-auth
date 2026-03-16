@@ -38,9 +38,19 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
   const { signInWithApple, appleAvailable } = useAppleAuth();
 
   // Determine enabled providers
+  // PERFORMANCE: Memoize to prevent recalculation when config hasn't changed
   const providers = useMemo<SocialAuthProvider[]>(() => {
     return determineEnabledProviders(socialConfig, appleAvailable, googleConfigured);
-  }, [socialConfig, appleAvailable, googleConfigured]);
+  }, [
+    // Use deep comparison for socialConfig to avoid unnecessary recalculation
+    // when parent passes a new object reference with same values
+    socialConfig?.google?.iosClientId,
+    socialConfig?.google?.webClientId,
+    socialConfig?.google?.androidClientId,
+    socialConfig?.apple?.enabled,
+    appleAvailable,
+    googleConfigured,
+  ]);
 
   // Social auth loading states
   const [googleLoading, setGoogleLoading] = useState(false);

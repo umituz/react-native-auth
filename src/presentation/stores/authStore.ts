@@ -28,9 +28,12 @@ export const useAuthStore = createStore<AuthState, AuthActions>({
     removeItem: (name) => storageService.removeItem(name),
   },
   version: 2,
+  // PERFORMANCE: Only persist essential flags
+  // Firebase handles user persistence, we only need anonymous mode and initialized state
   partialize: (state) => ({
     isAnonymous: state.isAnonymous,
     initialized: state.initialized,
+    loading: false, // Always restore as false to prevent loading state on app restart
   }),
   migrate: (persistedState: unknown) => {
     const state = (persistedState && typeof persistedState === "object" ? persistedState : {}) as Partial<AuthState>;

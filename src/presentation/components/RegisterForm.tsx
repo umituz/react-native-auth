@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, memo } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useRegisterForm } from "../hooks/useRegisterForm";
@@ -38,7 +38,7 @@ interface RegisterFormProps {
   onPrivacyPress?: () => void;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({
+export const RegisterForm = memo<RegisterFormProps>(({
   translations,
   onNavigateToLogin,
   termsUrl,
@@ -149,10 +149,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       />
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   passwordInput: { marginBottom: 4 },
   confirmPasswordInput: { marginBottom: 4 },
   signUpButton: { minHeight: 52, marginBottom: 16, marginTop: 8 },
 });
+
+RegisterForm.displayName = 'RegisterForm';

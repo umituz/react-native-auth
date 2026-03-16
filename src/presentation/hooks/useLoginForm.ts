@@ -6,6 +6,7 @@ import { useFormFields } from "../utils/form/useFormField.hook";
 import { sanitizeEmail } from "../../infrastructure/utils/validation/sanitization";
 import { useAuthErrorHandler } from "./useAuthErrorHandler";
 import { useLocalError } from "./useLocalError";
+import { extractFieldError } from "../../infrastructure/utils/calculators/formErrorCollection";
 
 interface LoginFormTranslations {
   successTitle: string;
@@ -44,7 +45,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     setEmailError(null);
     setPasswordError(null);
     setLocalError(null);
-  }, [setLocalError]);
+  }, [setLocalError, setEmailError, setPasswordError]);
 
   const { fields, updateField } = useFormFields(
     { email: "", password: "" },
@@ -79,11 +80,9 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     );
 
     if (!validation.isValid) {
-      // Collect errors first to avoid potential state update batching issues
-      const emailErrorMsg = validation.errors.find(e => e.field === "email")?.message || null;
-      const passwordErrorMsg = validation.errors.find(e => e.field === "password")?.message || null;
-      setEmailError(emailErrorMsg);
-      setPasswordError(passwordErrorMsg);
+      // Use utility to collect field errors
+      setEmailError(extractFieldError(validation.errors, "email"));
+      setPasswordError(extractFieldError(validation.errors, "password"));
       return;
     }
 
