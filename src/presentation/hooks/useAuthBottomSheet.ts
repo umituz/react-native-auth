@@ -128,7 +128,7 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     }
   }, [onAppleSignIn, signInWithApple]);
 
-  return {
+  return useMemo(() => ({
     modalRef,
     googleLoading,
     appleLoading,
@@ -140,5 +140,17 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     handleNavigateToLogin,
     handleGoogleSignIn,
     handleAppleSignIn,
-  };
+  }), [
+    modalRef,
+    googleLoading,
+    appleLoading,
+    mode,
+    providers,
+    handleDismiss,
+    handleClose,
+    handleNavigateToRegister,
+    handleNavigateToLogin,
+    handleGoogleSignIn,
+    handleAppleSignIn,
+  ]);
 }

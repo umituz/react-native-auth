@@ -7,10 +7,17 @@
 import { useCallback } from "react";
 import { useAuthStore } from "../stores/authStore";
 import {
-  selectAuthState,
   selectSetLoading,
   selectSetError,
 } from "../stores/auth.selectors";
+import {
+  calculateUserId,
+  calculateHasFirebaseUser,
+  calculateIsAnonymous,
+  calculateIsAuthenticated,
+  calculateUserType,
+  calculateIsAuthReady,
+} from "../../infrastructure/utils/calculators/authStateCalculator";
 import type { UserType } from "../../types/auth-store.types";
 import {
   useSignInMutation,
@@ -38,9 +45,14 @@ export interface UseAuthResult {
 }
 
 export function useAuth(): UseAuthResult {
-  // PERFORMANCE: Single batch selector instead of 10 separate selectors
-  // This reduces re-renders from 10x to 1x when auth state changes
-  const authState = useAuthStore(selectAuthState);
+  // PERFORMANCE: Individual selectors instead of selectAuthState to avoid unstable object references
+  // This fixes the 'getSnapshot should be cached' warning in React 19
+  const user = useAuthStore((s) => s.user);
+  const loading = useAuthStore((s) => s.loading);
+  const error = useAuthStore((s) => s.error);
+  const firebaseUser = useAuthStore((s) => s.firebaseUser);
+  const initialized = useAuthStore((s) => s.initialized);
+
   const setLoading = useAuthStore(selectSetLoading);
   const setError = useAuthStore(selectSetError);
 
@@ -110,8 +122,28 @@ export function useAuth(): UseAuthResult {
     }
   }, [setLoading, setError, anonymousModeMutation.mutateAsync]);
 
+  // Derive state (same logic as in selectAuthState but stable within this hook)
+  const userId = calculateUserId(firebaseUser);
+  const isAuthenticated = calculateIsAuthenticated(firebaseUser);
+  const isAnonymous = calculateIsAnonymous(firebaseUser);
+  const userType = calculateUserType(firebaseUser);
+  const isAuthReady = calculateIsAuthReady(initialized, loading);
+  const hasFirebaseUser = calculateHasFirebaseUser(firebaseUser);
+
   return {
-    ...authState,
-    signUp, signIn, signOut, continueAnonymously, setError,
+    user,
+    userId,
+    userType,
+    loading,
+    isAuthReady,
+    isAnonymous,
+    isAuthenticated,
+    hasFirebaseUser,
+    error,
+    signUp,
+    signIn,
+    signOut,
+    continueAnonymously,
+    setError,
   };
 }
