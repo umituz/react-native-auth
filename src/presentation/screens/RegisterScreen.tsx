@@ -1,4 +1,10 @@
-import React from "react";
+/**
+ * Register Screen Component
+ * Registration form screen with navigation
+ * PERFORMANCE: Memoized to prevent unnecessary re-renders
+ */
+
+import React, { memo, useCallback } from "react";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicCard } from "@umituz/react-native-design-system/atoms";
 import { useAppNavigation } from "@umituz/react-native-design-system/molecules";
@@ -20,19 +26,14 @@ export interface RegisterScreenProps {
   onPrivacyPress?: () => void;
 }
 
-export const RegisterScreen: React.FC<RegisterScreenProps> = ({
-  translations,
-  termsUrl,
-  privacyUrl,
-  onTermsPress,
-  onPrivacyPress,
-}) => {
+export const RegisterScreen = memo<RegisterScreenProps>(({ translations, termsUrl, privacyUrl, onTermsPress, onPrivacyPress }) => {
   const navigation = useAppNavigation();
   const tokens = useAppDesignTokens();
 
-  const handleNavigateToLogin = () => {
+  // PERFORMANCE: Stable callback reference
+  const handleNavigateToLogin = useCallback(() => {
     navigation.navigate("Login");
-  };
+  }, [navigation]);
 
   return (
     <ScreenLayout
@@ -55,4 +56,6 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       </AtomicCard>
     </ScreenLayout>
   );
-};
+});
+
+RegisterScreen.displayName = 'RegisterScreen';

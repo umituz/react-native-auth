@@ -1,9 +1,10 @@
 /**
  * Auth Link Component
  * Link text with button for navigation between auth screens
+ * PERFORMANCE: Memoized to prevent unnecessary re-renders
  */
 
-import React from "react";
+import React, { memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicText, AtomicButton } from "@umituz/react-native-design-system/atoms";
@@ -15,20 +16,12 @@ interface AuthLinkProps {
   disabled?: boolean;
 }
 
-export const AuthLink: React.FC<AuthLinkProps> = ({
-  text,
-  linkText,
-  onPress,
-  disabled = false,
-}) => {
+export const AuthLink = memo<AuthLinkProps>(({ text, linkText, onPress, disabled = false }) => {
   const tokens = useAppDesignTokens();
 
   return (
     <View style={[styles.container, { marginTop: tokens.spacing.xs, paddingTop: tokens.spacing.xs }]}>
-      <AtomicText
-        type="bodyMedium"
-        color="textSecondary"
-      >
+      <AtomicText type="bodyMedium" color="textSecondary">
         {text}{" "}
       </AtomicText>
       <AtomicButton
@@ -41,7 +34,9 @@ export const AuthLink: React.FC<AuthLinkProps> = ({
       </AtomicButton>
     </View>
   );
-};
+});
+
+AuthLink.displayName = 'AuthLink';
 
 const styles = StyleSheet.create({
   container: {

@@ -1,4 +1,10 @@
-import React from "react";
+/**
+ * Account Actions Component
+ * Logout and delete account actions
+ * PERFORMANCE: Memoized with useCallback for stable alert action handlers
+ */
+
+import React, { memo, useCallback } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicIcon, AtomicText } from "@umituz/react-native-design-system/atoms";
@@ -26,7 +32,7 @@ interface AccountActionsProps {
   config: AccountActionsConfig;
 }
 
-export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
+export const AccountActions = memo<AccountActionsProps>(({ config }) => {
   const tokens = useAppDesignTokens();
   const alert = useAlert();
   const {
@@ -46,7 +52,8 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
     showChangePassword = false,
   } = config;
 
-  const handleLogout = () => {
+  // PERFORMANCE: Stable callback references prevent unnecessary re-renders
+  const handleLogout = useCallback(() => {
     alert.show(AlertType.WARNING, AlertMode.MODAL, logoutConfirmTitle, logoutConfirmMessage, {
       actions: [
         { id: "cancel", label: cancelText, style: "secondary", onPress: () => {} },
@@ -66,9 +73,9 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
         },
       ],
     });
-  };
+  }, [alert, logoutText, logoutConfirmTitle, logoutConfirmMessage, cancelText, onLogout]);
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = useCallback(() => {
     alert.show(AlertType.ERROR, AlertMode.MODAL, deleteConfirmTitle, deleteConfirmMessage, {
       actions: [
         { id: "cancel", label: cancelText, style: "secondary", onPress: () => {} },
@@ -86,7 +93,7 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
         },
       ],
     });
-  };
+  }, [alert, deleteAccountText, deleteConfirmTitle, deleteConfirmMessage, deleteErrorTitle, deleteErrorMessage, cancelText, onDeleteAccount]);
 
   return (
     <View style={styles.container}>
@@ -111,7 +118,9 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
       </TouchableOpacity>
     </View>
   );
-};
+});
+
+AccountActions.displayName = 'AccountActions';
 
 const styles = StyleSheet.create({
   container: { gap: 12 },

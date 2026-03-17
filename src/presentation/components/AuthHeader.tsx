@@ -1,4 +1,10 @@
-import React from "react";
+/**
+ * Auth Header Component
+ * Displays auth screen title and optional subtitle
+ * PERFORMANCE: Memoized to prevent unnecessary re-renders
+ */
+
+import React, { memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
@@ -8,7 +14,7 @@ interface AuthHeaderProps {
   subtitle?: string;
 }
 
-export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
+export const AuthHeader = memo<AuthHeaderProps>(({ title, subtitle }) => {
   const tokens = useAppDesignTokens();
 
   return (
@@ -34,7 +40,9 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
       )}
     </View>
   );
-};
+});
+
+AuthHeader.displayName = 'AuthHeader';
 
 const styles = StyleSheet.create({
   header: {

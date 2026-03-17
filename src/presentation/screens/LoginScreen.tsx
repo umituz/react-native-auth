@@ -1,4 +1,10 @@
-import React from "react";
+/**
+ * Login Screen Component
+ * Login form screen with navigation
+ * PERFORMANCE: Memoized to prevent unnecessary re-renders
+ */
+
+import React, { memo, useCallback } from "react";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicCard } from "@umituz/react-native-design-system/atoms";
 import { useAppNavigation } from "@umituz/react-native-design-system/molecules";
@@ -16,13 +22,14 @@ export interface LoginScreenProps {
   translations: LoginScreenTranslations;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ translations }) => {
+export const LoginScreen = memo<LoginScreenProps>(({ translations }) => {
   const navigation = useAppNavigation();
   const tokens = useAppDesignTokens();
 
-  const handleNavigateToRegister = () => {
+  // PERFORMANCE: Stable callback reference
+  const handleNavigateToRegister = useCallback(() => {
     navigation.navigate("Register");
-  };
+  }, [navigation]);
 
   return (
     <ScreenLayout
@@ -41,4 +48,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ translations }) => {
       </AtomicCard>
     </ScreenLayout>
   );
-};
+});
+
+LoginScreen.displayName = 'LoginScreen';

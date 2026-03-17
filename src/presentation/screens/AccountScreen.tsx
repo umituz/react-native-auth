@@ -2,9 +2,10 @@
  * Account Screen
  * Pure UI component for account management
  * Business logic provided via props from app layer
+ * PERFORMANCE: Memoized to prevent unnecessary re-renders
  */
 
-import React from "react";
+import React, { memo } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicIcon, AtomicText } from "@umituz/react-native-design-system/atoms";
@@ -29,7 +30,7 @@ export interface AccountScreenProps {
     config: AccountScreenConfig;
 }
 
-export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
+export const AccountScreen = memo<AccountScreenProps>(({ config }) => {
     const tokens = useAppDesignTokens();
 
     return (
@@ -74,7 +75,9 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ config }) => {
             {config.PasswordPromptComponent}
         </>
     );
-};
+});
+
+AccountScreen.displayName = 'AccountScreen';
 
 const styles = StyleSheet.create({
     content: {

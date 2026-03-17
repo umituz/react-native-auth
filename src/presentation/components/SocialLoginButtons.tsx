@@ -1,4 +1,10 @@
-import React from "react";
+/**
+ * Social Login Buttons Component
+ * Google and Apple sign-in buttons
+ * PERFORMANCE: Memoized and provider checks memoized to prevent re-renders
+ */
+
+import React, { useMemo, memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicText, AtomicButton } from "@umituz/react-native-design-system/atoms";
@@ -19,17 +25,14 @@ interface SocialLoginButtonsProps {
   appleLoading?: boolean;
 }
 
-export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
-  translations,
-  enabledProviders,
-  onGooglePress,
-  onApplePress,
-  googleLoading = false,
-  appleLoading = false,
-}) => {
+export const SocialLoginButtons = memo<SocialLoginButtonsProps>(({ translations, enabledProviders, onGooglePress, onApplePress, googleLoading = false, appleLoading = false }) => {
   const tokens = useAppDesignTokens();
-  const hasGoogle = enabledProviders.includes("google");
-  const hasApple = enabledProviders.includes("apple");
+
+  // PERFORMANCE: Memoize provider checks to prevent recalculation on every render
+  const { hasGoogle, hasApple } = useMemo(() => ({
+    hasGoogle: enabledProviders.includes("google"),
+    hasApple: enabledProviders.includes("apple"),
+  }), [enabledProviders]);
 
   if (!hasGoogle && !hasApple) {
     return null;
@@ -74,7 +77,9 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
       </View>
     </View>
   );
-};
+});
+
+SocialLoginButtons.displayName = 'SocialLoginButtons';
 
 const styles = StyleSheet.create({
   container: {},
