@@ -119,7 +119,9 @@ export function resetListenerState(): void {
     try {
       state.unsubscribe();
     } catch (error) {
-      console.error('[ListenerState] Error during unsubscribe:', error);
+      if (__DEV__) {
+        console.error('[ListenerState] Error during unsubscribe:', error);
+      }
     }
   }
   state.initialized = false;

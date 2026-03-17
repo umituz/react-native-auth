@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
@@ -22,12 +22,7 @@ interface RequirementDotProps {
   pendingColor: ColorVariant;
 }
 
-const RequirementDot: React.FC<RequirementDotProps> = ({
-  label,
-  isValid,
-  successColor,
-  pendingColor,
-}) => {
+const RequirementDot = memo<RequirementDotProps>(({ label, isValid, successColor, pendingColor }) => {
   const tokens = useAppDesignTokens();
   const colorKey = isValid ? successColor : pendingColor;
   const dotColor = (tokens.colors as Record<string, string>)[colorKey] || tokens.colors.textTertiary;
@@ -40,20 +35,20 @@ const RequirementDot: React.FC<RequirementDotProps> = ({
       </AtomicText>
     </View>
   );
-};
+});
 
-export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
-  translations,
-  requirements,
-  showLabels = true,
-}) => {
+RequirementDot.displayName = 'RequirementDot';
+
+export const PasswordStrengthIndicator = memo<PasswordStrengthIndicatorProps>(({ translations, requirements, showLabels = true }) => {
   const tokens = useAppDesignTokens();
   const successColor: ColorVariant = "success";
   const pendingColor: ColorVariant = "textTertiary";
 
-  const items = [
-    { key: "minLength", label: translations.minLength, isValid: requirements.hasMinLength },
-  ];
+  // PERFORMANCE: Memoize items array to prevent recreation on every render
+  const items = useMemo(
+    () => [{ key: "minLength" as const, label: translations.minLength, isValid: requirements.hasMinLength }],
+    [translations.minLength, requirements.hasMinLength]
+  );
 
   if (!showLabels) {
     return (
@@ -86,7 +81,9 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
       ))}
     </View>
   );
-};
+});
+
+PasswordStrengthIndicator.displayName = 'PasswordStrengthIndicator';
 
 const styles = StyleSheet.create({
   container: {

@@ -20,7 +20,9 @@ export class AnonymousModeService {
       this.isAnonymousMode = value === "true";
       return this.isAnonymousMode;
     } catch (error) {
-      console.error('[AnonymousModeService] Failed to load state:', error instanceof Error ? error.message : String(error));
+      if (__DEV__) {
+        console.error('[AnonymousModeService] Failed to load state:', error instanceof Error ? error.message : String(error));
+      }
       this.isAnonymousMode = false;
       return false;
     }
@@ -31,7 +33,9 @@ export class AnonymousModeService {
       await storageProvider.set(this.storageKey, value.toString());
       return true;
     } catch (error) {
-      console.error('[AnonymousModeService] Failed to save state:', error instanceof Error ? error.message : String(error));
+      if (__DEV__) {
+        console.error('[AnonymousModeService] Failed to save state:', error instanceof Error ? error.message : String(error));
+      }
       return false;
     }
   }
@@ -42,7 +46,9 @@ export class AnonymousModeService {
       this.isAnonymousMode = false;
       return true;
     } catch (error) {
-      console.error('[AnonymousModeService] Failed to clear state:', error instanceof Error ? error.message : String(error));
+      if (__DEV__) {
+        console.error('[AnonymousModeService] Failed to clear state:', error instanceof Error ? error.message : String(error));
+      }
       return false;
     }
   }

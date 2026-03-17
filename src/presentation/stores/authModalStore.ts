@@ -78,11 +78,15 @@ export const useAuthModalStore = createStore<AuthModalState, AuthModalActions>({
           // If it's a promise, catch rejections
           if (result && typeof result.then === 'function') {
             result.catch((error) => {
-              console.error('[AuthModalStore] Pending callback error:', error);
+              if (__DEV__) {
+                console.error('[AuthModalStore] Pending callback error:', error);
+              }
             });
           }
         } catch (error) {
-          console.error('[AuthModalStore] Pending callback error:', error);
+          if (__DEV__) {
+            console.error('[AuthModalStore] Pending callback error:', error);
+          }
         }
         set({ pendingCallback: null });
       }

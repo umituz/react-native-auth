@@ -4,18 +4,11 @@
  */
 
 /**
- * Base validation result
- * Common interface for all validation results
- */
-export interface BaseValidationResult {
-  isValid: boolean;
-}
-
-/**
  * Single field validation result
  * Used for validating individual fields (email, password, etc.)
  */
-export interface ValidationResult extends BaseValidationResult {
+export interface ValidationResult {
+  isValid: boolean;
   error?: string;
 }
 
@@ -32,7 +25,8 @@ export interface FormValidationError {
  * Multi-field form validation result
  * Used for validating entire forms with multiple fields
  */
-export interface FormValidationResult extends BaseValidationResult {
+export interface FormValidationResult {
+  isValid: boolean;
   errors: FormValidationError[];
 }
 
@@ -48,6 +42,8 @@ export interface PasswordRequirements {
  * Password strength validation result
  * Extends ValidationResult with password-specific requirements
  */
-export interface PasswordStrengthResult extends ValidationResult {
+export interface PasswordStrengthResult {
+  isValid: boolean;
+  error?: string;
   requirements: PasswordRequirements;
 }

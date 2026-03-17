@@ -127,32 +127,6 @@ import { useUserProfile } from '@umituz/react-native-auth';
 
 ---
 
-
-**Purpose**: Profile update operations and form management
-
-**When to Use**:
-- Profile editing screens
-- Settings screens
-- Form state management
-- Profile modifications
-
-**Import Path**:
-```typescript
-import {
-  useProfileEdit
-} from '@umituz/react-native-auth';
-```
-
-
-**Rules**:
-- MUST validate before update
-- MUST handle loading state
-- MUST show errors to user
-- MUST not allow anonymous updates
-
-
----
-
 ### useAccountManagement
 
 **Purpose**: Account operations (logout, delete)
@@ -177,37 +151,6 @@ import { useAccountManagement } from '@umituz/react-native-auth';
 - MUST hide for anonymous users
 
 **Documentation**: `useAccountManagement.md`
-
----
-
-### useSocialLogin
-
-**Purpose**: Google and Apple authentication
-
-**When to Use**:
-- Social authentication needed
-- Want Google sign-in
-- Want Apple sign-in (iOS)
-- Unified social auth interface
-
-**Import Path**:
-```typescript
-import {
-  useSocialLogin,
-  useGoogleAuth,
-  useAppleAuth
-} from '@umituz/react-native-auth';
-```
-
-**File**: `useSocialLogin.ts`
-
-**Rules**:
-- MUST configure providers before use
-- MUST check provider availability
-- MUST handle loading states
-- MUST handle platform differences
-
-**Documentation**: `useSocialLogin.md`
 
 ---
 

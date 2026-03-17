@@ -39,7 +39,9 @@ export const usePasswordPromptNavigation = (
           })
         );
       } catch (error) {
-        console.error('[usePasswordPromptNavigation] Navigation failed:', error);
+        if (__DEV__) {
+          console.error('[usePasswordPromptNavigation] Navigation failed:', error);
+        }
         setPasswordPromptCallback(null);
         resolve(null);
       }

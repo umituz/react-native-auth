@@ -58,7 +58,9 @@ export const AccountActions: React.FC<AccountActionsProps> = ({ config }) => {
             try {
               await onLogout();
             } catch (error) {
-              console.error('[AccountActions] Logout failed:', error instanceof Error ? error.message : String(error));
+              if (__DEV__) {
+                console.error('[AccountActions] Logout failed:', error instanceof Error ? error.message : String(error));
+              }
             }
           },
         },

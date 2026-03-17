@@ -98,7 +98,16 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
     } catch (err: unknown) {
       setLocalError(handleAuthError(err));
     }
-  }, [fields, signIn, translations, handleAuthError, getErrorMessage, clearFieldErrorsState, setLocalError]);
+  }, [
+    fields.email,
+    fields.password,
+    signIn,
+    translations,
+    handleAuthError,
+    getErrorMessage,
+    clearFieldErrorsState,
+    setLocalError,
+  ]);
 
   const handleContinueAnonymously = useCallback(async () => {
     try {

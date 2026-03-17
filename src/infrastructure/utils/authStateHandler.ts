@@ -49,7 +49,9 @@ export function createAuthStateHandler(
     try {
       await ensureUserDocument(user, extras);
     } catch (error) {
-      console.error('[AuthStateHandler] Failed to ensure user document:', error);
+      if (__DEV__) {
+        console.error('[AuthStateHandler] Failed to ensure user document:', error);
+      }
       // Continue execution - don't let user document creation failure block auth flow
     }
 

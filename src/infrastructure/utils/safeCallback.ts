@@ -34,12 +34,16 @@ export async function safeCallback<T extends unknown[]>(
     // If callback returns a promise, await it and catch rejections
     if (result && typeof result.then === 'function') {
       await result.catch((error) => {
-        console.error(`${errorPrefix} User callback promise rejected:`, error);
+        if (__DEV__) {
+          console.error(`${errorPrefix} User callback promise rejected:`, error);
+        }
       });
     }
   } catch (error) {
     // Catch synchronous errors
-    console.error(`${errorPrefix} User callback error:`, error);
+    if (__DEV__) {
+      console.error(`${errorPrefix} User callback error:`, error);
+    }
   }
 }
 
@@ -70,11 +74,15 @@ export function safeCallbackSync<T extends unknown[]>(
     // If callback returns a promise, catch rejections but don't await
     if (result && typeof result.then === 'function') {
       result.catch((error) => {
-        console.error(`${errorPrefix} User callback promise rejected:`, error);
+        if (__DEV__) {
+          console.error(`${errorPrefix} User callback promise rejected:`, error);
+        }
       });
     }
   } catch (error) {
     // Catch synchronous errors
-    console.error(`${errorPrefix} User callback error:`, error);
+    if (__DEV__) {
+      console.error(`${errorPrefix} User callback error:`, error);
+    }
   }
 }

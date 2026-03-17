@@ -74,7 +74,9 @@ export function AuthProvider({ children, ErrorFallback = DefaultErrorFallback }:
         try {
           unsubscribe();
         } catch (error) {
-          console.error('[AuthProvider] Cleanup failed:', error instanceof Error ? error.message : String(error));
+          if (__DEV__) {
+            console.error('[AuthProvider] Cleanup failed:', error instanceof Error ? error.message : String(error));
+          }
         }
       }
     };

@@ -10,6 +10,8 @@ import { getAuthService } from "../../services/AuthService";
 import { completeInitialization, setUnsubscribe } from "./listenerState.util";
 import { handleAuthStateChange } from "./authListenerStateHandler";
 
+const AUTH_LISTENER_TIMEOUT_MS = 10000;
+
 type StoreActions = AuthActions;
 
 /**
@@ -32,15 +34,17 @@ export function setupAuthListener(
     }
   }
 
-  // Safety timeout: if listener doesn't trigger within 10 seconds, mark as initialized
+  // Safety timeout: if listener doesn't trigger within AUTH_LISTENER_TIMEOUT_MS, mark as initialized
   let hasTriggered = false;
   const timeout = setTimeout(() => {
     if (!hasTriggered) {
-      console.warn("[AuthListener] Auth listener timeout - marking as initialized");
+      if (__DEV__) {
+        console.warn("[AuthListener] Auth listener timeout - marking as initialized");
+      }
       store.setInitialized(true);
       store.setLoading(false);
     }
-  }, 10000);
+  }, AUTH_LISTENER_TIMEOUT_MS);
 
   try {
     const unsubscribe = onIdTokenChanged(auth, (user) => {
@@ -55,7 +59,9 @@ export function setupAuthListener(
   } catch (error) {
     clearTimeout(timeout);
     // If listener setup fails, ensure we clean up and mark as initialized
-    console.error("[AuthListener] Failed to setup auth listener:", error);
+    if (__DEV__) {
+      console.error("[AuthListener] Failed to setup auth listener:", error);
+    }
     completeInitialization();
     store.setLoading(false);
     store.setInitialized(true);

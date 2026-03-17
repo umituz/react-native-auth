@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
@@ -13,10 +13,7 @@ interface PasswordMatchIndicatorProps {
   isMatch: boolean;
 }
 
-export const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
-  translations,
-  isMatch,
-}) => {
+export const PasswordMatchIndicator = memo<PasswordMatchIndicatorProps>(({ translations, isMatch }) => {
   const tokens = useAppDesignTokens();
   const color = isMatch ? tokens.colors.success : tokens.colors.error;
   const text = isMatch ? translations.match : translations.noMatch;
@@ -27,7 +24,9 @@ export const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
       <AtomicText type="labelSmall" style={{ color }}>{text}</AtomicText>
     </View>
   );
-};
+});
+
+PasswordMatchIndicator.displayName = 'PasswordMatchIndicator';
 
 const styles = StyleSheet.create({
   container: {

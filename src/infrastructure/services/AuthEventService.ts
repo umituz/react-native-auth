@@ -101,7 +101,9 @@ class AuthEventService {
         try {
           listener(payload);
         } catch (error) {
-          console.error(`[AuthEventService] Listener error for "${event}":`, error);
+          if (__DEV__) {
+            console.error(`[AuthEventService] Listener error for "${event}":`, error);
+          }
         }
       }
     }

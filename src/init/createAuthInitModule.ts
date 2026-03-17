@@ -92,7 +92,9 @@ export function createAuthInitModule(
               try {
                 await onRestorePurchases();
               } catch (error) {
-                console.error('[AuthInitModule] Purchase restoration failed:', error instanceof Error ? error.message : String(error));
+                if (__DEV__) {
+                  console.error('[AuthInitModule] Purchase restoration failed:', error instanceof Error ? error.message : String(error));
+                }
               }
             }
 
@@ -101,7 +103,9 @@ export function createAuthInitModule(
               try {
                 await onUserConverted(anonymousId, authenticatedId);
               } catch (error) {
-                console.error('[AuthInitModule] onUserConverted callback failed:', error instanceof Error ? error.message : String(error));
+                if (__DEV__) {
+                  console.error('[AuthInitModule] onUserConverted callback failed:', error instanceof Error ? error.message : String(error));
+                }
               }
             }
           },
@@ -109,7 +113,9 @@ export function createAuthInitModule(
 
         return true;
       } catch (error) {
-        console.error('[AuthInitModule] Auth initialization failed:', error instanceof Error ? error.message : String(error));
+        if (__DEV__) {
+          console.error('[AuthInitModule] Auth initialization failed:', error instanceof Error ? error.message : String(error));
+        }
         throw error;
       }
     },

@@ -32,7 +32,7 @@ export { initializeAuth, isAuthInitialized, resetAuthInitialization } from './in
 export type { InitializeAuthOptions } from './infrastructure/services/initializeAuth';
 export { validateEmail, validatePasswordForLogin, validatePasswordForRegister, validatePasswordConfirmation, validateDisplayName } from './infrastructure/utils/AuthValidation';
 export type { ValidationResult, PasswordStrengthResult, PasswordRequirements } from './infrastructure/utils/AuthValidation';
-export type { BaseValidationResult, FormValidationError, FormValidationResult } from './infrastructure/utils/validation/types';
+export type { FormValidationError, FormValidationResult } from './infrastructure/utils/validation/types';
 export { SECURITY_LIMITS, sanitizeEmail, sanitizePassword, sanitizeName } from './infrastructure/utils/validation/sanitization';
 export type { SecurityLimitKey } from './infrastructure/utils/validation/sanitization';
 export { isEmpty, isEmptyEmail, isEmptyPassword, isEmptyName, isNotEmpty, hasContent } from './infrastructure/utils/validation/validationHelpers';
@@ -59,16 +59,10 @@ export {
   getFirstErrorMessage,
   // User Profile Calculator
   calculateUserProfileDisplay,
-  calculateDisplayName,
-  hasUserAvatar,
-  getAvatarUrl,
   // Password Strength Calculator
   calculatePasswordRequirements,
   calculatePasswordsMatch,
-  calculateConfirmationError,
-  calculatePasswordValidity,
   calculatePasswordValidation,
-  hasMinLength,
   calculatePasswordStrength,
 } from './infrastructure/utils/calculators';
 
@@ -89,10 +83,6 @@ export { useUserProfile } from './presentation/hooks/useUserProfile';
 export type { UserProfileData, UseUserProfileParams } from './presentation/hooks/useUserProfile';
 export { useAccountManagement } from './presentation/hooks/useAccountManagement';
 export type { UseAccountManagementReturn, UseAccountManagementOptions } from './presentation/hooks/useAccountManagement';
-export { useProfileEdit } from './presentation/hooks/useProfileEdit';
-export type { ProfileEditFormState, UseProfileEditReturn } from './presentation/hooks/useProfileEdit';
-export { useSocialLogin } from './presentation/hooks/useSocialLogin';
-export type { UseSocialLoginConfig, UseSocialLoginResult } from './presentation/hooks/useSocialLogin';
 export { useAppleAuth } from './presentation/hooks/useAppleAuth';
 export type { UseAppleAuthResult } from './presentation/hooks/useAppleAuth';
 export { useAuthBottomSheet } from './presentation/hooks/useAuthBottomSheet';

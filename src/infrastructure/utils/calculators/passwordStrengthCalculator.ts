@@ -51,31 +51,6 @@ export function calculatePasswordsMatch(
 }
 
 /**
- * Calculate password confirmation error
- */
-export function calculateConfirmationError(
-  password: string,
-  confirmPassword: string
-): string | null {
-  if (!confirmPassword) {
-    return null;
-  }
-
-  const result = validatePasswordConfirmation(password, confirmPassword);
-  return result.error ?? null;
-}
-
-/**
- * Calculate overall password validity
- */
-export function calculatePasswordValidity(
-  requirements: PasswordRequirements,
-  passwordsMatch: boolean
-): boolean {
-  return requirements.hasMinLength && passwordsMatch;
-}
-
-/**
  * Calculate all password validation state at once
  * More efficient than calling individual functions
  */
@@ -91,10 +66,14 @@ export function calculatePasswordValidation(
   const passwordsMatch = calculatePasswordsMatch(password, confirmPassword);
 
   // Calculate confirmation error
-  const confirmationError = calculateConfirmationError(password, confirmPassword);
+  let confirmationError: string | null = null;
+  if (confirmPassword) {
+    const result = validatePasswordConfirmation(password, confirmPassword);
+    confirmationError = result.error ?? null;
+  }
 
   // Calculate overall validity
-  const isValid = calculatePasswordValidity(requirements, passwordsMatch);
+  const isValid = requirements.hasMinLength && passwordsMatch;
 
   return {
     requirements,
@@ -102,13 +81,6 @@ export function calculatePasswordValidation(
     isValid,
     confirmationError,
   };
-}
-
-/**
- * Quick check if password meets minimum length requirement
- */
-export function hasMinLength(password: string, minLength: number): boolean {
-  return password.length >= minLength;
 }
 
 /**

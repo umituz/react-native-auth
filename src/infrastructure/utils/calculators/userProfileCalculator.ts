@@ -46,32 +46,3 @@ export function calculateUserProfileDisplay(
     accountSettingsRoute: accountRoute,
   };
 }
-
-/**
- * Get display name for user
- * Extracts display name calculation for reusability
- */
-export function calculateDisplayName(
-  user: AuthUser,
-  anonymousDisplayName: string = "Anonymous User"
-): string {
-  if (user.isAnonymous) {
-    return anonymousDisplayName;
-  }
-
-  return user.displayName || user.email || anonymousDisplayName;
-}
-
-/**
- * Check if user has avatar
- */
-export function hasUserAvatar(user: AuthUser): boolean {
-  return !!user.photoURL;
-}
-
-/**
- * Get avatar URL if available
- */
-export function getAvatarUrl(user: AuthUser): string | undefined {
-  return user.photoURL || undefined;
-}

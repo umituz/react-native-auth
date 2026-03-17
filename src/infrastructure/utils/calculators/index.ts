@@ -25,18 +25,12 @@ export {
 // User Profile Calculator
 export {
   calculateUserProfileDisplay,
-  calculateDisplayName,
-  hasUserAvatar,
-  getAvatarUrl,
 } from "./userProfileCalculator";
 
 // Password Strength Calculator
 export {
   calculatePasswordRequirements,
   calculatePasswordsMatch,
-  calculateConfirmationError,
-  calculatePasswordValidity,
   calculatePasswordValidation,
-  hasMinLength,
   calculatePasswordStrength,
 } from "./passwordStrengthCalculator";

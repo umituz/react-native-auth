@@ -42,7 +42,9 @@ export function handleAuthStateChange(
     // Call user callback with proper error handling for async callbacks
     safeCallbackSync(onAuthStateChange, [user], '[AuthListener]');
   } catch (error) {
-    console.error("[AuthListener] Error handling auth state change:", error);
+    if (__DEV__) {
+      console.error("[AuthListener] Error handling auth state change:", error);
+    }
     // Ensure we don't leave the app in a bad state
     store.setInitialized(true);
     store.setLoading(false);
