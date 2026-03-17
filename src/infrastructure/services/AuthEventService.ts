@@ -68,11 +68,15 @@ class AuthEventService {
 
     // Return cleanup function
     return () => {
-      const index = eventListeners.indexOf(listener);
+      // Re-fetch eventListeners to ensure we have the current array
+      const currentListeners = this.listeners.get(event);
+      if (!currentListeners) return;
+
+      const index = currentListeners.indexOf(listener);
       if (index > -1) {
-        eventListeners.splice(index, 1);
+        currentListeners.splice(index, 1);
         // Clean up empty arrays to prevent memory leaks
-        if (eventListeners.length === 0) {
+        if (currentListeners.length === 0) {
           this.listeners.delete(event);
         }
       }
