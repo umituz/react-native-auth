@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
 import type { ColorVariant } from "@umituz/react-native-design-system/typography";
-import type { PasswordRequirements } from "../../infrastructure/utils/validation/types";
+import type { PasswordRequirements } from "@shared/validation/types";
 
 export interface PasswordStrengthTranslations {
   minLength: string;

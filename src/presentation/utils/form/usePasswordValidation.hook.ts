@@ -5,9 +5,9 @@
  */
 
 import { useMemo } from "react";
-import type { PasswordRequirements } from "../../../infrastructure/utils/validation/types";
-import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
-import { calculatePasswordValidation } from "../../../infrastructure/utils/calculators/passwordStrengthCalculator";
+import type { PasswordRequirements } from "@shared/validation/types";
+import type { PasswordConfig } from "@domain/value-objects/AuthConfig";
+import { calculatePasswordValidation } from "@infrastructure/utils/calculators/passwordStrengthCalculator";
 
 interface UsePasswordValidationResult {
   passwordRequirements: PasswordRequirements;

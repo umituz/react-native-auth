@@ -14,8 +14,8 @@ export function useSocialAuthHandlers(
   onAppleSignIn?: () => Promise<void>
 ): SocialAuthHandlers {
   // Social Auth Hooks
-  const { signInWithGoogle, googleConfigured } = useGoogleAuth(socialConfig?.google);
-  const { signInWithApple, appleAvailable } = useAppleAuth();
+  const { signInWithGoogle } = useGoogleAuth(socialConfig?.google);
+  const { signInWithApple } = useAppleAuth();
 
   // Social auth loading states
   const [googleLoading, setGoogleLoading] = useState(false);

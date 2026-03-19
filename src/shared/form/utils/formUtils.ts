@@ -16,7 +16,7 @@ export function sanitizeFormValues<T extends Record<string, string>>(
     if (key in sanitized) {
       const sanitizer = sanitizers[key];
       if (sanitizer) {
-        sanitized[key] = sanitizer(sanitized[key]);
+        sanitized[key] = sanitizer(sanitized[key]) as T[Extract<keyof T, string>];
       }
     }
   }

@@ -61,7 +61,9 @@ export const RegisterForm = memo<RegisterFormProps>(({
 
       <AtomicButton
         variant="primary"
-        onPress={() => void handleSignUp()}
+        onPress={() => {
+          handleSignUp().catch(() => {});
+        }}
         disabled={loading || !email.trim() || !password || !confirmPassword}
         fullWidth
         style={styles.signUpButton}

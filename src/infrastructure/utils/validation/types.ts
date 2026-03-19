@@ -1,16 +1,7 @@
 /**
- * Validation Types
- * Shared type definitions for validation results across the application
+ * Form Validation Types
+ * Infrastructure-specific form validation types
  */
-
-/**
- * Single field validation result
- * Used for validating individual fields (email, password, etc.)
- */
-export interface ValidationResult {
-  isValid: boolean;
-  error?: string;
-}
 
 /**
  * Form validation error
@@ -30,20 +21,3 @@ export interface FormValidationResult {
   errors: FormValidationError[];
 }
 
-/**
- * Password requirements
- * Tracks which password requirements are met
- */
-export interface PasswordRequirements {
-  hasMinLength: boolean;
-}
-
-/**
- * Password strength validation result
- * Extends ValidationResult with password-specific requirements
- */
-export interface PasswordStrengthResult {
-  isValid: boolean;
-  error?: string;
-  requirements: PasswordRequirements;
-}

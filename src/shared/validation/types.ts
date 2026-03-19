@@ -16,7 +16,7 @@ export interface PasswordStrengthResult extends ValidationResult {
   requirements?: PasswordRequirements;
 }
 
-export interface ValidationRule<T = any> {
+export interface ValidationRule<T = unknown> {
   validate(value: T): ValidationResult;
 }
 

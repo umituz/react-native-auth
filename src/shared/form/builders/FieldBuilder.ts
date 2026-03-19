@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useRef } from 'react';
-import type { FieldState, FieldChangeHandler, FormFieldConfig } from '../types/FormTypes';
+import type { FieldChangeHandler, FormFieldConfig } from '../types/FormTypes';
 
 export interface UseFieldOptions extends FormFieldConfig {
   initialValue?: string;
@@ -31,7 +31,6 @@ export function useField(
 ): UseFieldResult {
   const {
     initialValue = '',
-    validateOnChange = false,
     clearErrorOnChange = true,
     onValueChange,
     onErrorClear,

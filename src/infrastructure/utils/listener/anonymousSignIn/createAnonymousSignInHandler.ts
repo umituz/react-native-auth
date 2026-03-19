@@ -4,7 +4,6 @@
  */
 
 import type { Auth } from 'firebase/auth';
-import type { User } from 'firebase/auth';
 import type { AnonymousStore } from './types';
 import { attemptAnonymousSignIn } from './attemptAnonymousSignIn';
 import {

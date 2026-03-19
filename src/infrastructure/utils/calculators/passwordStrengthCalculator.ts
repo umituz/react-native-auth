@@ -9,7 +9,7 @@ import {
   validatePasswordConfirmation,
 } from "../AuthValidation";
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
-import type { PasswordRequirements } from "../validation/types";
+import type { PasswordRequirements } from "@shared/validation/types";
 
 interface PasswordValidationInput {
   password: string;
@@ -36,7 +36,7 @@ export function calculatePasswordRequirements(
   }
 
   const result = validatePasswordForRegister(password, config);
-  return result.requirements;
+  return result.requirements ?? { hasMinLength: false };
 }
 
 /**

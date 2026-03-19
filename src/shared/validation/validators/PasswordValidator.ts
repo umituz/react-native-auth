@@ -3,8 +3,8 @@
  * Handles password validation with strength requirements
  */
 
-import type { PasswordStrengthResult, ValidationResult, ValidatorConfig } from '../types';
-import { MinLengthRule, RequiredRule } from '../rules/ValidationRule';
+import type { PasswordStrengthResult, ValidationResult } from '../types';
+import { RequiredRule } from '../rules/ValidationRule';
 import { PasswordSanitizer } from '../sanitizers/PasswordSanitizer';
 
 export interface PasswordConfig {

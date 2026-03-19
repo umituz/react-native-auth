@@ -20,7 +20,7 @@ export class EmailValidator {
 
     this.requiredRule = new RequiredRule('Email');
     this.regexRule = new RegexRule(
-      this.config.emailRegex,
+      this.config.emailRegex!,
       'auth.validation.invalidEmail'
     );
   }

@@ -3,9 +3,9 @@
  * Base class and common validation rules
  */
 
-import type { ValidationResult, ValidatorConfig } from '../types';
+import type { ValidationResult } from '../types';
 
-export abstract class BaseValidationRule<T = any> {
+export abstract class BaseValidationRule<T = unknown> {
   abstract validate(value: T): ValidationResult;
 }
 
@@ -19,7 +19,7 @@ export class RequiredRule extends BaseValidationRule<string | null | undefined> 
 
   validate(value: string | null | undefined): ValidationResult {
     if (!value || value.trim() === '') {
-      return { isValid: false, error: `auth.validation.${thisFieldNameToKey()}.required` };
+      return { isValid: false, error: `auth.validation.${this.thisFieldNameToKey()}.required` };
     }
     return { isValid: true };
   }

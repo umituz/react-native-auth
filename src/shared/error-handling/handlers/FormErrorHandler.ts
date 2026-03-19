@@ -3,14 +3,9 @@
  * Handles form-specific error logic
  */
 
-import type { FieldError, ErrorMap } from '../types/ErrorTypes';
+import type { FieldError, ErrorMap, FormErrorHandlerConfig } from '../types/ErrorTypes';
 import { ErrorHandler } from './ErrorHandler';
 import { FieldErrorMapper } from '../mappers/FieldErrorMapper';
-
-export interface FormErrorHandlerConfig {
-  translations?: ErrorMap;
-  errorMappings?: Partial<typeof DEFAULT_AUTH_ERROR_MAPPINGS>;
-}
 
 export class FormErrorHandler extends ErrorHandler {
   constructor(config: FormErrorHandlerConfig = {}) {

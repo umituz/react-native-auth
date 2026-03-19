@@ -11,6 +11,7 @@ import { FormPasswordInput } from '../form/FormPasswordInput';
 import { PasswordStrengthIndicator } from '../PasswordStrengthIndicator';
 import { PasswordMatchIndicator } from '../PasswordMatchIndicator';
 import type { RegisterFormTranslations } from './types';
+import type { PasswordRequirements } from '@shared/validation/types';
 
 export interface RegisterFormFieldsProps {
   displayName: string;
@@ -19,14 +20,14 @@ export interface RegisterFormFieldsProps {
   confirmPassword: string;
   fieldErrors: Record<string, string | null>;
   loading: boolean;
-  passwordRequirements: any;
+  passwordRequirements: PasswordRequirements;
   passwordsMatch: boolean;
   translations: RegisterFormTranslations;
   onDisplayNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
   onConfirmPasswordChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: () => Promise<void>;
 }
 
 export const RegisterFormFields: React.FC<RegisterFormFieldsProps> = ({

@@ -21,3 +21,8 @@ export interface ErrorMappingConfig {
   errorNameMap?: ErrorMap;
   defaultKey?: string;
 }
+
+export interface FormErrorHandlerConfig {
+  translations?: ErrorMap;
+  errorMappings?: Record<string, string>;
+}

@@ -84,11 +84,11 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
         hideAuthModal();
         onAuthSuccess?.();
 
-        const timeoutId = executeAfterAuth(() => {
+        executeAfterAuth(() => {
           executePendingCallback();
         });
 
-        return () => clearTimeout(timeoutId);
+        return undefined;
       }
       return undefined;
     }

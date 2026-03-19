@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useRef } from 'react';
-import type { FormState, FormConfig, FieldChangeHandler } from '../types/FormTypes';
+import type { FormConfig } from '../types/FormTypes';
 
 export interface UseFormOptions<T extends Record<string, string>> extends FormConfig {
   initialValues: T;
@@ -34,8 +34,6 @@ export function useForm<T extends Record<string, string>>(
 ): UseFormResult<T> {
   const {
     initialValues,
-    validateOnBlur = false,
-    clearErrorsOnSubmit = true,
     onFieldChange,
     onErrorsClear,
   } = options;

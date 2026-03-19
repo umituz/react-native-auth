@@ -3,7 +3,6 @@
  */
 
 import type { GoogleAuthConfig } from '../useGoogleAuth';
-import type { SocialAuthProvider } from '../../domain/value-objects/AuthConfig';
 
 export interface SocialAuthConfiguration {
   google?: GoogleAuthConfig;

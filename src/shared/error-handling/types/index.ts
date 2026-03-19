@@ -7,4 +7,5 @@ export type {
   FormFieldErrors,
   ErrorMap,
   ErrorMappingConfig,
+  FormErrorHandlerConfig,
 } from './ErrorTypes';

@@ -1,10 +1,10 @@
-import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
+import type { PasswordConfig } from "@domain/value-objects/AuthConfig";
 import { isEmptyEmail, isEmptyPassword, isEmptyName } from "./validation/validationHelpers";
 import type {
   ValidationResult,
   PasswordStrengthResult,
   PasswordRequirements,
-} from "./validation/types";
+} from "@shared/validation/types";
 
 // Export validation types
 export type {

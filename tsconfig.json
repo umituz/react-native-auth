@@ -14,7 +14,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-native",
-    "types": ["node"]
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["src/shared/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@domain/*": ["src/domain/*"],
+      "@presentation/*": ["src/presentation/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": [
@@ -23,6 +29,6 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/node_modules/**",
-    "node_modules/expo-file-system/**/*"
+    "src/**/node_modules/**"
   ]
 }

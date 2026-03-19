@@ -5,6 +5,10 @@
 
 import type { ErrorMap, ErrorMappingConfig } from '../types/ErrorTypes';
 
+interface ErrorWithCode extends Error {
+  code?: string;
+}
+
 export class ErrorMapper {
   private config: ErrorMappingConfig;
 
@@ -25,7 +29,7 @@ export class ErrorMapper {
       return this.config.defaultKey!;
     }
 
-    const code = (error as any).code;
+    const code = (error as ErrorWithCode).code;
     const name = error.name;
 
     // First check by error name (most specific)

@@ -19,7 +19,7 @@ export class NameValidator {
 
     this.requiredRule = new RequiredRule('Name');
     this.minLengthRule = new MinLengthRule(
-      this.config.displayNameMinLength,
+      this.config.displayNameMinLength!,
       'auth.validation.nameTooShort'
     );
   }
