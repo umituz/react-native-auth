@@ -54,16 +54,26 @@ export class AnonymousModeService {
   }
 
   async enable(storageProvider: IStorageProvider): Promise<void> {
-    // Save to storage first, then update memory to maintain consistency.
-    // This prevents TOCTOU: memory is never set to true unless storage confirms the write.
-    const saveSuccess = await this.save(storageProvider, true);
+    const previousState = this.isAnonymousMode;
 
-    if (!saveSuccess) {
-      throw new Error('Failed to save anonymous mode state');
+    try {
+      // Save to storage first, then update memory to maintain consistency.
+      // This prevents TOCTOU: memory is never set to true unless storage confirms the write.
+      const saveSuccess = await this.save(storageProvider, true);
+
+      if (!saveSuccess) {
+        // Rollback to previous state on failure
+        this.isAnonymousMode = previousState;
+        throw new Error('Failed to save anonymous mode state');
+      }
+
+      this.isAnonymousMode = true;
+      emitAnonymousModeEnabled();
+    } catch (error) {
+      // Ensure state is rolled back on any error
+      this.isAnonymousMode = previousState;
+      throw error;
     }
-
-    this.isAnonymousMode = true;
-    emitAnonymousModeEnabled();
   }
 
   getIsAnonymousMode(): boolean {

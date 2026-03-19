@@ -123,11 +123,12 @@ export function resetListenerState(): void {
         console.error('[ListenerState] Error during unsubscribe:', error);
       }
     }
+    // Always set to null even if unsubscribe fails to prevent retry loops
+    state.unsubscribe = null;
   }
   state.initialized = false;
   state.refCount = 0;
   state.initializationInProgress = false;
   state.anonymousSignInInProgress = false;
   state.cleanupInProgress = false;
-  state.unsubscribe = null;
 }

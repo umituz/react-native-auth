@@ -59,7 +59,8 @@ export const useAuthHandlers = (appInfo: AuthHandlersAppInfo, translations?: Aut
       if (__DEV__) {
         console.error("[useAuthHandlers] Failed to open app store:", error);
       }
-      Alert.alert(translations?.common || "", translations?.failedToOpenAppStore || "");
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      Alert.alert(translations?.common || "", translations?.failedToOpenAppStore || errorMessage);
     }
   }, [appInfo.appStoreUrl, translations]);
 
@@ -70,9 +71,10 @@ export const useAuthHandlers = (appInfo: AuthHandlersAppInfo, translations?: Aut
       if (__DEV__) {
         console.error("[useAuthHandlers] Sign out failed:", error);
       }
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       AlertService.createErrorAlert(
         translations?.common || "",
-        translations?.unknown || ""
+        translations?.unknown || errorMessage
       );
     }
   }, [signOut, translations]);

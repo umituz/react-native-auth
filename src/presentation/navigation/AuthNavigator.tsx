@@ -38,18 +38,39 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
   >(undefined);
 
   useEffect(() => {
+    let isMounted = true;
+    const abortController = new AbortController();
+
     const checkInitialRoute = async () => {
-      const result = await storageRepository.getString(SHOW_REGISTER_KEY, "false");
-      const value = unwrap(result, "false");
-      if (value === "true") {
-        setInitialRouteName("Register");
-        void storageRepository.removeItem(SHOW_REGISTER_KEY);
-      } else {
-        setInitialRouteName("Login");
+      try {
+        const result = await storageRepository.getString(SHOW_REGISTER_KEY, "false");
+        // Check if component is still mounted before updating state
+        if (!isMounted || abortController.signal.aborted) return;
+
+        const value = unwrap(result, "false");
+        if (value === "true") {
+          setInitialRouteName("Register");
+          void storageRepository.removeItem(SHOW_REGISTER_KEY);
+        } else {
+          setInitialRouteName("Login");
+        }
+      } catch (error) {
+        // Silently fail - will default to Login screen
+        if (__DEV__) {
+          console.error('[AuthNavigator] Failed to check initial route:', error);
+        }
+        if (isMounted && !abortController.signal.aborted) {
+          setInitialRouteName("Login");
+        }
       }
     };
 
     void checkInitialRoute();
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, []);
 
   // Memoize nested translation objects to prevent screen wrapper recreation

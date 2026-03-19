@@ -38,8 +38,8 @@ export class AuthService {
 
     if (this.initialized) return;
 
-    // Create and store initialization promise to prevent concurrent initialization
-    this.initializationPromise = (async () => {
+    // Store reference to current promise to prevent race condition
+    const initPromise = (async () => {
       this.repository = new AuthRepository(this.config);
 
       if (this.storageProvider) {
@@ -48,10 +48,15 @@ export class AuthService {
       this.initialized = true;
     })();
 
+    this.initializationPromise = initPromise;
+
     try {
-      await this.initializationPromise;
+      await initPromise;
     } finally {
-      this.initializationPromise = null;
+      // Only null out if it's still the same promise (prevents race condition)
+      if (this.initializationPromise === initPromise) {
+        this.initializationPromise = null;
+      }
     }
   }
 
