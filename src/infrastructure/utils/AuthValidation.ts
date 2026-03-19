@@ -1,10 +1,19 @@
-import type { PasswordConfig } from "@domain/value-objects/AuthConfig";
+import type { PasswordConfig } from "../../domain/value-objects/AuthConfig";
 import { isEmptyEmail, isEmptyPassword, isEmptyName } from "./validation/validationHelpers";
-import type {
-  ValidationResult,
-  PasswordStrengthResult,
-  PasswordRequirements,
-} from "@shared/validation/types";
+
+// Define validation types locally
+export interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
+export interface PasswordRequirements {
+  hasMinLength: boolean;
+}
+
+export interface PasswordStrengthResult extends ValidationResult {
+  requirements: PasswordRequirements;
+}
 
 // Export validation types
 export type {

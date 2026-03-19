@@ -26,7 +26,24 @@ export class AuthService {
   }
 
   private get repositoryInstance(): AuthRepository {
-    if (!this.initialized) throw new Error("AuthService not initialized");
+    if (!this.initialized) {
+      // Only auto-initialize in development for better DX
+      if (__DEV__) {
+        console.warn('[AuthService] Not initialized - auto-initializing for development. In production, call initialize() explicitly before using auth methods.');
+        this.initialize().catch((error) => {
+          console.error('[AuthService] Auto-initialization failed:', error);
+          throw new Error("AuthService not initialized. Please ensure Firebase Auth is properly configured.");
+        });
+        // Create repository immediately for synchronous operations
+        if (!this.repository) {
+          this.repository = new AuthRepository(this.config);
+          this.initialized = true;
+        }
+      } else {
+        // In production, fail fast with clear error
+        throw new Error("AuthService not initialized. Please call initializeAuth() during app startup.");
+      }
+    }
     return this.repository;
   }
 
@@ -133,7 +150,26 @@ export async function initializeAuthService(
 }
 
 export function getAuthService(): AuthService | null {
-  return (authServiceInstance && authServiceInstance.isInitialized()) ? authServiceInstance : null;
+  if (!authServiceInstance) {
+    if (__DEV__) {
+      console.warn('[AuthService] Auto-creating service instance. Call initializeAuth() explicitly in production.');
+    }
+    authServiceInstance = new AuthService();
+  }
+
+  // Only attempt auto-initialization in development
+  if (!authServiceInstance.isInitialized() && __DEV__) {
+    authServiceInstance.initialize().catch(() => {
+      // Error handled by service
+    });
+  }
+
+  // In production, return null if not initialized to fail fast
+  if (!authServiceInstance.isInitialized()) {
+    return null;
+  }
+
+  return authServiceInstance;
 }
 
 export function resetAuthService(): void {

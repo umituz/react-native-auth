@@ -11,7 +11,7 @@ import { FormPasswordInput } from '../form/FormPasswordInput';
 import { PasswordStrengthIndicator } from '../PasswordStrengthIndicator';
 import { PasswordMatchIndicator } from '../PasswordMatchIndicator';
 import type { RegisterFormTranslations } from './types';
-import type { PasswordRequirements } from '@shared/validation/types';
+import type { PasswordRequirements } from '../../../infrastructure/utils/AuthValidation';
 
 export interface RegisterFormFieldsProps {
   displayName: string;

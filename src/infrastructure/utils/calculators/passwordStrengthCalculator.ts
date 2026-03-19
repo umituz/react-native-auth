@@ -9,7 +9,7 @@ import {
   validatePasswordConfirmation,
 } from "../AuthValidation";
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
-import type { PasswordRequirements } from "@shared/validation/types";
+import type { PasswordRequirements } from "../AuthValidation";
 
 interface PasswordValidationInput {
   password: string;
