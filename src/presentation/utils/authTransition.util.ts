@@ -66,10 +66,12 @@ export function useAuthTransitions(
 
 /**
  * Execute callback with delay after auth
+ * @returns Cleanup function to cancel the timeout
  */
 export function executeAfterAuth(
   callback: () => void,
   delay: number = 100
-): ReturnType<typeof setTimeout> {
-  return setTimeout(callback, delay);
+): () => void {
+  const timeoutId = setTimeout(callback, delay);
+  return () => clearTimeout(timeoutId);
 }

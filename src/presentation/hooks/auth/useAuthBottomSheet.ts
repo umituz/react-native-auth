@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { BottomSheetModalRef } from '@umituz/react-native-design-system/molecules';
 import { useAuthModalStore } from '../../stores/authModalStore';
 import { useAuth } from '../useAuth';
+import { useAppleAuth } from '../useAppleAuth';
+import { useGoogleAuth } from '../useGoogleAuth';
 import { determineEnabledProviders } from '../../utils/socialAuthHandler.util';
 import { useAuthTransitions, executeAfterAuth } from '../../utils/authTransition.util';
 import { useSocialAuthHandlers } from './useSocialAuthHandlers';
@@ -21,6 +23,10 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
   const { isVisible, mode, hideAuthModal, setMode, executePendingCallback, clearPendingCallback } =
     useAuthModalStore();
   const { isAuthenticated, isAnonymous } = useAuth();
+
+  // Social auth availability
+  const { appleAvailable } = useAppleAuth();
+  const { googleConfigured } = useGoogleAuth();
 
   // Social auth handlers
   const { handleGoogleSignIn, handleAppleSignIn, googleLoading, appleLoading } =
@@ -59,11 +65,9 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
         hideAuthModal();
         onAuthSuccess?.();
 
-        const timeoutId = executeAfterAuth(() => {
+        return executeAfterAuth(() => {
           executePendingCallback();
         });
-
-        return () => clearTimeout(timeoutId);
       }
       return undefined;
     }
@@ -106,5 +110,3 @@ export function useAuthBottomSheet(params: UseAuthBottomSheetParams = {}) {
     ]
   );
 }
-
-// TODO: Fix appleAvailable and googleConfigured references

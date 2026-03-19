@@ -13,7 +13,6 @@ export type { PasswordConfig } from '../shared/validation/validators';
 export {
   EmailSanitizer,
   PasswordSanitizer,
-  NameSanitizer,
 } from '../shared/validation/sanitizers';
 export {
   BaseValidationRule,
