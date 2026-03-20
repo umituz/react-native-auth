@@ -112,8 +112,8 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
       cardStyle: { backgroundColor: tokens.colors.backgroundPrimary },
     },
     screens: [
-      { name: "Login", component: LoginScreenWrapper },
-      { name: "Register", component: RegisterScreenWrapper },
+      { name: "Login", component: LoginScreenWrapper as React.ComponentType<any> },
+      { name: "Register", component: RegisterScreenWrapper as React.ComponentType<any> },
     ],
   };
 
