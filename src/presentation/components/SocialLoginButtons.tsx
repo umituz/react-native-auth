@@ -98,7 +98,5 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     gap: 12,
   },
-  socialButton: {
-    minHeight: 48,
-  },
+  socialButton: {},
 });

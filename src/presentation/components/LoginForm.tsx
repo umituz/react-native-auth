@@ -88,7 +88,6 @@ export const LoginForm = memo<LoginFormProps>(({
 
 const styles = StyleSheet.create({
   signInButton: {
-    minHeight: 52,
     marginBottom: 16,
   },
 });

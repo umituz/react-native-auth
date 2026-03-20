@@ -154,7 +154,7 @@ export const RegisterForm = memo<RegisterFormProps>(({
 const styles = StyleSheet.create({
   passwordInput: { marginBottom: 4 },
   confirmPasswordInput: { marginBottom: 4 },
-  signUpButton: { minHeight: 52, marginBottom: 16, marginTop: 8 },
+  signUpButton: { marginBottom: 16, marginTop: 8 },
 });
 
 RegisterForm.displayName = 'RegisterForm';
