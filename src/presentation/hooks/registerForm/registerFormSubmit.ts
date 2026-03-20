@@ -4,7 +4,7 @@
  */
 
 import { useCallback } from "react";
-import { alertService } from "@umituz/react-native-design-system/molecules";
+import { AlertService } from "@umituz/react-native-design-system/molecules";
 import { DEFAULT_PASSWORD_CONFIG } from "../../../domain/value-objects/AuthConfig";
 import {
   validateRegisterForm,
@@ -57,7 +57,7 @@ export function useRegisterFormSubmit(
       await signUp(sanitizedEmail, fields.password, sanitizedName);
 
       if (translations) {
-        alertService.success(translations.successTitle, translations.signUpSuccess);
+        AlertService.success(translations.successTitle, translations.signUpSuccess);
       }
     } catch (err: unknown) {
       setLocalError(handleAuthError(err));

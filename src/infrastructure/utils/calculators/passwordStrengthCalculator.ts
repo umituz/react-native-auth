@@ -11,6 +11,9 @@ import {
 import type { PasswordConfig } from "../../../domain/value-objects/AuthConfig";
 import type { PasswordRequirements } from "../AuthValidation";
 
+// Re-export PasswordRequirements type
+export type { PasswordRequirements };
+
 interface PasswordValidationInput {
   password: string;
   confirmPassword: string;

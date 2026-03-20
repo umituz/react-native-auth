@@ -15,13 +15,6 @@ export interface PasswordStrengthResult extends ValidationResult {
   requirements: PasswordRequirements;
 }
 
-// Export validation types
-export type {
-  ValidationResult,
-  PasswordStrengthResult,
-  PasswordRequirements,
-};
-
 interface ValidationConfig {
   emailRegex: RegExp;
   displayNameMinLength: number;

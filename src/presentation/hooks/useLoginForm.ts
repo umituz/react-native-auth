@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "./useAuth";
 import { validateLoginForm } from "../utils/form/validation/formValidators";
-import { alertService } from "@umituz/react-native-design-system/molecules";
+import { AlertService } from "@umituz/react-native-design-system/molecules";
 import { useFormFields } from "../utils/form/useFormField.hook";
 import { sanitizeEmail } from "../../infrastructure/utils/validation/sanitization";
 import { useAuthErrorHandler } from "./useAuthErrorHandler";
@@ -90,7 +90,7 @@ export function useLoginForm(config?: UseLoginFormConfig): UseLoginFormResult {
       await signIn(sanitizedEmail, fields.password);
 
       if (translations) {
-        alertService.success(
+        AlertService.success(
           translations.successTitle,
           translations.signInSuccess
         );
