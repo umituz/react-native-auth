@@ -166,9 +166,15 @@ export type { UseLocalErrorResult } from './presentation/hooks/useLocalError';
 export { AuthProvider } from './presentation/providers/AuthProvider';
 export type { ErrorFallbackProps } from './presentation/providers/AuthProvider';
 export { LoginScreen } from './presentation/screens/LoginScreen';
-export type { LoginScreenProps } from './presentation/screens/LoginScreen';
+export type {
+  LoginScreenProps,
+  LoginScreenTranslations,
+} from './presentation/screens/LoginScreen';
 export { RegisterScreen } from './presentation/screens/RegisterScreen';
-export type { RegisterScreenProps } from './presentation/screens/RegisterScreen';
+export type {
+  RegisterScreenProps,
+  RegisterScreenTranslations,
+} from './presentation/screens/RegisterScreen';
 export { AccountScreen } from './presentation/screens/AccountScreen';
 export type {
   AccountScreenProps,
@@ -183,12 +189,20 @@ export type {
   PasswordPromptScreenProps,
 } from './presentation/screens/PasswordPromptScreen';
 export { AuthNavigator } from './presentation/navigation/AuthNavigator';
-export type { AuthStackParamList } from './presentation/navigation/AuthNavigator';
+export type {
+  AuthStackParamList,
+  AuthNavigatorProps,
+  AuthNavigatorTranslations,
+} from './presentation/navigation/AuthNavigator';
 export { AuthBottomSheet } from './presentation/components/AuthBottomSheet';
 export type {
   AuthBottomSheetProps,
   AuthBottomSheetTranslations,
 } from './presentation/components/AuthBottomSheet';
+export { SocialLoginButtons } from './presentation/components/SocialLoginButtons';
+export type {
+  SocialLoginButtonsTranslations,
+} from './presentation/components/SocialLoginButtons';
 export { ProfileSection } from './presentation/components/ProfileSection';
 export type {
   ProfileSectionProps,
