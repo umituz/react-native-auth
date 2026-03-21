@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { useResponsive } from "@umituz/react-native-design-system/responsive";
 import { AtomicText, AtomicIcon, AtomicKeyboardAvoidingView } from "@umituz/react-native-design-system/atoms";
 import { BottomSheetModal } from "@umituz/react-native-design-system/molecules";
 import { useAuthBottomSheet, type SocialAuthConfiguration } from "../hooks/useAuthBottomSheet";
@@ -44,6 +45,7 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
   onAuthSuccess,
 }) => {
   const tokens = useAppDesignTokens();
+  const responsive = useResponsive();
 
   const {
     modalRef,
@@ -58,6 +60,23 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
     handleGoogleSignIn,
     handleAppleSignIn,
   } = useAuthBottomSheet({ socialConfig, onGoogleSignIn, onAppleSignIn, onAuthSuccess });
+
+  const scrollContentStyle = useMemo(() => [
+    styles.scrollContent,
+    {
+      paddingHorizontal: responsive.horizontalPadding,
+      paddingBottom: responsive.verticalPadding * 3,
+    },
+  ], [responsive.horizontalPadding, responsive.verticalPadding]);
+
+  const headerStyle = useMemo(() => [
+    styles.header,
+    {
+      marginBottom: responsive.verticalPadding,
+      marginTop: responsive.horizontalPadding,
+      paddingTop: responsive.horizontalPadding,
+    },
+  ], [responsive.verticalPadding, responsive.horizontalPadding]);
 
   return (
     <BottomSheetModal
@@ -80,11 +99,11 @@ export const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         </TouchableOpacity>
 
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={scrollContentStyle}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.header}>
+          <View style={headerStyle}>
             <AtomicText type="headlineLarge" color="textPrimary" style={styles.title}>
               {mode === "login" ? translations.signIn : translations.createAccount}
             </AtomicText>

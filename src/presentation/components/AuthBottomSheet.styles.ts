@@ -11,8 +11,8 @@ export const styles = StyleSheet.create({
         borderRadius: 2,
     },
     scrollContent: {
-        paddingHorizontal: 24,
-        paddingBottom: 80,
+        // paddingHorizontal ve paddingBottom artık component içinden responsive olarak verilecek
+        flexGrow: 1,
     },
     closeButton: {
         position: "absolute",
@@ -23,9 +23,9 @@ export const styles = StyleSheet.create({
     },
     header: {
         alignItems: "center",
-        marginBottom: 24,
-        marginTop: 8,
-        paddingTop: 16,
+        // marginBottom artık component içinden responsive olarak verilecek
+        // marginTop artık component içinden responsive olarak verilecek
+        // paddingTop artık component içinden responsive olarak verilecek
     },
     title: {
         marginBottom: 8,

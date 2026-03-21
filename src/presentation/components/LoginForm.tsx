@@ -1,6 +1,7 @@
-import React, { useRef, memo } from "react";
+import React, { useRef, memo, useMemo } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { AtomicButton } from "@umituz/react-native-design-system/atoms";
+import { useResponsive } from "@umituz/react-native-design-system/responsive";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { AuthErrorDisplay } from "./AuthErrorDisplay";
 import { AuthLink } from "./AuthLink";
@@ -27,6 +28,7 @@ export const LoginForm = memo<LoginFormProps>(({
   onNavigateToRegister,
 }) => {
   const passwordRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const responsive = useResponsive();
   const {
     email,
     password,
@@ -38,6 +40,11 @@ export const LoginForm = memo<LoginFormProps>(({
     handleSignIn,
     displayError,
   } = useLoginForm();
+
+  const signInButtonStyle = useMemo(() => [
+    styles.signInButton,
+    { marginBottom: responsive.verticalPadding },
+  ], [responsive.verticalPadding]);
 
   return (
     <>
@@ -71,7 +78,7 @@ export const LoginForm = memo<LoginFormProps>(({
         onPress={() => { void handleSignIn(); }}
         disabled={loading || !email.trim() || !password}
         fullWidth
-        style={styles.signInButton}
+        style={signInButtonStyle}
       >
         {translations.signIn}
       </AtomicButton>
@@ -87,9 +94,7 @@ export const LoginForm = memo<LoginFormProps>(({
 });
 
 const styles = StyleSheet.create({
-  signInButton: {
-    marginBottom: 16,
-  },
+  signInButton: {},
 });
 
 LoginForm.displayName = 'LoginForm';

@@ -9,6 +9,7 @@ import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { AtomicCard } from "@umituz/react-native-design-system/atoms";
 import { useAppNavigation } from "@umituz/react-native-design-system/molecules";
 import { ScreenLayout } from "@umituz/react-native-design-system/layouts";
+import { useResponsive } from "@umituz/react-native-design-system/responsive";
 import { AuthHeader } from "../components/AuthHeader";
 import { LoginForm, type LoginFormTranslations } from "../components/LoginForm";
 
@@ -25,6 +26,7 @@ export interface LoginScreenProps {
 export const LoginScreen = memo<LoginScreenProps>(({ translations }) => {
   const navigation = useAppNavigation();
   const tokens = useAppDesignTokens();
+  const responsive = useResponsive();
 
   // PERFORMANCE: Stable callback reference
   const handleNavigateToRegister = useCallback(() => {
@@ -35,7 +37,7 @@ export const LoginScreen = memo<LoginScreenProps>(({ translations }) => {
     <ScreenLayout
       scrollable
       keyboardAvoiding
-      maxWidth={440}
+      maxWidth={responsive.maxContentWidth}
       contentContainerStyle={{ justifyContent: "center" }}
       backgroundColor={tokens.colors.backgroundPrimary}
     >

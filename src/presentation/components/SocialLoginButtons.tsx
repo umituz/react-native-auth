@@ -7,6 +7,7 @@
 import React, { useMemo, memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { useResponsive } from "@umituz/react-native-design-system/responsive";
 import { AtomicText, AtomicButton } from "@umituz/react-native-design-system/atoms";
 import type { SocialAuthProvider } from "../../domain/value-objects/AuthConfig";
 
@@ -27,6 +28,7 @@ interface SocialLoginButtonsProps {
 
 export const SocialLoginButtons = memo<SocialLoginButtonsProps>(({ translations, enabledProviders, onGooglePress, onApplePress, googleLoading = false, appleLoading = false }) => {
   const tokens = useAppDesignTokens();
+  const responsive = useResponsive();
 
   // PERFORMANCE: Memoize provider checks to prevent recalculation on every render
   const { hasGoogle, hasApple } = useMemo(() => ({
@@ -34,12 +36,17 @@ export const SocialLoginButtons = memo<SocialLoginButtonsProps>(({ translations,
     hasApple: enabledProviders.includes("apple"),
   }), [enabledProviders]);
 
+  const containerStyle = useMemo(() => [
+    styles.container,
+    { marginTop: responsive.verticalPadding },
+  ], [responsive.verticalPadding]);
+
   if (!hasGoogle && !hasApple) {
     return null;
   }
 
   return (
-    <View style={[styles.container, { marginTop: tokens.spacing.lg }]}>
+    <View style={containerStyle}>
       <View style={styles.dividerContainer}>
         <View style={[styles.divider, { backgroundColor: tokens.colors.border }]} />
         <AtomicText type="bodySmall" color="textSecondary" style={styles.dividerText}>

@@ -7,6 +7,7 @@
 import React, { memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { useResponsive } from "@umituz/react-native-design-system/responsive";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
 
 interface AuthHeaderProps {
@@ -16,9 +17,10 @@ interface AuthHeaderProps {
 
 export const AuthHeader = memo<AuthHeaderProps>(({ title, subtitle }) => {
   const tokens = useAppDesignTokens();
+  const responsive = useResponsive();
 
   return (
-    <View style={[styles.header, { marginBottom: tokens.spacing.xl, paddingHorizontal: tokens.spacing.md }]}>
+    <View style={[styles.header, { marginBottom: tokens.spacing.xl, paddingHorizontal: responsive.horizontalPadding }]}>
       <AtomicText
         type="headlineLarge"
         color="textPrimary"
